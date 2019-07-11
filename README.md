@@ -13,6 +13,7 @@ python3
  # cd /usr/bin;ln -s python3.5m python3
 ```
 
+tensorflowlite(import tensorflow.lite) is includes in since version 1.14.  
 tensorflow and opencv  
 ```
  # python3 -m pip install tensorflow-gpu  
