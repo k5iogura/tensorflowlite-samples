@@ -39,7 +39,7 @@ Goto [Object Detection](https://www.tensorflow.org/lite/models/object_detection/
 ## Run inference  
 
 ```
- $ python3 sample.py
+ $ python3 dog_detect.py
  $
    INFO: Initialized TensorFlow Lite runtime.
    7.386FPS
