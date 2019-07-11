@@ -35,7 +35,7 @@ Goto [Object Detection](https://www.tensorflow.org/lite/models/object_detection/
    coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip detect.tflite labelmap.txt
 ```
 - detect.tflite : includes weights and network  
-- labelmap.txt  : includes detectable object labels  
+- labelmap.txt  : includes detectable object labels(But top 1 line ??? may be unnessesary)  
 
 ## Run inference  
 
