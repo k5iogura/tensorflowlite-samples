@@ -13,6 +13,7 @@ python3
  # cd /usr/bin;ln -s python3.5m python3
 ```
 
+tensorflowlite(import tensorflow.lite) is includes in since version 1.14.  
 tensorflow and opencv  
 ```
  # python3 -m pip install tensorflow-gpu  
@@ -43,6 +44,7 @@ Goto [Object Detection](https://www.tensorflow.org/lite/models/object_detection/
  $
    INFO: Initialized TensorFlow Lite runtime.
    7.386FPS
+ $ eog result.jpg
 ```
 
 Shows result of Interpreter.get_tensor(index).  
