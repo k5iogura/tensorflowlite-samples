@@ -43,6 +43,7 @@ Goto [Object Detection](https://www.tensorflow.org/lite/models/object_detection/
  $
    INFO: Initialized TensorFlow Lite runtime.
    7.386FPS
+ $ eog result.jpg
 ```
 
 Shows result of Interpreter.get_tensor(index).  
