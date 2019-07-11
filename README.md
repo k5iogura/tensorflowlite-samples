@@ -61,4 +61,7 @@ Shows result of Interpreter.get_tensor(index).
 **Scores    = Interpreter.get_tensor(index+2)**  
 **Number and detections = Interpreter.get_tensor(index+3)**  
 
+![](./dog_result.jpg)  
+
+**July.07,2019**  
 
