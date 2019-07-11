@@ -36,7 +36,7 @@ print("location:",boxes)
 print("classes :",classes)
 print("score   :",scores)
 print("num dets:",Ndets)
-print("%.3fFPS"%(10./(time()-start)))
+print("%.3fFPS"%(1./(time()-start)))
 for i in range(int(Ndets[0])):
     score       = scores[0][i]
     if score < 0.6: continue
