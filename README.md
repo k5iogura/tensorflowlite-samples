@@ -45,10 +45,21 @@ Goto [Object Detection](https://www.tensorflow.org/lite/models/object_detection/
    7.386FPS
 ```
 
-|index    |Name                  |Description   |
-|-        |-                     |-             |
-|0        |Locations             |Multidimensional array of [10][4] floating point values between 0 and 1, the inner arrays representing bounding boxes in the form [top, left, bottom, right] |
-|1        |Classes               |Array of 10 integers (output as floating point values) each indicating the index of a class label from the labels file |
-|2        |Scores                |Array of 10 floating point values between 0 and 1 representing probability that a class was detected |
-|3        |Number and detections |Array of length 1 containing a floating point value expressing the total number of detection results |
+Shows result of Interpreter.get_tensor(index).  
+index : Interpreter.get_output_details()[0]['index']  
+
+|index     |Name                  |Description   |
+|-         |-                     |-             |
+|+0        |Locations             |Multidimensional array of [10][4] floating point values between 0 and 1, the inner arrays representing bounding boxes in the form [top, left, bottom, right] |
+|+1        |Classes               |Array of 10 integers (output as floating point values) each indicating the index of a class label from the labels file |
+|+2        |Scores                |Array of 10 floating point values between 0 and 1 representing probability that a class was detected |
+|+3        |Number and detections |Array of length 1 containing a floating point value expressing the total number of detection results |
+
+**
+Locations = Interpreter.get_tensor(index+0)  
+Classes   = Interpreter.get_tensor(index+1)  
+Scores    = Interpreter.get_tensor(index+2)  
+Number and detections = Interpreter.get_tensor(index+3)  
+**
+
 
