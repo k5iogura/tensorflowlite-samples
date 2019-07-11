@@ -1,3 +1,4 @@
+import os, sys
 import numpy as np
 import cv2
 import tensorflow as tf
@@ -8,6 +9,12 @@ org_h, org_w = org.shape[:2]
 img = cv2.resize(org, (300,300))
 img = img[np.newaxis,:,:,:]
 print("input image size:",org.shape)
+
+with open('labelmap.txt') as f: LABELS = f.readlines()
+LABELS = [ l.strip() for l in LABELS ]
+LABELS = LABELS[1:]
+for j,l in enumerate(LABELS):print(j,":",l)
+print("Classes:",len(LABELS))
 
 ip = tf.lite.Interpreter(model_path="./detect.tflite")
 ip.allocate_tensors()
@@ -38,6 +45,8 @@ for i in range(int(Ndets[0])):
     rb = (int(right*org_w), int(bottom*org_h))
     class_id    = int(classes[0][i])
     print("%.3f(%.3f %.3f %.3f %.3f) %d"%(score,tl[0],tl[1],rb[0],rb[1],class_id))
-    res = cv2.rectangle(org,tl,rb,(255,255,255),3)
+    label_txt = "%d-%s"%(class_id,LABELS[class_id])
+    res = cv2.rectangle(org,tl,rb,(255,255,255),1)
+    res = cv2.putText(res,label_txt,tl,cv2.FONT_HERSHEY_SIMPLEX,1.0,(255,255,255),2)
     cv2.imwrite("result.jpg",res)
 
