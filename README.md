@@ -14,6 +14,8 @@ python3
 ```
 
 tensorflowlite(import tensorflow.lite) is includes in since version 1.14.  
+tensorflow greater than version 1.6 requires AVX instruction, so not supported Celeron CPU.  
+tensorflowlite is included in tensorflow version greater than 1.13.  
 tensorflow and opencv  
 ```
  # python3 -m pip install tensorflow-gpu  
