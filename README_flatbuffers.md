@@ -28,7 +28,7 @@ About json of detect.tflite flatbuffers with scheme_v3.fbs.
 ```
 [
   operator_codes:[
-  { builtin_code: "CONV_2D" },   <== operator_code_index
+  { builtin_code: "CONV_2D" },   <== operator_code_index 0
   ...
   { builtin_code: "CUSTOM",
     custom_code : "TFLite_Detection_PostProcess" }
@@ -64,7 +64,7 @@ About json of detect.tflite flatbuffers with scheme_v3.fbs.
     }
   ],
   buffers:[  
-    data:[204, ... ,255],    <== buffers_index 1   
+    data:[204, ... ,255],    <== buffers_index 0   
     ...
     data:[153, ... ,237]
   ]
