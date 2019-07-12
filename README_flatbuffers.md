@@ -24,5 +24,51 @@ Convert tflite to json using tflite schema spec file(schema_v3.fbs).
    detect.json
 ```
 
+About json of detect.tflite flatbuffers with scheme_v3.fbs.  
+```
+operator_codes:[
+  builtin_code: "CONV_2D"
+  ...
+  builtin_code: "CUSTOM", custom_code : "TFLite_Detection_PostProcess"
+]  
+subgraphs:[  
+{ tensors:[               <== tensors_index 0
+    shape:[1,19,19,12],      
+    type:  "UINT8",          
+    buffer: 93,  <== buffers_index(points buffers area)  
+    name:  "BoxPredictor_0/BoxEncodingPredictor/BiasAdd",
+    quantization:[
+      min:[-15.094324],max:[5.057784],scale[0.079028],zero_point:[191]
+    ]     
+  ],      
+  ...     
+  tensor:[
+  inputs: [tensors_index,],    
+  outputs:[tensors_index,],    
+  operators:[
+  {
+    inputs: [tensors_index,],
+    outputs:[tensors_index,],
+    builtin_options_type: "Conv2DOptions",
+    builtin_options:{stride_w: 2, stride_h: 2},
+  ]},
+  ...
+  {
+    opcode_index: 5 <== operator_code_index
+    inputs: [tensors_index,],
+    outputs:[tensors_index,],
+    custom_options:[
+    [121, ... ,1]
+    ]
+  ]}
+}
+]
+buffers:[  
+  data:[204, ... ,255],    <== buffers_index 1   
+  ...
+  data:[153, ... ,237]
+]
+```
+
 **July.12,2019**  
 
