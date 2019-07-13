@@ -19,7 +19,7 @@ Install flatc command from [google flatbuffers github](https://github.com/google
 Convert tflite to json using tflite schema spec file(schema_v3.fbs).  
 ```
  $ wget https://raw.githubusercontent.com/tensorflow/tensorflow/master/tensorflow/lite/schema/schema_v3.fbs
- $ flatc -t schema_v3.fbs -- ./detect.tflite 
+ $ flatc --strict-json -t schema_v3.fbs -- ./detect.tflite 
  $ ls *.json
    detect.json
 ```
