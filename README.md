@@ -6,6 +6,8 @@ python-pip python3pip
 pip setuptools  
 apt pyhon-dev python3-dev  
 apt libhdf5-dev  
+ln -s /usr/include/hdf5/serial/\*.h /usr/include/  
+ln -s /usr/lib/aarch  
 apt wheel
 python setup.py dbist_wheel
 
