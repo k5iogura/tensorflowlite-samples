@@ -1,6 +1,13 @@
 # tensorflowlite-samples
 
 ## [To json from tflite with flatbuffers](./README_flatbuffers.md)  
+## On rock64 requesries
+python-pip python3pip  
+pip setuptools  
+apt pyhon-dev python3-dev  
+apt libhdf5-dev  
+apt wheel
+python setup.py dbist_wheel
 
 Reference  
 [初心者に優しくないTensorflow Lite の公式サンプル](https://qiita.com/yohachi/items/434f0da356161e82c242)  
