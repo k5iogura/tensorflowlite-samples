@@ -1,31 +1,49 @@
 import json
 import os, sys
 
-target=['/buffers/data','/operator_codes','/subgraphs/inputs', '/subgraphs/outputs']
-result=[[] for i in range(len(target))]
+def findlist(json_obj,target):
+    result=[[] for i in range(len(target))]
 
-def findlist(node_name, path, node, targets):
-    ty_node = type(node)
-    #print(path,node_name,ty_node)
-    if ty_node is dict: # Has child
-        for k in node.keys():
-            findlist(k, path+'/'+k, node[k], targets)
-    elif ty_node is list:
-        if path in targets:
-#            print(path,node)
-            rindx = targets.index(path)
-            result[rindx].append(node)
-        else:
-            for n in node:
-                findlist(node_name, path, n, targets)
+    def json_walk(node_name, path, node, targets):
+        ty_node = type(node)
+        #print(path,node_name,ty_node)
+        if ty_node is dict: # Has child
+            for k in node.keys():
+                json_walk(k, path+'/'+k, node[k], targets)
+        elif ty_node is list:
+            if path in targets:
+                rindx = targets.index(path)
+                result[rindx].append(node)
+            else:
+                for n in node:
+                    json_walk(node_name, path, n, targets)
 
-with open('detect.json') as r:
-    j = json.load(r)
-    findlist('','',j,target)
-    for i,r in enumerate(result):
-        if len(r)>100:
-            for j in r:
-                print(target[i],len(j))
-        else:
-            print(target[i],r)
+    json_walk('','',json_obj,target)
+    return result
+
+def walk_tensor(json_obj,start_idx,generators):
+    for j in json_obj:
+        for o_idx in j['outputs']:
+            generators[o_idx] = j['inputs']
+
+if __name__=='__main__':
+    with open('detect.json') as r:
+        target=['/buffers/data','/operator_codes','/subgraphs/inputs', '/subgraphs/outputs']
+        j = json.load(r)
+        inputs    = findlist(j,['/subgraphs/inputs'])
+        outputs   = findlist(j,['/subgraphs/outputs'])
+        tensors   = findlist(j,['/subgraphs/tensors'])
+        operators = findlist(j,['/subgraphs/operators'])
+        buffers   = findlist(j,['/buffers'])
+        print("inputs:",inputs)
+        print("outputs:",outputs)
+        print("tensors   N:",len(tensors[0][0]))
+        print("buffers   N:",len(buffers[0][0]))
+        print("operators N:",len(operators[0][0]))
+
+        generators = [[-1] for i in range(len(tensors[0][0]))]
+
+        walk_tensor(operators[0][0], inputs[0][0][0], generators)
+        for i in range(len(generators)):
+            print(i,generators[i])
 
