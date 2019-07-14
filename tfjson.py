@@ -1,18 +1,20 @@
 import json
 import os, sys
 
-def nodep(node_name, node):
-    ty = type(node)
-    if ty is dict: # Has child
+target=['/subgraphs/tensors/quantization/min','/operator_codes','/subgraphs/inputs', '/subgraphs/outputs']
+def findlist(node_name, path, node, targets):
+    ty_node = type(node)
+    #print(path,node_name,ty_node)
+    if ty_node is dict: # Has child
         for k in node.keys():
-            nodep(k, node[k])
-    elif ty is list:
-        if node_name == 'data':
-            print(len(node))
+            findlist(k, path+'/'+k, node[k], targets)
+    elif ty_node is list:
+        if path in targets:
+            print(path,node)
         else:
             for n in node:
-                nodep(node_name, n)
+                findlist(node_name, path, n, targets)
 
 with open('detect.json') as r:
     j = json.load(r)
-    nodep('/',j)
+    findlist('','',j,target)
