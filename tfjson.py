@@ -1,5 +1,6 @@
 import json
 import os, sys
+import numpy as np
 
 def findlist(json_obj,target):
     result=[[] for i in range(len(target))]
@@ -35,15 +36,32 @@ if __name__=='__main__':
         tensors   = findlist(j,['/subgraphs/tensors'])
         operators = findlist(j,['/subgraphs/operators'])
         buffers   = findlist(j,['/buffers'])
-        print("inputs:",inputs)
-        print("outputs:",outputs)
+        print("inputs:",inputs[0][0])
+        print("outputs:",outputs[0][0])
         print("tensors   N:",len(tensors[0][0]))
         print("buffers   N:",len(buffers[0][0]))
         print("operators N:",len(operators[0][0]))
 
-        generators = [[-1] for i in range(len(tensors[0][0]))]
+        for idx, start_operator in enumerate(operators[0][0]):
+            start_tensors = start_operator.get('inputs')
+            if inputs[0][0][0] in start_tensors:
+                break
 
-        walk_tensor(operators[0][0], inputs[0][0][0], generators)
-        for i in range(len(generators)):
-            print(i,generators[i])
+        for t_idx in start_tensors:
+            print(t_idx)
+            tensor = tensors[0][0][t_idx]
+            bufidx = tensor.get('buffer')
+            bufshp = tensor.get('shape')
+            print('tensor',tensor, bufidx, bufshp, np.prod(bufshp))
+            bufdata= buffers[0][0][bufidx]
+            if bufdata=={}:
+                bN = 0
+            else:
+                bN = len(bufdata.get('data'))
+            print('buffer',bufidx,bufdata,bN)
+
+        #list_generators = [[-1] for i in range(len(tensors[0][0]))]
+        #walk_tensor(operators[0][0], inputs[0][0][0], generators)
+        #for i in range(len(generators)):
+            #print(i,generators[i])
 
