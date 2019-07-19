@@ -1,6 +1,8 @@
 # tensorflowlite-samples
 
 ## [To json from tflite with flatbuffers](./README_flatbuffers.md)  
+## [Standalone tensorflow-lite.a](CNN_NumberDetector/05_TensorflowLite_CPP/README.md)  
+
 ## On rock64 requesries
 python-pip python3pip  
 pip setuptools  
