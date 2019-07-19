@@ -1,6 +1,7 @@
 # Using tensorflow-lite.a builds a.out(mnist by tensorflowlite)
 
-On Ubuntu16.04 Intel CPU with AVX support.  
+**Prerequiesties**  
+Ubuntu16.04 Intel CPU with AVX support.  
 ```
 $ lscpu
 Architecture:          x86_64
