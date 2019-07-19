@@ -46,6 +46,7 @@ Clone tensorflow.git.
 
 Makes a.out with tensorflow-lite.a.  
 ```
+ # apt install -y libopencv-dev
  $ cd
  $ git clone https://github.com/k5iogura/tensorflowlite-samples
  $ cd tensorflowlite-samples/CNN_NumberDetector/05_TensorflowLite_CPP/
