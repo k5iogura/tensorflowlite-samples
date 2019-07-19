@@ -6,11 +6,12 @@
 **notice:**  
 Support of AVX CPU Instruction is unnessesary for this repo. because tensorflow-lite.a is compiled from ground.  
 
-### Clone tensorflow.git.  
+### Clone tensorflow.git and build libtensorflow-lite.a.  
 ```
  $ cd
  $ git clone tensorflow/tensorflow
  $ cd tensorflow
+ $ ./tensorflow/lite/tools/make/download_dependencies.sh
  $ ./tensorflow/lite/tools/make/build_lib.sh
  $ ls ./tensorflow/lite/tools/make/gen/linux_x86_64/lib/
    benchmark-lib.a  libtensorflow-lite.a
