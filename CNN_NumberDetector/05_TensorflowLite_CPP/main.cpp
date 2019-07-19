@@ -17,7 +17,7 @@
 int main()
 {
 	/* read input image data */
-	cv::Mat image = cv::imread("./resource/9.jpg");
+	cv::Mat image = cv::imread("./resource/4.jpg");
 	cv::imshow("InputImage", image);
 	
 	/* convert to 28 x 28 grayscale image (normalized: 0 ~ 1.0) */
