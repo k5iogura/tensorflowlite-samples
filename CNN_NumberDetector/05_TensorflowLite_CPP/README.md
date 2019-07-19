@@ -1,6 +1,6 @@
 # Using tensorflow-lite.a builds a.out
 
-On Ubuntu16.04 Intel CPU with AVX.  
+On Ubuntu16.04 Intel CPU with AVX support.  
 ```
 $ lscpu
 Architecture:          x86_64
@@ -155,7 +155,8 @@ prob of 7: 0.006
 prob of 8: 0.001
 prob of 9: 0.003
 ```
-![](resource/4.jpg)  
+![](resource/4.jpg) input  
+![](4.png)  
 
 **July.19,2019**
 
