@@ -1,4 +1,4 @@
-# Using tensorflow-lite.a builds a.out
+# Using tensorflow-lite.a builds a.out(mnist by tensorflowlite)
 
 On Ubuntu16.04 Intel CPU with AVX support.  
 ```
