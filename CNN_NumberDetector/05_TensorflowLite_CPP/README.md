@@ -1,40 +1,12 @@
 # Using tensorflow-lite.a builds a.out(mnist by tensorflowlite)
 
 **Prerequiesties**  
-Ubuntu16.04 Intel CPU with AVX support.  
-```
-$ lscpu
-Architecture:          x86_64
-CPU op-mode(s):        32-bit, 64-bit
-Byte Order:            Little Endian
-CPU(s):                1
-On-line CPU(s) list:   0
-Thread(s) per core:    1
-Core(s) per socket:    1
-Socket(s):             1
-NUMA node(s):          1
-Vendor ID:             GenuineIntel
-CPU family:            6
-Model:                 94
-Model name:            Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz
-Stepping:              3
-CPU MHz:               3192.000
-BogoMIPS:              6384.00
-Hypervisor vendor:     KVM
-Virtualization type:   full
-L1d cache:             32K
-L1i cache:             32K
-L2 cache:              256K
-L3 cache:              6144K
-NUMA node0 CPU(s):     0
-Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 
-clflush mmx fxsr sse sse2 ht syscall nx rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc 
-cpuid tsc_known_freq pni pclmulqdq monitor ssse3 cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes 
-xsave avx rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single pti fsgsbase avx2 invpcid 
-rdseed clflushopt
-```
+- Ubuntu16.04 Intel CPU  
 
-Clone tensorflow.git.  
+**notice:**  
+Support of AVX CPU Instruction is unnessesary for this repo. because tensorflow-lite.a is compiled from ground.  
+
+### Clone tensorflow.git.  
 ```
  $ cd
  $ git clone tensorflow/tensorflow
@@ -44,7 +16,48 @@ Clone tensorflow.git.
    benchmark-lib.a  libtensorflow-lite.a
 ```
 
-Makes a.out with tensorflow-lite.a.  
+### Install flatbuffers  
+```
+ $ git clone https://github.com/google/flatbuffers
+ $ mkdir flatbuffers/build; cd flatbuffers/build
+ $ cmake ..
+ $ make
+ # make install
+ [ 37%] Built target flatc
+[ 56%] Built target flattests
+[ 65%] Built target flatbuffers
+[ 70%] Built target flatsamplebinary
+[ 84%] Built target flatsamplebfbs
+[ 87%] Built target flathash
+[100%] Built target flatsampletext
+Install the project...
+-- Install configuration: ""
+-- Installing: /usr/local/include/flatbuffers
+-- Installing: /usr/local/include/flatbuffers/flatc.h
+-- Installing: /usr/local/include/flatbuffers/util.h
+-- Installing: /usr/local/include/flatbuffers/reflection.h
+-- Installing: /usr/local/include/flatbuffers/idl.h
+-- Installing: /usr/local/include/flatbuffers/code_generators.h
+-- Installing: /usr/local/include/flatbuffers/flatbuffers.h
+-- Installing: /usr/local/include/flatbuffers/minireflect.h
+-- Installing: /usr/local/include/flatbuffers/flexbuffers.h
+-- Installing: /usr/local/include/flatbuffers/reflection_generated.h
+-- Installing: /usr/local/include/flatbuffers/base.h
+-- Installing: /usr/local/include/flatbuffers/stl_emulation.h
+-- Installing: /usr/local/include/flatbuffers/registry.h
+-- Installing: /usr/local/include/flatbuffers/hash.h
+-- Installing: /usr/local/include/flatbuffers/grpc.h
+-- Installing: /usr/local/lib/cmake/flatbuffers/FlatbuffersConfig.cmake
+-- Installing: /usr/local/lib/cmake/flatbuffers/FlatbuffersConfigVersion.cmake
+-- Installing: /usr/local/lib/libflatbuffers.a
+-- Installing: /usr/local/lib/cmake/flatbuffers/FlatbuffersTargets.cmake
+-- Installing: /usr/local/lib/cmake/flatbuffers/FlatbuffersTargets-noconfig.cmake
+-- Installing: /usr/local/bin/flatc
+-- Installing: /usr/local/lib/cmake/flatbuffers/FlatcTargets.cmake
+-- Installing: /usr/local/lib/cmake/flatbuffers/FlatcTargets-noconfig.cmake
+```
+
+### Makes a.out with tensorflow-lite.a.  
 ```
  # apt install -y libopencv-dev
  $ cd
@@ -69,7 +82,7 @@ Makes a.out with tensorflow-lite.a.
    for GNU/Linux 2.6.32, BuildID[sha1]=67e1936131c250d06045da1ed67b95f6c87c8ad5, not strippe
 ```
 
-Run a.out for resource/4.png.  
+### Run a.out for resource/4.png.  
 ```
 INFO: Initialized TensorFlow Lite runtime.
 === Pre-invoke Interpreter State ===
