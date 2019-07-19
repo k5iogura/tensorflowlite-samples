@@ -155,4 +155,7 @@ prob of 7: 0.006
 prob of 8: 0.001
 prob of 9: 0.003
 ```
+![](resource/4.jpg)  
+
+**July.19,2019**
 
