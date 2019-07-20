@@ -3,7 +3,10 @@ TENSORFLOW="../../tensorflow"
 if [ ! -d tensorflow ];then
     if [ ! -d ../../tensorflow/tensorflow ];then
         echo submodule update
-        pushd ../../tensorflow;git submodule update
+        pushd ../../tensorflow
+        git submodule update
+        ./tensorflow/lite/tools/make/download_dependencies.sh
+        ./tensorflow/lite/tools/make/build_lib.sh
         popd
     fi
     if [ -d ../../tensorflow/tensorflow ];then
