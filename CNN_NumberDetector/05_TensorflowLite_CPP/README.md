@@ -8,6 +8,8 @@
 Support of AVX CPU Instruction is unnessesary for this repo. because tensorflow-lite.a is compiled from ground.  
 
 ### Clone tensorflow.git and build libtensorflow-lite.a.  
+git repo. master at July.20,2019  
+
 ```
  $ cd
  $ git clone tensorflow/tensorflow
