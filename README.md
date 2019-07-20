@@ -17,7 +17,7 @@ Reference
 [初心者に優しくないTensorflow Lite の公式サンプル](https://qiita.com/yohachi/items/434f0da356161e82c242)  
 [Object Detection](https://www.tensorflow.org/lite/models/object_detection/overview)  
 
-## tensorflowlite  
+## tensorflowlite within tensorflow(full version)  
 On CentOS7.5 install python3, tensorflow-gpu and opencv.  
 python3  
 ```
