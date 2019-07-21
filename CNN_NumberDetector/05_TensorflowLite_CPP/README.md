@@ -2,7 +2,7 @@
 
 **Prerequiesties**  
 - Ubuntu16.04 Intel CPU  
-  pkg-config  
+  pkg-config( for opencv )  
   
 **notice:**  
 Support of AVX CPU Instruction is unnessesary for this repo. because tensorflow-lite.a is compiled from ground.  
