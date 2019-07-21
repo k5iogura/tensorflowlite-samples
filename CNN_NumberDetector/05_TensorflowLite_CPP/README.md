@@ -2,7 +2,7 @@
 
 **Prerequiesties**  
 - Ubuntu16.04 Intel CPU  
-  pkg-config  
+  pkg-config( for opencv )  
   
 **notice:**  
 Support of AVX CPU Instruction is unnessesary for this repo. because tensorflow-lite.a is compiled from ground.  
@@ -12,7 +12,10 @@ git repo. master at July.20,2019
 
 ```
  $ cd
- $ git clone tensorflow/tensorflow
+ $ git clone https://github.com/k5iogura/tensorflowlite-samples
+ $ cd tensorflowlite-samples
+ $ git submodule init
+ $ git submodule update
  $ cd tensorflow
  $ ./tensorflow/lite/tools/make/download_dependencies.sh
  $ ./tensorflow/lite/tools/make/build_lib.sh
@@ -20,54 +23,12 @@ git repo. master at July.20,2019
    benchmark-lib.a  libtensorflow-lite.a
 ```
 
-### Install flatbuffers  
-```
- $ git clone https://github.com/google/flatbuffers
- $ mkdir flatbuffers/build; cd flatbuffers/build
- $ cmake ..
- $ make
- # make install
- [ 37%] Built target flatc
-[ 56%] Built target flattests
-[ 65%] Built target flatbuffers
-[ 70%] Built target flatsamplebinary
-[ 84%] Built target flatsamplebfbs
-[ 87%] Built target flathash
-[100%] Built target flatsampletext
-Install the project...
--- Install configuration: ""
--- Installing: /usr/local/include/flatbuffers
--- Installing: /usr/local/include/flatbuffers/flatc.h
--- Installing: /usr/local/include/flatbuffers/util.h
--- Installing: /usr/local/include/flatbuffers/reflection.h
--- Installing: /usr/local/include/flatbuffers/idl.h
--- Installing: /usr/local/include/flatbuffers/code_generators.h
--- Installing: /usr/local/include/flatbuffers/flatbuffers.h
--- Installing: /usr/local/include/flatbuffers/minireflect.h
--- Installing: /usr/local/include/flatbuffers/flexbuffers.h
--- Installing: /usr/local/include/flatbuffers/reflection_generated.h
--- Installing: /usr/local/include/flatbuffers/base.h
--- Installing: /usr/local/include/flatbuffers/stl_emulation.h
--- Installing: /usr/local/include/flatbuffers/registry.h
--- Installing: /usr/local/include/flatbuffers/hash.h
--- Installing: /usr/local/include/flatbuffers/grpc.h
--- Installing: /usr/local/lib/cmake/flatbuffers/FlatbuffersConfig.cmake
--- Installing: /usr/local/lib/cmake/flatbuffers/FlatbuffersConfigVersion.cmake
--- Installing: /usr/local/lib/libflatbuffers.a
--- Installing: /usr/local/lib/cmake/flatbuffers/FlatbuffersTargets.cmake
--- Installing: /usr/local/lib/cmake/flatbuffers/FlatbuffersTargets-noconfig.cmake
--- Installing: /usr/local/bin/flatc
--- Installing: /usr/local/lib/cmake/flatbuffers/FlatcTargets.cmake
--- Installing: /usr/local/lib/cmake/flatbuffers/FlatcTargets-noconfig.cmake
-```
-
 ### Makes a.out with tensorflow-lite.a.  
 ```
  # apt install -y libopencv-dev
  $ cd
- $ git clone https://github.com/k5iogura/tensorflowlite-samples
  $ cd tensorflowlite-samples/CNN_NumberDetector/05_TensorflowLite_CPP/
- $ cp ~/tensorflow/tensorflow/lite/tools/make/gen/linux_x86_64/lib/libtensorflow-lite.a .
+ $ cp ../../tensorflow/tensorflow/lite/tools/make/gen/linux_x86_64/lib/libtensorflow-lite.a .
  $ ./make.sh
  #!/bin/bash -v
   if [ ! -d tensorflow ];then
