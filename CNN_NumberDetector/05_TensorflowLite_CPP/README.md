@@ -12,7 +12,10 @@ git repo. master at July.20,2019
 
 ```
  $ cd
- $ git clone tensorflow/tensorflow
+ $ git clone https://github.com/k5iogura/tensorflowlite-samples
+ $ cd tensorflowlite-samples
+ $ git submodule init
+ $ git submodule update
  $ cd tensorflow
  $ ./tensorflow/lite/tools/make/download_dependencies.sh
  $ ./tensorflow/lite/tools/make/build_lib.sh
@@ -65,9 +68,8 @@ Install the project...
 ```
  # apt install -y libopencv-dev
  $ cd
- $ git clone https://github.com/k5iogura/tensorflowlite-samples
  $ cd tensorflowlite-samples/CNN_NumberDetector/05_TensorflowLite_CPP/
- $ cp ~/tensorflow/tensorflow/lite/tools/make/gen/linux_x86_64/lib/libtensorflow-lite.a .
+ $ cp ../../tensorflow/tensorflow/lite/tools/make/gen/linux_x86_64/lib/libtensorflow-lite.a .
  $ ./make.sh
  #!/bin/bash -v
   if [ ! -d tensorflow ];then
