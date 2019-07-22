@@ -9,8 +9,10 @@ build_pip_package.sh is supported master branch as of now.
 ### A. Into docker with ubuntu 16.04 bash,  
 ```
  $ docker run -it --rm --net host -e DISPLAY=$DISPLAY -v $HOME/.Xauthority:/root/.Xauthority ubuntu:16.04 bash
+ # uname -r
+   4.15.0-54-generic
 ```
-### B. Into VirtualBox with ubuntu 16.04 bash,  
+### B. Into VirtualBox with ubuntu 16.04 bash.  
 
 ### Install tflite_runtime python module via below,  
 ```
