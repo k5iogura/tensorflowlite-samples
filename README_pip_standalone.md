@@ -4,10 +4,13 @@ To use tensorflowlite without full tensorflow version, use build_pip_package.sh.
 Below reproduction of build_pippackage.sh.  
 build_pip_package.sh is supported master branch as of now.  
 
-### Into docker with ubuntu.16.04 bash,  
+## Select base system to install tflite_runtime  
+
+### A. Into docker with ubuntu 16.04 bash,  
 ```
  $ docker run -it --rm --net host -e DISPLAY=$DISPLAY ubuntu:16.04 bash
 ```
+### B. Into VirtualBox with ubuntu 16.04 bash,  
 
 ### Install tflite_runtime python module via below,  
 ```
