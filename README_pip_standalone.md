@@ -16,7 +16,7 @@ build_pip_package.sh is supported master branch as of now.
 ```
  # apt install git curl vim vim-syntax-gtk ctags make cmake
  # apt install swig libjpeg-dev zlib1g-dev python3-dev python3-numpy python3 python
- # apt install -y python-pip python3-pip libopencv-dev
+ # apt install python-pip python3-pip libopencv-dev
  # apt install python-numpy
  # pip install numpy
 
