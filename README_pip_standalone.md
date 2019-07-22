@@ -13,6 +13,7 @@ build_pip_package.sh is supported master branch as of now.
    4.15.0-54-generic
 ```
 ### B. Into VirtualBox with ubuntu 16.04 bash.  
+It does'nt work fine.  
 
 ### Install tflite_runtime python module via below,  
 ```
