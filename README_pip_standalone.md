@@ -38,7 +38,8 @@ build_pip_package.sh is supported master branch as of now.
 ```
  # pip install opencv-python
  # cd / ; git clone https://github.com/k5iogura/tensorflowlite-samples;cd tensorflowlite-samples
- # python dog_detector_tflite_runtime.py
+ # unzip coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip
+ # python dog_detect_tflite_runtime.py
    ...
    INFO: Initialized TensorFlow Lite runtime.
    ('location:', array([[[0.1904766 , 0.14921203, 0.7673927 , 0.76377976],
@@ -66,5 +67,6 @@ build_pip_package.sh is supported master branch as of now.
  # apt install feh
    feh result.jpg
 ```
+![](dog_result.jpg)  
 
 **July.22,2019**
