@@ -8,7 +8,7 @@ build_pip_package.sh is supported master branch as of now.
 
 ### A. Into docker with ubuntu 16.04 bash,  
 ```
- $ docker run -it --rm --net host -e DISPLAY=$DISPLAY ubuntu:16.04 bash
+ $ docker run -it --rm --net host -e DISPLAY=$DISPLAY -v $HOME/.Xauthority:/root/.Xauthority ubuntu:16.04 bash
 ```
 ### B. Into VirtualBox with ubuntu 16.04 bash,  
 
@@ -63,6 +63,8 @@ build_pip_package.sh is supported master branch as of now.
    
  # ls result.jpg
    result.jpg
+ # apt install feh
+   feh result.jpg
 ```
 
 **July.22,2019**
