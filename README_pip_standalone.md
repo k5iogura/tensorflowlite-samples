@@ -17,7 +17,7 @@ It does'nt work fine.
 
 ### Install tflite_runtime python module via below,  
 ```
- # apt install git curl vim vim-syntax-gtk ctags make cmake
+ # apt install openssh-server git curl vim vim-syntax-gtk ctags make cmake
  # apt install swig libjpeg-dev zlib1g-dev python3-dev python3-numpy python3 python
  # apt install python-pip python3-pip libopencv-dev
  # apt install python-numpy
