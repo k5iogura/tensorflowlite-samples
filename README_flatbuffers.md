@@ -16,6 +16,13 @@ Install flatc command from [google flatbuffers github](https://github.com/google
    flatc version 1.11.0
 ```
 
+Install python I/F.  
+```
+ $ pip install python
+ $ python -c "import flatbuffers"
+ $
+```
+
 Convert tflite to json using tflite schema spec file(schema_v3.fbs).  
 ```
  $ wget https://raw.githubusercontent.com/tensorflow/tensorflow/master/tensorflow/lite/schema/schema_v3.fbs
