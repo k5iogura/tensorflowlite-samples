@@ -57,14 +57,19 @@ class graph:
         return input_operators_idxes, distin_tensor_idxes
 
     def print_operator(self, operator_idx):
+        opcode_index = self.get_opcode_index(operator_idx)
         o_obj = self.operators_list[operator_idx]
-        print("dist_tensor {} <= operator {} = src_tensor {}".format( o_obj['outputs'], operator_idx, o_obj['inputs']) )
+        print("dist_tensor {} <= operator {} = src_tensor {}".format( o_obj['outputs'], opcode_index, o_obj['inputs']) )
 
     def proc_operator(self, operator_idx):
         o_obj = self.operators_list[operator_idx]
         input_tensors  = o_obj.get('inputs')
         output_tensors = o_obj.get('outputs')
         opcode_index   = o_obj.get('opcode_index') if o_obj.get('opcode_index') else 0
+
+    def get_opcode_index(self,operator):
+        opcode_index = self.operators_list[operator].get('opcode_index')
+        return opcode_index if opcode_index is not None else 0
 
     def list2int(self, bdy, idx, Nbyte):
         val = 0
@@ -80,14 +85,19 @@ class graph:
         typ = self.tensors_list[tensor_idx].get('type')
         bdy = self.datas_list[idx]
         if   typ == 'FLOAT32':
+            if len(bdy)==0: return np.asarray([], np.float32)
             return np.asarray( [self.list2float(bdy, i, 4) for i in range(0,len(bdy),4)], np.float32 ).reshape(shp)
         elif typ == 'FLOAT16':
+            if len(bdy)==0: return np.asarray([], np.float16)
             return np.asarray( [self.list2float(bdy, i, 2) for i in range(0,len(bdy),2)], np.float16 ).reshape(shp)
         elif typ == 'INT32':
+            if len(bdy)==0: return np.asarray([], np.int32)
             return np.asarray( [self.list2int(bdy, i, 4) for i in range(0,len(bdy),4)], np.int32 ).reshape(shp)
         elif typ == 'UINT8':
+            if len(bdy)==0: return np.asarray([], np.uint8)
             return np.asarray(bdy, np.uint8).reshape(shp)
         elif typ == 'INT64':
+            if len(bdy)==0: return np.asarray([], np.int64)
             return np.asarray( [self.list2int(bdy, i, 8) for i in range(0,len(bdy),8)], np.int64 ).reshape(shp)
 
     #     Generators      Focus        Consumers
@@ -104,16 +114,21 @@ class graph:
             if verbose: self.print_operator(o)
 
             if proc is not None:
+                opcode_index = self.get_opcode_index(o)
+                src_numpy_list = []
                 src_tensors_list = self.operators_list[o].get('inputs')
                 for t in src_tensors_list:
-                    idx = self.tensors_list[t].get('buffer')
-                    shp = self.tensors_list[t].get('shape')
-                    typ = self.tensors_list[t].get('type')
-                    bdy = self.datas_list[idx]
-                    print('  src_tensor',t, '-> buffer', idx, 'size', len(bdy),typ, 'shape', shp)
+#                    idx = self.tensors_list[t].get('buffer')
+#                    shp = self.tensors_list[t].get('shape')
+#                    typ = self.tensors_list[t].get('type')
+#                    bdy = self.datas_list[idx]
+#                    print('  src_tensor',t, '-> buffer', idx, 'size', len(bdy),typ, 'shape', shp)
+                    src_numpy_list.append(self.get_tensor(t))
 
-                dst_list = self.operators_list[o].get('outputs')
-                opcode_index  = self.operators_list[o].get('opcode_index')
+                dst_numpy_list = []
+                dst_tensors_list = self.operators_list[o].get('outputs')
+                for t in dst_tensors_list:
+                    dst_numpy_list.append(self.get_tensor(t))
                 #proc(operation_dst, opcode_index, operation_src)
 
 def exec_operation(np_dst, opcode_index, np_src):
