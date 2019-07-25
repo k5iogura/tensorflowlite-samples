@@ -1,10 +1,11 @@
 import os,sys
 import json
+import numpy as np
 from pdb import *
 
-class walker:
-    def __init__(self):
-        with open('detect.json') as j: root = json.load(j)
+class graph:
+    def __init__(self,json_text='detect.json'):
+        with open(json_text) as j: root = json.load(j)
 
         # datas_list   = /buffers/data
         cleanup_lambda = lambda i: i.get('data') if i.get('data') is not None else []
@@ -55,20 +56,69 @@ class walker:
                 distin_tensor_idxes.append(ope['outputs'])
         return input_operators_idxes, distin_tensor_idxes
 
-#     Generators      Focus        Consumers
-#Tensor ---- ope ---+ Tensor +---- ope --- Tensor
-#List               | List   |             List
-#                   |        |
-#Tensor ____ ope ___|        |____ ope --- Tensor
-#List                                      List
-w=walker()
-def walk(tensor_idx):
-    operators, tensors = w.generators(tensor_idx)
-    for o, t in zip(operators,tensors):
-        if w.flag(o)>0:continue
-        walk(t)
-        o_obj = w.operators_list[o]
-        print("dist_tensor {} <= operator {} = src_tensor {}".format( o_obj['outputs'], o, o_obj['inputs']) )
+    def print_operator(self, operator_idx):
+        o_obj = self.operators_list[operator_idx]
+        print("dist_tensor {} <= operator {} = src_tensor {}".format( o_obj['outputs'], operator_idx, o_obj['inputs']) )
 
-walk(w.outputs_list)
+    def proc_operator(self, operator_idx):
+        o_obj = self.operators_list[operator_idx]
+        input_tensors  = o_obj.get('inputs')
+        output_tensors = o_obj.get('outputs')
+        opcode_index   = o_obj.get('opcode_index') if o_obj.get('opcode_index') else 0
+
+    def list2int(self, bdy, idx, Nbyte):
+        val = 0
+        for s, i in enumerate(range(idx, idx+Nbyte)): val += bdy[i]<<(8*s)
+        return val
+
+    def list2float(self, bdy, idx, Nbyte):
+        return np.float32(self.list2int(bdy,idx,Nbyte))
+
+    def get_tensor(self, tensor_idx):
+        idx = self.tensors_list[tensor_idx].get('buffer')
+        shp = self.tensors_list[tensor_idx].get('shape')
+        typ = self.tensors_list[tensor_idx].get('type')
+        bdy = self.datas_list[idx]
+        if   typ == 'FLOAT32':
+            return np.asarray( [self.list2float(bdy, i, 4) for i in range(0,len(bdy),4)], np.float32 ).reshape(shp)
+        elif typ == 'FLOAT16':
+            return np.asarray( [self.list2float(bdy, i, 2) for i in range(0,len(bdy),2)], np.float16 ).reshape(shp)
+        elif typ == 'INT32':
+            return np.asarray( [self.list2int(bdy, i, 4) for i in range(0,len(bdy),4)], np.int32 ).reshape(shp)
+        elif typ == 'UINT8':
+            return np.asarray(bdy, np.uint8).reshape(shp)
+        elif typ == 'INT64':
+            return np.asarray( [self.list2int(bdy, i, 8) for i in range(0,len(bdy),8)], np.int64 ).reshape(shp)
+
+    #     Generators      Focus        Consumers
+    #Tensor ---- ope ---+ Tensor +---- ope --- Tensor
+    #List               | List   |             List
+    #                   |        |
+    #Tensor ____ ope ___|        |____ ope --- Tensor
+    #List                                      List
+    def walk_from(self, tensor_idx, proc=None, verbose=True):
+        operators, tensors = self.generators(tensor_idx)
+        for o, t in zip(operators, tensors):
+            if self.flag(o)>0:continue
+            self.walk_from(t, proc, verbose)
+            if verbose: self.print_operator(o)
+
+            if proc is not None:
+                src_tensors_list = self.operators_list[o].get('inputs')
+                for t in src_tensors_list:
+                    idx = self.tensors_list[t].get('buffer')
+                    shp = self.tensors_list[t].get('shape')
+                    typ = self.tensors_list[t].get('type')
+                    bdy = self.datas_list[idx]
+                    print('  src_tensor',t, '-> buffer', idx, 'size', len(bdy),typ, 'shape', shp)
+
+                dst_list = self.operators_list[o].get('outputs')
+                opcode_index  = self.operators_list[o].get('opcode_index')
+                #proc(operation_dst, opcode_index, operation_src)
+
+def exec_operation(np_dst, opcode_index, np_src):
+    pass
+
+g=graph('detect.json')
+g.walk_from(g.outputs_list, exec_operation, verbose=True)
 
