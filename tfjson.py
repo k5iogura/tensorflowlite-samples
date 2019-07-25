@@ -57,9 +57,9 @@ class graph:
         return input_operators_idxes, distin_tensor_idxes
 
     def print_operator(self, operator_idx):
-        opcode_index = self.get_opcode_index(operator_idx)
+        opcode= self.get_opcode_index(operator_idx)
         o_obj = self.operators_list[operator_idx]
-        print("dist_tensor {} <= operator {} = src_tensor {}".format( o_obj['outputs'], opcode_index, o_obj['inputs']) )
+        print("dist_tensor {} <= operator {}(code {}) = src_tensor {}".format( o_obj['outputs'], operator_idx, opcode, o_obj['inputs']) )
 
     def proc_operator(self, operator_idx):
         o_obj = self.operators_list[operator_idx]
