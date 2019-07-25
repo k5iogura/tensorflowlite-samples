@@ -93,6 +93,9 @@ class graph:
         elif typ == 'INT64':
             if len(bdy)==0: return np.asarray([], np.int64)
             return np.asarray( [self.list2int(bdy, i, 8) for i in range(0,len(bdy),8)], np.int64 ).reshape(shp)
+        elif typ == None:
+            return np.asarray([], np.uint8)
+        assert False, "tensor_idx={} shape:{} type:{} bdy:{}".format(tensor_idx, shp, typ, bdy)
 
     #     Generators      Focus        Consumers
     #Tensor ---- ope ---+ Tensor +---- ope --- Tensor
@@ -116,16 +119,15 @@ class graph:
                 dst_numpy_list = []
                 dst_tensors_list = self.operators_list[o].get('outputs')
                 for t in dst_tensors_list: dst_numpy_list.append(self.get_tensor(t))
-            #    proc(dst_numpy_list, opcode_index, src_numpy_list)
+                proc(dst_numpy_list, opcode_index, src_numpy_list)
 
 def exec_operation(np_dst, opcode_index, np_src):
-    for i in np_dst:
-        assert i is not None,np_src
     print(
+        "  dst_shape:{} <= {} <= src_shape:{}".format(
         [i.shape for i in np_dst],
         opcode_index,
         [j.shape for j in np_src]
-    )
+    ))
 
 g=graph('detect.json')
 g.walk_from(g.outputs_list, exec_operation, verbose=True)
