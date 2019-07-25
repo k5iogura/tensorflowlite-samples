@@ -1,5 +1,6 @@
 import os,sys
 import json
+from pdb import *
 
 class walker:
     def __init__(self):
@@ -69,5 +70,5 @@ def walk(tensor_idx):
         o_obj = w.operators_list[o]
         print("dist_tensor {} <= operator {} = src_tensor {}".format( o_obj['outputs'], o, o_obj['inputs']) )
 
-walk([w.outputs_list[0]])
+walk(w.outputs_list)
 
