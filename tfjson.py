@@ -81,6 +81,11 @@ class graph:
             )
         )
 
+    def get_builtin_code(self,operator_idx):
+        opcode_index = self.get_opcode_index(operator_idx)
+        builtin_code = self.operator_codes_list[opcode_index].get('builtin_code')
+        return builtin_code if builtin_code is not None else 'Undefind'
+
     def get_opcode_index(self,operator_idx):
         opcode_index = self.operators_list[operator_idx].get('opcode_index')
         return opcode_index if opcode_index is not None else 0
@@ -150,29 +155,28 @@ class graph:
         self.walk_from(self.outputs_list, None, verbose)
 
     def invoke(self, verbose=True):
-        if verbose: print("----- INVOKING -----")
-        for o in self.order_list:
-            operator   = self.operators_list[o]
+        if verbose: print("----- INVOKING      -----")
+        for order, operator_idx in enumerate(self.order_list):
+            operator   = self.operators_list[operator_idx]
             src_tensor = operator.get('inputs')
             dst_tensor = operator.get('outputs')
             src_tensors_npy = [self.get_tensor_npy(tensor) for tensor in src_tensor]
             dst_tensors_npy = [self.get_tensor_npy(tensor) for tensor in dst_tensor]
-            print(dst_tensor,o,src_tensor)
-            exec_operation(self, dst_tensors_npy, o, src_tensors_npy)
-            break
-        if verbose: print("----- INVOKING -----")
+            print("-----\ndst_tensor {} <= operator_idx {} <= src {}".format(dst_tensor, operator_idx, src_tensor))
+            exec_operation(self, dst_tensors_npy, operator_idx, src_tensors_npy)
+            if order==100:break
+        if verbose: print("----- INVOKING DONE -----")
 
 def exec_operation(graph, np_dst, operator_idx, np_src):
     opcode_index = graph.get_opcode_index(operator_idx)
     operator     = graph.operators_list[operator_idx]
+    builtin_name = graph.get_builtin_code(operator_idx),
     print(
         "  dst_shape:{} <= {} <= src_shape:{}".format(
         [i.shape for i in np_dst],
-        opcode_index,
+        builtin_name,
         [j.shape for j in np_src]
     ))
-    print(operator)
-    print(graph.operator_codes_list[opcode_index])
 #    set_trace()
 
 g=graph('detect.json')
