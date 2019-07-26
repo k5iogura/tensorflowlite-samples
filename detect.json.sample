@@ -1,0 +1,5014 @@
+{
+  "version": 3,
+  "operator_codes": [
+    {
+      "builtin_code": "CONV_2D"
+    },
+    {
+      "builtin_code": "CONCATENATION"
+    },
+    {
+      "builtin_code": "DEPTHWISE_CONV_2D"
+    },
+    {
+      "builtin_code": "LOGISTIC"
+    },
+    {
+      "builtin_code": "RESHAPE"
+    },
+    {
+      "builtin_code": "CUSTOM",
+      "custom_code": "TFLite_Detection_PostProcess"
+    }
+  ],
+  "subgraphs": [
+    {
+      "tensors": [
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            12
+          ],
+          "type": "UINT8",
+          "buffer": 93,
+          "name": "BoxPredictor_0/BoxEncodingPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -15.094324
+            ],
+            "max": [
+              5.057784
+            ],
+            "scale": [
+              0.079028
+            ],
+            "zero_point": [
+              191
+            ]
+          }
+        },
+        {
+          "shape": [
+            12
+          ],
+          "type": "INT32",
+          "buffer": 12,
+          "name": "BoxPredictor_0/BoxEncodingPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000139
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            12,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 94,
+          "name": "BoxPredictor_0/BoxEncodingPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.723016
+            ],
+            "max": [
+              0.782037
+            ],
+            "scale": [
+              0.005902
+            ],
+            "zero_point": [
+              123
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            273
+          ],
+          "type": "UINT8",
+          "buffer": 83,
+          "name": "BoxPredictor_0/ClassPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -11.094388
+            ],
+            "max": [
+              1.205912
+            ],
+            "scale": [
+              0.048236
+            ],
+            "zero_point": [
+              230
+            ]
+          }
+        },
+        {
+          "shape": [
+            273
+          ],
+          "type": "INT32",
+          "buffer": 11,
+          "name": "BoxPredictor_0/ClassPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000058
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            273,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 151,
+          "name": "BoxPredictor_0/ClassPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.249356
+            ],
+            "max": [
+              0.377814
+            ],
+            "scale": [
+              0.002459
+            ],
+            "zero_point": [
+              101
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            1083,
+            1,
+            4
+          ],
+          "type": "UINT8",
+          "buffer": 152,
+          "name": "BoxPredictor_0/Reshape",
+          "quantization": {
+            "min": [
+              -15.094324
+            ],
+            "max": [
+              5.057784
+            ],
+            "scale": [
+              0.079028
+            ],
+            "zero_point": [
+              191
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            1083,
+            91
+          ],
+          "type": "UINT8",
+          "buffer": 153,
+          "name": "BoxPredictor_0/Reshape_1",
+          "quantization": {
+            "min": [
+              -11.094388
+            ],
+            "max": [
+              1.205912
+            ],
+            "scale": [
+              0.048236
+            ],
+            "zero_point": [
+              230
+            ]
+          }
+        },
+        {
+          "shape": [
+            4
+          ],
+          "type": "INT32",
+          "buffer": 92,
+          "name": "BoxPredictor_0/stack",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            3
+          ],
+          "type": "INT32",
+          "buffer": 105,
+          "name": "BoxPredictor_0/stack_1",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            1,
+            10,
+            10,
+            24
+          ],
+          "type": "UINT8",
+          "buffer": 155,
+          "name": "BoxPredictor_1/BoxEncodingPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -4.341042
+            ],
+            "max": [
+              3.680448
+            ],
+            "scale": [
+              0.031457
+            ],
+            "zero_point": [
+              138
+            ]
+          }
+        },
+        {
+          "shape": [
+            24
+          ],
+          "type": "INT32",
+          "buffer": 10,
+          "name": "BoxPredictor_1/BoxEncodingPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000072
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            24,
+            1,
+            1,
+            768
+          ],
+          "type": "UINT8",
+          "buffer": 154,
+          "name": "BoxPredictor_1/BoxEncodingPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.357648
+            ],
+            "max": [
+              0.425139
+            ],
+            "scale": [
+              0.00307
+            ],
+            "zero_point": [
+              117
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            10,
+            10,
+            546
+          ],
+          "type": "UINT8",
+          "buffer": 117,
+          "name": "BoxPredictor_1/ClassPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -8.903173
+            ],
+            "max": [
+              1.607517
+            ],
+            "scale": [
+              0.041218
+            ],
+            "zero_point": [
+              216
+            ]
+          }
+        },
+        {
+          "shape": [
+            546
+          ],
+          "type": "INT32",
+          "buffer": 9,
+          "name": "BoxPredictor_1/ClassPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000045
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            546,
+            1,
+            1,
+            768
+          ],
+          "type": "UINT8",
+          "buffer": 78,
+          "name": "BoxPredictor_1/ClassPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.252102
+            ],
+            "max": [
+              0.241035
+            ],
+            "scale": [
+              0.001934
+            ],
+            "zero_point": [
+              130
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            600,
+            1,
+            4
+          ],
+          "type": "UINT8",
+          "buffer": 156,
+          "name": "BoxPredictor_1/Reshape",
+          "quantization": {
+            "min": [
+              -4.341042
+            ],
+            "max": [
+              3.680448
+            ],
+            "scale": [
+              0.031457
+            ],
+            "zero_point": [
+              138
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            600,
+            91
+          ],
+          "type": "UINT8",
+          "buffer": 138,
+          "name": "BoxPredictor_1/Reshape_1",
+          "quantization": {
+            "min": [
+              -8.903173
+            ],
+            "max": [
+              1.607517
+            ],
+            "scale": [
+              0.041218
+            ],
+            "zero_point": [
+              216
+            ]
+          }
+        },
+        {
+          "shape": [
+            4
+          ],
+          "type": "INT32",
+          "buffer": 76,
+          "name": "BoxPredictor_1/stack",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            3
+          ],
+          "type": "INT32",
+          "buffer": 89,
+          "name": "BoxPredictor_1/stack_1",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            1,
+            5,
+            5,
+            24
+          ],
+          "type": "UINT8",
+          "buffer": 157,
+          "name": "BoxPredictor_2/BoxEncodingPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -3.689552
+            ],
+            "max": [
+              3.777399
+            ],
+            "scale": [
+              0.029282
+            ],
+            "zero_point": [
+              126
+            ]
+          }
+        },
+        {
+          "shape": [
+            24
+          ],
+          "type": "INT32",
+          "buffer": 47,
+          "name": "BoxPredictor_2/BoxEncodingPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000205
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            24,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 109,
+          "name": "BoxPredictor_2/BoxEncodingPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.373591
+            ],
+            "max": [
+              0.379528
+            ],
+            "scale": [
+              0.002953
+            ],
+            "zero_point": [
+              126
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            5,
+            5,
+            546
+          ],
+          "type": "UINT8",
+          "buffer": 158,
+          "name": "BoxPredictor_2/ClassPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -7.71951
+            ],
+            "max": [
+              1.522157
+            ],
+            "scale": [
+              0.036242
+            ],
+            "zero_point": [
+              213
+            ]
+          }
+        },
+        {
+          "shape": [
+            546
+          ],
+          "type": "INT32",
+          "buffer": 8,
+          "name": "BoxPredictor_2/ClassPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000125
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            546,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 135,
+          "name": "BoxPredictor_2/ClassPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.263716
+            ],
+            "max": [
+              0.198018
+            ],
+            "scale": [
+              0.001811
+            ],
+            "zero_point": [
+              146
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            150,
+            1,
+            4
+          ],
+          "type": "UINT8",
+          "buffer": 159,
+          "name": "BoxPredictor_2/Reshape",
+          "quantization": {
+            "min": [
+              -3.689552
+            ],
+            "max": [
+              3.777399
+            ],
+            "scale": [
+              0.029282
+            ],
+            "zero_point": [
+              126
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            150,
+            91
+          ],
+          "type": "UINT8",
+          "buffer": 160,
+          "name": "BoxPredictor_2/Reshape_1",
+          "quantization": {
+            "min": [
+              -7.71951
+            ],
+            "max": [
+              1.522157
+            ],
+            "scale": [
+              0.036242
+            ],
+            "zero_point": [
+              213
+            ]
+          }
+        },
+        {
+          "shape": [
+            4
+          ],
+          "type": "INT32",
+          "buffer": 84,
+          "name": "BoxPredictor_2/stack",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            3
+          ],
+          "type": "INT32",
+          "buffer": 96,
+          "name": "BoxPredictor_2/stack_1",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            24
+          ],
+          "type": "UINT8",
+          "buffer": 161,
+          "name": "BoxPredictor_3/BoxEncodingPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -3.456358
+            ],
+            "max": [
+              3.538653
+            ],
+            "scale": [
+              0.027431
+            ],
+            "zero_point": [
+              126
+            ]
+          }
+        },
+        {
+          "shape": [
+            24
+          ],
+          "type": "INT32",
+          "buffer": 7,
+          "name": "BoxPredictor_3/BoxEncodingPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.00022
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            24,
+            1,
+            1,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 130,
+          "name": "BoxPredictor_3/BoxEncodingPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.30006
+            ],
+            "max": [
+              0.367517
+            ],
+            "scale": [
+              0.002618
+            ],
+            "zero_point": [
+              115
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            546
+          ],
+          "type": "UINT8",
+          "buffer": 91,
+          "name": "BoxPredictor_3/ClassPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -7.662566
+            ],
+            "max": [
+              1.425594
+            ],
+            "scale": [
+              0.03564
+            ],
+            "zero_point": [
+              215
+            ]
+          }
+        },
+        {
+          "shape": [
+            546
+          ],
+          "type": "INT32",
+          "buffer": 6,
+          "name": "BoxPredictor_3/ClassPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000148
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            546,
+            1,
+            1,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 162,
+          "name": "BoxPredictor_3/ClassPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.247699
+            ],
+            "max": [
+              0.201645
+            ],
+            "scale": [
+              0.001762
+            ],
+            "zero_point": [
+              141
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            54,
+            1,
+            4
+          ],
+          "type": "UINT8",
+          "buffer": 163,
+          "name": "BoxPredictor_3/Reshape",
+          "quantization": {
+            "min": [
+              -3.456358
+            ],
+            "max": [
+              3.538653
+            ],
+            "scale": [
+              0.027431
+            ],
+            "zero_point": [
+              126
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            54,
+            91
+          ],
+          "type": "UINT8",
+          "buffer": 102,
+          "name": "BoxPredictor_3/Reshape_1",
+          "quantization": {
+            "min": [
+              -7.662566
+            ],
+            "max": [
+              1.425594
+            ],
+            "scale": [
+              0.03564
+            ],
+            "zero_point": [
+              215
+            ]
+          }
+        },
+        {
+          "shape": [
+            4
+          ],
+          "type": "INT32",
+          "buffer": 175,
+          "name": "BoxPredictor_3/stack",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            3
+          ],
+          "type": "INT32",
+          "buffer": 87,
+          "name": "BoxPredictor_3/stack_1",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            1,
+            2,
+            2,
+            24
+          ],
+          "type": "UINT8",
+          "buffer": 106,
+          "name": "BoxPredictor_4/BoxEncodingPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -2.850468
+            ],
+            "max": [
+              2.416701
+            ],
+            "scale": [
+              0.020656
+            ],
+            "zero_point": [
+              138
+            ]
+          }
+        },
+        {
+          "shape": [
+            24
+          ],
+          "type": "INT32",
+          "buffer": 5,
+          "name": "BoxPredictor_4/BoxEncodingPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000083
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            24,
+            1,
+            1,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 165,
+          "name": "BoxPredictor_4/BoxEncodingPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.192953
+            ],
+            "max": [
+              0.199373
+            ],
+            "scale": [
+              0.001539
+            ],
+            "zero_point": [
+              125
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            2,
+            2,
+            546
+          ],
+          "type": "UINT8",
+          "buffer": 143,
+          "name": "BoxPredictor_4/ClassPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -6.149231
+            ],
+            "max": [
+              0.789061
+            ],
+            "scale": [
+              0.027209
+            ],
+            "zero_point": [
+              226
+            ]
+          }
+        },
+        {
+          "shape": [
+            546
+          ],
+          "type": "INT32",
+          "buffer": 4,
+          "name": "BoxPredictor_4/ClassPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000063
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            546,
+            1,
+            1,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 167,
+          "name": "BoxPredictor_4/ClassPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.130348
+            ],
+            "max": [
+              0.170675
+            ],
+            "scale": [
+              0.00118
+            ],
+            "zero_point": [
+              110
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            24,
+            1,
+            4
+          ],
+          "type": "UINT8",
+          "buffer": 168,
+          "name": "BoxPredictor_4/Reshape",
+          "quantization": {
+            "min": [
+              -2.850468
+            ],
+            "max": [
+              2.416701
+            ],
+            "scale": [
+              0.020656
+            ],
+            "zero_point": [
+              138
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            24,
+            91
+          ],
+          "type": "UINT8",
+          "buffer": 169,
+          "name": "BoxPredictor_4/Reshape_1",
+          "quantization": {
+            "min": [
+              -6.149231
+            ],
+            "max": [
+              0.789061
+            ],
+            "scale": [
+              0.027209
+            ],
+            "zero_point": [
+              226
+            ]
+          }
+        },
+        {
+          "shape": [
+            4
+          ],
+          "type": "INT32",
+          "buffer": 86,
+          "name": "BoxPredictor_4/stack",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            3
+          ],
+          "type": "INT32",
+          "buffer": 85,
+          "name": "BoxPredictor_4/stack_1",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            1,
+            1,
+            1,
+            24
+          ],
+          "type": "UINT8",
+          "buffer": 111,
+          "name": "BoxPredictor_5/BoxEncodingPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -3.047909
+            ],
+            "max": [
+              2.06536
+            ],
+            "scale": [
+              0.020052
+            ],
+            "zero_point": [
+              152
+            ]
+          }
+        },
+        {
+          "shape": [
+            24
+          ],
+          "type": "INT32",
+          "buffer": 3,
+          "name": "BoxPredictor_5/BoxEncodingPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000088
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            24,
+            1,
+            1,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 128,
+          "name": "BoxPredictor_5/BoxEncodingPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.252255
+            ],
+            "max": [
+              0.256237
+            ],
+            "scale": [
+              0.001994
+            ],
+            "zero_point": [
+              127
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            1,
+            1,
+            546
+          ],
+          "type": "UINT8",
+          "buffer": 172,
+          "name": "BoxPredictor_5/ClassPredictor/BiasAdd",
+          "quantization": {
+            "min": [
+              -5.934154
+            ],
+            "max": [
+              1.136917
+            ],
+            "scale": [
+              0.02773
+            ],
+            "zero_point": [
+              214
+            ]
+          }
+        },
+        {
+          "shape": [
+            546
+          ],
+          "type": "INT32",
+          "buffer": 1,
+          "name": "BoxPredictor_5/ClassPredictor/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000054
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            546,
+            1,
+            1,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 171,
+          "name": "BoxPredictor_5/ClassPredictor/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.143225
+            ],
+            "max": [
+              0.16774
+            ],
+            "scale": [
+              0.001219
+            ],
+            "zero_point": [
+              117
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            6,
+            1,
+            4
+          ],
+          "type": "UINT8",
+          "buffer": 140,
+          "name": "BoxPredictor_5/Reshape",
+          "quantization": {
+            "min": [
+              -3.047909
+            ],
+            "max": [
+              2.06536
+            ],
+            "scale": [
+              0.020052
+            ],
+            "zero_point": [
+              152
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            6,
+            91
+          ],
+          "type": "UINT8",
+          "buffer": 173,
+          "name": "BoxPredictor_5/Reshape_1",
+          "quantization": {
+            "min": [
+              -5.934154
+            ],
+            "max": [
+              1.136917
+            ],
+            "scale": [
+              0.02773
+            ],
+            "zero_point": [
+              214
+            ]
+          }
+        },
+        {
+          "shape": [
+            4
+          ],
+          "type": "INT32",
+          "buffer": 133,
+          "name": "BoxPredictor_5/stack",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            3
+          ],
+          "type": "INT32",
+          "buffer": 107,
+          "name": "BoxPredictor_5/stack_1",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            192
+          ],
+          "type": "INT32",
+          "buffer": 19,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_2_1x1_192/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000116
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            10,
+            10,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 145,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_2_1x1_192/Relu6",
+          "quantization": {
+            "min": [
+              -6.20044
+            ],
+            "max": [
+              6.866494
+            ],
+            "scale": [
+              0.051243
+            ],
+            "zero_point": [
+              121
+            ]
+          }
+        },
+        {
+          "shape": [
+            192,
+            1,
+            1,
+            768
+          ],
+          "type": "UINT8",
+          "buffer": 71,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_2_1x1_192/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.75349
+            ],
+            "max": [
+              0.504298
+            ],
+            "scale": [
+              0.004933
+            ],
+            "zero_point": [
+              153
+            ]
+          }
+        },
+        {
+          "shape": [
+            96
+          ],
+          "type": "INT32",
+          "buffer": 17,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_3_1x1_96/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000205
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            5,
+            5,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 146,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_3_1x1_96/Relu6",
+          "quantization": {
+            "min": [
+              -4.910028
+            ],
+            "max": [
+              6.269054
+            ],
+            "scale": [
+              0.04384
+            ],
+            "zero_point": [
+              112
+            ]
+          }
+        },
+        {
+          "shape": [
+            96,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 42,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_3_1x1_96/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.346078
+            ],
+            "max": [
+              0.407327
+            ],
+            "scale": [
+              0.002955
+            ],
+            "zero_point": [
+              117
+            ]
+          }
+        },
+        {
+          "shape": [
+            96
+          ],
+          "type": "INT32",
+          "buffer": 16,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_4_1x1_96/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000299
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 148,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_4_1x1_96/Relu6",
+          "quantization": {
+            "min": [
+              -4.633415
+            ],
+            "max": [
+              5.730803
+            ],
+            "scale": [
+              0.040644
+            ],
+            "zero_point": [
+              114
+            ]
+          }
+        },
+        {
+          "shape": [
+            96,
+            1,
+            1,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 118,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_4_1x1_96/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.345164
+            ],
+            "max": [
+              0.558932
+            ],
+            "scale": [
+              0.003545
+            ],
+            "zero_point": [
+              97
+            ]
+          }
+        },
+        {
+          "shape": [
+            48
+          ],
+          "type": "INT32",
+          "buffer": 14,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_5_1x1_48/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.00013
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            2,
+            2,
+            48
+          ],
+          "type": "UINT8",
+          "buffer": 72,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_5_1x1_48/Relu6",
+          "quantization": {
+            "min": [
+              -3.334431
+            ],
+            "max": [
+              3.932919
+            ],
+            "scale": [
+              0.028499
+            ],
+            "zero_point": [
+              117
+            ]
+          }
+        },
+        {
+          "shape": [
+            48,
+            1,
+            1,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 80,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_1_Conv2d_5_1x1_48/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.25523
+            ],
+            "max": [
+              0.362631
+            ],
+            "scale": [
+              0.002423
+            ],
+            "zero_point": [
+              105
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 18,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_2_3x3_s2_384/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000141
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            5,
+            5,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 100,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_2_3x3_s2_384/Relu6",
+          "quantization": {
+            "min": [
+              -8.246266
+            ],
+            "max": [
+              9.424305
+            ],
+            "scale": [
+              0.069296
+            ],
+            "zero_point": [
+              119
+            ]
+          }
+        },
+        {
+          "shape": [
+            384,
+            3,
+            3,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 43,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_2_3x3_s2_384/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.33187
+            ],
+            "max": [
+              0.368277
+            ],
+            "scale": [
+              0.002746
+            ],
+            "zero_point": [
+              121
+            ]
+          }
+        },
+        {
+          "shape": [
+            192
+          ],
+          "type": "INT32",
+          "buffer": 149,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_3_3x3_s2_192/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000232
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 141,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_3_3x3_s2_192/Relu6",
+          "quantization": {
+            "min": [
+              -8.758585
+            ],
+            "max": [
+              12.716791
+            ],
+            "scale": [
+              0.084217
+            ],
+            "zero_point": [
+              104
+            ]
+          }
+        },
+        {
+          "shape": [
+            192,
+            3,
+            3,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 41,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_3_3x3_s2_192/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.485902
+            ],
+            "max": [
+              0.862137
+            ],
+            "scale": [
+              0.005286
+            ],
+            "zero_point": [
+              92
+            ]
+          }
+        },
+        {
+          "shape": [
+            192
+          ],
+          "type": "INT32",
+          "buffer": 15,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_4_3x3_s2_192/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000162
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            2,
+            2,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 150,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_4_3x3_s2_192/Relu6",
+          "quantization": {
+            "min": [
+              -5.099391
+            ],
+            "max": [
+              8.588449
+            ],
+            "scale": [
+              0.053678
+            ],
+            "zero_point": [
+              95
+            ]
+          }
+        },
+        {
+          "shape": [
+            192,
+            3,
+            3,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 39,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_4_3x3_s2_192/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.460121
+            ],
+            "max": [
+              0.553788
+            ],
+            "scale": [
+              0.003976
+            ],
+            "zero_point": [
+              116
+            ]
+          }
+        },
+        {
+          "shape": [
+            96
+          ],
+          "type": "INT32",
+          "buffer": 13,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_5_3x3_s2_96/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000167
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            1,
+            1,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 108,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_5_3x3_s2_96/Relu6",
+          "quantization": {
+            "min": [
+              -4.422213
+            ],
+            "max": [
+              6.85443
+            ],
+            "scale": [
+              0.044222
+            ],
+            "zero_point": [
+              100
+            ]
+          }
+        },
+        {
+          "shape": [
+            96,
+            3,
+            3,
+            48
+          ],
+          "type": "UINT8",
+          "buffer": 44,
+          "name": "FeatureExtractor/MobilenetV1/Conv2d_13_pointwise_2_Conv2d_5_3x3_s2_96/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.573133
+            ],
+            "max": [
+              0.922091
+            ],
+            "scale": [
+              0.005864
+            ],
+            "zero_point": [
+              98
+            ]
+          }
+        },
+        {
+          "shape": [
+            24
+          ],
+          "type": "INT32",
+          "buffer": 36,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_0/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000084
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            150,
+            150,
+            24
+          ],
+          "type": "UINT8",
+          "buffer": 82,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_0/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            24,
+            3,
+            3,
+            3
+          ],
+          "type": "UINT8",
+          "buffer": 176,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_0/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -1.638728
+            ],
+            "max": [
+              1.11439
+            ],
+            "scale": [
+              0.010797
+            ],
+            "zero_point": [
+              152
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 137,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_10_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 49,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_10_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000455
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 98,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_10_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -2.456389
+            ],
+            "max": [
+              2.475557
+            ],
+            "scale": [
+              0.019341
+            ],
+            "zero_point": [
+              127
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 23,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_10_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000125
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 81,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_10_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 104,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_10_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.551433
+            ],
+            "max": [
+              0.806641
+            ],
+            "scale": [
+              0.005326
+            ],
+            "zero_point": [
+              104
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 97,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_11_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 110,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_11_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.00041
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 99,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_11_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -2.624428
+            ],
+            "max": [
+              1.818642
+            ],
+            "scale": [
+              0.017424
+            ],
+            "zero_point": [
+              151
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 22,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_11_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000139
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 115,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_11_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 51,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_11_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.821283
+            ],
+            "max": [
+              0.682008
+            ],
+            "scale": [
+              0.005895
+            ],
+            "zero_point": [
+              139
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            10,
+            10,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 125,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_12_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 37,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_12_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000558
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 73,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_12_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -2.855571
+            ],
+            "max": [
+              3.188507
+            ],
+            "scale": [
+              0.023702
+            ],
+            "zero_point": [
+              120
+            ]
+          }
+        },
+        {
+          "shape": [
+            768
+          ],
+          "type": "INT32",
+          "buffer": 21,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_12_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.00012
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            10,
+            10,
+            768
+          ],
+          "type": "UINT8",
+          "buffer": 142,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_12_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            768,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 48,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_12_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.535145
+            ],
+            "max": [
+              0.760128
+            ],
+            "scale": [
+              0.005079
+            ],
+            "zero_point": [
+              105
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            10,
+            10,
+            768
+          ],
+          "type": "UINT8",
+          "buffer": 144,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_13_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            768
+          ],
+          "type": "INT32",
+          "buffer": 45,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_13_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000333
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            768
+          ],
+          "type": "UINT8",
+          "buffer": 46,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_13_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -1.687998
+            ],
+            "max": [
+              1.922226
+            ],
+            "scale": [
+              0.014158
+            ],
+            "zero_point": [
+              119
+            ]
+          }
+        },
+        {
+          "shape": [
+            768
+          ],
+          "type": "INT32",
+          "buffer": 20,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_13_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000119
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            10,
+            10,
+            768
+          ],
+          "type": "UINT8",
+          "buffer": 103,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_13_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999535
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            768,
+            1,
+            1,
+            768
+          ],
+          "type": "UINT8",
+          "buffer": 61,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_13_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.716563
+            ],
+            "max": [
+              0.57528
+            ],
+            "scale": [
+              0.005066
+            ],
+            "zero_point": [
+              141
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            150,
+            150,
+            24
+          ],
+          "type": "UINT8",
+          "buffer": 114,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_1_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            24
+          ],
+          "type": "INT32",
+          "buffer": 35,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_1_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.00097
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            24
+          ],
+          "type": "UINT8",
+          "buffer": 68,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_1_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -2.952785
+            ],
+            "max": [
+              7.564634
+            ],
+            "scale": [
+              0.041245
+            ],
+            "zero_point": [
+              72
+            ]
+          }
+        },
+        {
+          "shape": [
+            48
+          ],
+          "type": "INT32",
+          "buffer": 69,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_1_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000372
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            150,
+            150,
+            48
+          ],
+          "type": "UINT8",
+          "buffer": 113,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_1_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            48,
+            1,
+            1,
+            24
+          ],
+          "type": "UINT8",
+          "buffer": 67,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_1_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -1.847729
+            ],
+            "max": [
+              2.181499
+            ],
+            "scale": [
+              0.015801
+            ],
+            "zero_point": [
+              117
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            75,
+            75,
+            48
+          ],
+          "type": "UINT8",
+          "buffer": 120,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_2_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            48
+          ],
+          "type": "INT32",
+          "buffer": 34,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_2_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000999
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            48
+          ],
+          "type": "UINT8",
+          "buffer": 66,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_2_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -4.981545
+            ],
+            "max": [
+              5.849651
+            ],
+            "scale": [
+              0.042475
+            ],
+            "zero_point": [
+              117
+            ]
+          }
+        },
+        {
+          "shape": [
+            96
+          ],
+          "type": "INT32",
+          "buffer": 33,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_2_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000191
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            75,
+            75,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 123,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_2_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            96,
+            1,
+            1,
+            48
+          ],
+          "type": "UINT8",
+          "buffer": 170,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_2_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.967381
+            ],
+            "max": [
+              1.102963
+            ],
+            "scale": [
+              0.008119
+            ],
+            "zero_point": [
+              119
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            75,
+            75,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 124,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_3_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            96
+          ],
+          "type": "INT32",
+          "buffer": 52,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_3_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000849
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 65,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_3_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -5.14778
+            ],
+            "max": [
+              4.048323
+            ],
+            "scale": [
+              0.036063
+            ],
+            "zero_point": [
+              143
+            ]
+          }
+        },
+        {
+          "shape": [
+            96
+          ],
+          "type": "INT32",
+          "buffer": 53,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_3_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000175
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            75,
+            75,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 79,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_3_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            96,
+            1,
+            1,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 64,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_3_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -1.004724
+            ],
+            "max": [
+              0.89726
+            ],
+            "scale": [
+              0.007459
+            ],
+            "zero_point": [
+              135
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            38,
+            38,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 126,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_4_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            96
+          ],
+          "type": "INT32",
+          "buffer": 32,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_4_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000294
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 63,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_4_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -1.568748
+            ],
+            "max": [
+              1.621751
+            ],
+            "scale": [
+              0.012512
+            ],
+            "zero_point": [
+              125
+            ]
+          }
+        },
+        {
+          "shape": [
+            192
+          ],
+          "type": "INT32",
+          "buffer": 75,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_4_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.00016
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            38,
+            38,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 70,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_4_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            192,
+            1,
+            1,
+            96
+          ],
+          "type": "UINT8",
+          "buffer": 62,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_4_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.728628
+            ],
+            "max": [
+              1.007362
+            ],
+            "scale": [
+              0.006808
+            ],
+            "zero_point": [
+              107
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            38,
+            38,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 122,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_5_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            192
+          ],
+          "type": "INT32",
+          "buffer": 31,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_5_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.001067
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 60,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_5_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -6.423401
+            ],
+            "max": [
+              5.141709
+            ],
+            "scale": [
+              0.045353
+            ],
+            "zero_point": [
+              142
+            ]
+          }
+        },
+        {
+          "shape": [
+            192
+          ],
+          "type": "INT32",
+          "buffer": 30,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_5_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000115
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            38,
+            38,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 95,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_5_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            192,
+            1,
+            1,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 59,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_5_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.595722
+            ],
+            "max": [
+              0.647931
+            ],
+            "scale": [
+              0.004877
+            ],
+            "zero_point": [
+              122
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 77,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_6_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            192
+          ],
+          "type": "INT32",
+          "buffer": 38,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_6_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000319
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 58,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_6_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -1.431741
+            ],
+            "max": [
+              2.029678
+            ],
+            "scale": [
+              0.013574
+            ],
+            "zero_point": [
+              105
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 29,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_6_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000145
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 129,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_6_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384,
+            1,
+            1,
+            192
+          ],
+          "type": "UINT8",
+          "buffer": 57,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_6_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.791094
+            ],
+            "max": [
+              0.776309
+            ],
+            "scale": [
+              0.006147
+            ],
+            "zero_point": [
+              129
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 131,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_7_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 50,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_7_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000611
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 56,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_7_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -3.117962
+            ],
+            "max": [
+              3.505301
+            ],
+            "scale": [
+              0.025974
+            ],
+            "zero_point": [
+              120
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 28,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_7_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.00013
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 136,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_7_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 55,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_7_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.686513
+            ],
+            "max": [
+              0.718541
+            ],
+            "scale": [
+              0.00551
+            ],
+            "zero_point": [
+              125
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 132,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_8_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 27,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_8_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000432
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 116,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_8_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -1.967011
+            ],
+            "max": [
+              2.710809
+            ],
+            "scale": [
+              0.018344
+            ],
+            "zero_point": [
+              107
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 26,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_8_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000123
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 134,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_8_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 54,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_8_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.534141
+            ],
+            "max": [
+              0.800755
+            ],
+            "scale": [
+              0.005235
+            ],
+            "zero_point": [
+              102
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 112,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_9_depthwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 25,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_9_depthwise/depthwise_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000493
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            3,
+            3,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 121,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_9_depthwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -2.130208
+            ],
+            "max": [
+              3.215527
+            ],
+            "scale": [
+              0.020964
+            ],
+            "zero_point": [
+              102
+            ]
+          }
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "INT32",
+          "buffer": 24,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_9_pointwise/Conv2D_Fold_bias",
+          "quantization": {
+            "scale": [
+              0.000145
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            19,
+            19,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 166,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_9_pointwise/Relu6",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              5.999762
+            ],
+            "scale": [
+              0.023528
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            384,
+            1,
+            1,
+            384
+          ],
+          "type": "UINT8",
+          "buffer": 139,
+          "name": "FeatureExtractor/MobilenetV1/MobilenetV1/Conv2d_9_pointwise/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -0.547524
+            ],
+            "max": [
+              1.024533
+            ],
+            "scale": [
+              0.006165
+            ],
+            "zero_point": [
+              89
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            1917,
+            4
+          ],
+          "type": "UINT8",
+          "buffer": 147,
+          "name": "Squeeze",
+          "quantization": {
+            "min": [
+              -15.094324
+            ],
+            "max": [
+              5.057784
+            ],
+            "scale": [
+              0.079028
+            ],
+            "zero_point": [
+              191
+            ]
+          }
+        },
+        {
+          "shape": [
+            3
+          ],
+          "type": "INT32",
+          "buffer": 2,
+          "name": "Squeeze_shape",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+
+          ],
+          "buffer": 74,
+          "name": "TFLite_Detection_PostProcess",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+
+          ],
+          "buffer": 40,
+          "name": "TFLite_Detection_PostProcess:1",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+
+          ],
+          "buffer": 164,
+          "name": "TFLite_Detection_PostProcess:2",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+
+          ],
+          "buffer": 101,
+          "name": "TFLite_Detection_PostProcess:3",
+          "quantization": {
+          }
+        },
+        {
+          "shape": [
+            1917,
+            4
+          ],
+          "type": "UINT8",
+          "buffer": 90,
+          "name": "anchors",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              1.64553
+            ],
+            "scale": [
+              0.006453
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            1917,
+            1,
+            4
+          ],
+          "type": "UINT8",
+          "buffer": 88,
+          "name": "concat",
+          "quantization": {
+            "min": [
+              -15.094324
+            ],
+            "max": [
+              5.057784
+            ],
+            "scale": [
+              0.079028
+            ],
+            "zero_point": [
+              191
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            1917,
+            91
+          ],
+          "type": "UINT8",
+          "buffer": 119,
+          "name": "concat_1",
+          "quantization": {
+            "min": [
+              -11.091299
+            ],
+            "max": [
+              1.591577
+            ],
+            "scale": [
+              0.049737
+            ],
+            "zero_point": [
+              223
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            1917,
+            91
+          ],
+          "type": "UINT8",
+          "buffer": 174,
+          "name": "convert_scores",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              0.996094
+            ],
+            "scale": [
+              0.003906
+            ],
+            "zero_point": [
+              0
+            ]
+          }
+        },
+        {
+          "shape": [
+            1,
+            300,
+            300,
+            3
+          ],
+          "type": "UINT8",
+          "buffer": 127,
+          "name": "normalized_input_image_tensor",
+          "quantization": {
+            "min": [
+              -1.0
+            ],
+            "max": [
+              0.992188
+            ],
+            "scale": [
+              0.007812
+            ],
+            "zero_point": [
+              128
+            ]
+          }
+        }
+      ],
+      "inputs": [
+        175
+      ],
+      "outputs": [
+        167,
+        168,
+        169,
+        170
+      ],
+      "operators": [
+        {
+          "inputs": [
+            175,
+            86,
+            84
+          ],
+          "outputs": [
+            85
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 2,
+            "stride_h": 2
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            85,
+            113,
+            112
+          ],
+          "outputs": [
+            111
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            111,
+            116,
+            114
+          ],
+          "outputs": [
+            115
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            115,
+            119,
+            118
+          ],
+          "outputs": [
+            117
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 2,
+            "stride_h": 2,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            117,
+            122,
+            120
+          ],
+          "outputs": [
+            121
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            121,
+            125,
+            124
+          ],
+          "outputs": [
+            123
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            123,
+            128,
+            126
+          ],
+          "outputs": [
+            127
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            127,
+            131,
+            130
+          ],
+          "outputs": [
+            129
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 2,
+            "stride_h": 2,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            129,
+            134,
+            132
+          ],
+          "outputs": [
+            133
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            133,
+            137,
+            136
+          ],
+          "outputs": [
+            135
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            135,
+            140,
+            138
+          ],
+          "outputs": [
+            139
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            139,
+            143,
+            142
+          ],
+          "outputs": [
+            141
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 2,
+            "stride_h": 2,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            141,
+            146,
+            144
+          ],
+          "outputs": [
+            145
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            145,
+            149,
+            148
+          ],
+          "outputs": [
+            147
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            147,
+            152,
+            150
+          ],
+          "outputs": [
+            151
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            151,
+            155,
+            154
+          ],
+          "outputs": [
+            153
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            153,
+            158,
+            156
+          ],
+          "outputs": [
+            157
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            157,
+            161,
+            160
+          ],
+          "outputs": [
+            159
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            159,
+            164,
+            162
+          ],
+          "outputs": [
+            163
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            163,
+            89,
+            88
+          ],
+          "outputs": [
+            87
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            87,
+            92,
+            90
+          ],
+          "outputs": [
+            91
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            91,
+            95,
+            94
+          ],
+          "outputs": [
+            93
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            93,
+            98,
+            96
+          ],
+          "outputs": [
+            97
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            97,
+            101,
+            100
+          ],
+          "outputs": [
+            99
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 2,
+            "stride_h": 2,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            99,
+            104,
+            102
+          ],
+          "outputs": [
+            103
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 2,
+          "inputs": [
+            103,
+            107,
+            106
+          ],
+          "outputs": [
+            105
+          ],
+          "builtin_options_type": "DepthwiseConv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "depth_multiplier": 1
+          }
+        },
+        {
+          "inputs": [
+            105,
+            110,
+            108
+          ],
+          "outputs": [
+            109
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "inputs": [
+            109,
+            62,
+            60
+          ],
+          "outputs": [
+            61
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "fused_activation_function": "RELU6"
+          }
+        },
+        {
+          "inputs": [
+            61,
+            74,
+            72
+          ],
+          "outputs": [
+            73
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 2,
+            "stride_h": 2,
+            "fused_activation_function": "RELU6"
+          }
+        },
+        {
+          "inputs": [
+            73,
+            65,
+            63
+          ],
+          "outputs": [
+            64
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "fused_activation_function": "RELU6"
+          }
+        },
+        {
+          "inputs": [
+            64,
+            77,
+            75
+          ],
+          "outputs": [
+            76
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 2,
+            "stride_h": 2,
+            "fused_activation_function": "RELU6"
+          }
+        },
+        {
+          "inputs": [
+            76,
+            68,
+            66
+          ],
+          "outputs": [
+            67
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "fused_activation_function": "RELU6"
+          }
+        },
+        {
+          "inputs": [
+            67,
+            80,
+            78
+          ],
+          "outputs": [
+            79
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 2,
+            "stride_h": 2,
+            "fused_activation_function": "RELU6"
+          }
+        },
+        {
+          "inputs": [
+            79,
+            71,
+            69
+          ],
+          "outputs": [
+            70
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1,
+            "fused_activation_function": "RELU6"
+          }
+        },
+        {
+          "inputs": [
+            70,
+            83,
+            81
+          ],
+          "outputs": [
+            82
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 2,
+            "stride_h": 2,
+            "fused_activation_function": "RELU6"
+          }
+        },
+        {
+          "inputs": [
+            97,
+            2,
+            1
+          ],
+          "outputs": [
+            0
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            0,
+            8
+          ],
+          "outputs": [
+            6
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              1083,
+              1,
+              4
+            ]
+          }
+        },
+        {
+          "inputs": [
+            97,
+            5,
+            4
+          ],
+          "outputs": [
+            3
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            3,
+            9
+          ],
+          "outputs": [
+            7
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              1083,
+              91
+            ]
+          }
+        },
+        {
+          "inputs": [
+            109,
+            12,
+            11
+          ],
+          "outputs": [
+            10
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            10,
+            18
+          ],
+          "outputs": [
+            16
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              600,
+              1,
+              4
+            ]
+          }
+        },
+        {
+          "inputs": [
+            109,
+            15,
+            14
+          ],
+          "outputs": [
+            13
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            13,
+            19
+          ],
+          "outputs": [
+            17
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              600,
+              91
+            ]
+          }
+        },
+        {
+          "inputs": [
+            73,
+            22,
+            21
+          ],
+          "outputs": [
+            20
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            20,
+            28
+          ],
+          "outputs": [
+            26
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              150,
+              1,
+              4
+            ]
+          }
+        },
+        {
+          "inputs": [
+            73,
+            25,
+            24
+          ],
+          "outputs": [
+            23
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            23,
+            29
+          ],
+          "outputs": [
+            27
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              150,
+              91
+            ]
+          }
+        },
+        {
+          "inputs": [
+            76,
+            32,
+            31
+          ],
+          "outputs": [
+            30
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            30,
+            38
+          ],
+          "outputs": [
+            36
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              54,
+              1,
+              4
+            ]
+          }
+        },
+        {
+          "inputs": [
+            76,
+            35,
+            34
+          ],
+          "outputs": [
+            33
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            33,
+            39
+          ],
+          "outputs": [
+            37
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              54,
+              91
+            ]
+          }
+        },
+        {
+          "inputs": [
+            79,
+            42,
+            41
+          ],
+          "outputs": [
+            40
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            40,
+            48
+          ],
+          "outputs": [
+            46
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              24,
+              1,
+              4
+            ]
+          }
+        },
+        {
+          "inputs": [
+            79,
+            45,
+            44
+          ],
+          "outputs": [
+            43
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            43,
+            49
+          ],
+          "outputs": [
+            47
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              24,
+              91
+            ]
+          }
+        },
+        {
+          "inputs": [
+            82,
+            52,
+            51
+          ],
+          "outputs": [
+            50
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            50,
+            58
+          ],
+          "outputs": [
+            56
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              6,
+              1,
+              4
+            ]
+          }
+        },
+        {
+          "opcode_index": 1,
+          "inputs": [
+            6,
+            16,
+            26,
+            36,
+            46,
+            56
+          ],
+          "outputs": [
+            172
+          ],
+          "builtin_options_type": "ConcatenationOptions",
+          "builtin_options": {
+            "axis": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            172,
+            166
+          ],
+          "outputs": [
+            165
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              1917,
+              4
+            ]
+          }
+        },
+        {
+          "inputs": [
+            82,
+            55,
+            54
+          ],
+          "outputs": [
+            53
+          ],
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "stride_w": 1,
+            "stride_h": 1
+          }
+        },
+        {
+          "opcode_index": 4,
+          "inputs": [
+            53,
+            59
+          ],
+          "outputs": [
+            57
+          ],
+          "builtin_options_type": "ReshapeOptions",
+          "builtin_options": {
+            "new_shape": [
+              1,
+              6,
+              91
+            ]
+          }
+        },
+        {
+          "opcode_index": 1,
+          "inputs": [
+            7,
+            17,
+            27,
+            37,
+            47,
+            57
+          ],
+          "outputs": [
+            173
+          ],
+          "builtin_options_type": "ConcatenationOptions",
+          "builtin_options": {
+            "axis": 1
+          }
+        },
+        {
+          "opcode_index": 3,
+          "inputs": [
+            173
+          ],
+          "outputs": [
+            174
+          ]
+        },
+        {
+          "opcode_index": 5,
+          "inputs": [
+            165,
+            174,
+            171
+          ],
+          "outputs": [
+            167,
+            168,
+            169,
+            170
+          ],
+          "custom_options": [
+            121,
+            95,
+            115,
+            99,
+            97,
+            108,
+            101,
+            0,
+            95,
+            111,
+            117,
+            116,
+            112,
+            117,
+            116,
+            95,
+            113,
+            117,
+            97,
+            110,
+            116,
+            105,
+            122,
+            101,
+            100,
+            0,
+            109,
+            97,
+            120,
+            95,
+            100,
+            101,
+            116,
+            101,
+            99,
+            116,
+            105,
+            111,
+            110,
+            115,
+            0,
+            110,
+            109,
+            115,
+            95,
+            115,
+            99,
+            111,
+            114,
+            101,
+            95,
+            116,
+            104,
+            114,
+            101,
+            115,
+            104,
+            111,
+            108,
+            100,
+            0,
+            119,
+            95,
+            115,
+            99,
+            97,
+            108,
+            101,
+            0,
+            120,
+            95,
+            115,
+            99,
+            97,
+            108,
+            101,
+            0,
+            110,
+            109,
+            115,
+            95,
+            105,
+            111,
+            117,
+            95,
+            116,
+            104,
+            114,
+            101,
+            115,
+            104,
+            111,
+            108,
+            100,
+            0,
+            104,
+            95,
+            115,
+            99,
+            97,
+            108,
+            101,
+            0,
+            109,
+            97,
+            120,
+            95,
+            99,
+            108,
+            97,
+            115,
+            115,
+            101,
+            115,
+            95,
+            112,
+            101,
+            114,
+            95,
+            100,
+            101,
+            116,
+            101,
+            99,
+            116,
+            105,
+            111,
+            110,
+            0,
+            110,
+            117,
+            109,
+            95,
+            99,
+            108,
+            97,
+            115,
+            115,
+            101,
+            115,
+            0,
+            10,
+            134,
+            48,
+            41,
+            119,
+            69,
+            106,
+            19,
+            88,
+            81,
+            151,
+            10,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            64,
+            1,
+            0,
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            154,
+            153,
+            25,
+            63,
+            119,
+            204,
+            43,
+            50,
+            90,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            64,
+            0,
+            0,
+            32,
+            65,
+            0,
+            0,
+            32,
+            65,
+            106,
+            14,
+            6,
+            6,
+            14,
+            14,
+            6,
+            14,
+            14,
+            14,
+            50,
+            38,
+            1
+          ]
+        }
+      ]
+    }
+  ],
+  "description": "TOCO Converted.",
+  "buffers": [
+    {
+    },
+    {
+      "data": [
+        204,
+        178,
+        254,
+        255,
