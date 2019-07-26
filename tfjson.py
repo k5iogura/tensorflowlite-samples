@@ -81,6 +81,9 @@ class graph:
             )
         )
 
+    def get_tensor_quantization(self,tensor_idx):
+        return self.tensors_list[tensor_idx].get('quantization')
+
     def get_builtin_code(self,operator_idx):
         opcode_index = self.get_opcode_index(operator_idx)
         builtin_code = self.operator_codes_list[opcode_index].get('builtin_code')
@@ -163,6 +166,9 @@ class graph:
             src_tensors_npy = [self.get_tensor_npy(tensor) for tensor in src_tensor]
             dst_tensors_npy = [self.get_tensor_npy(tensor) for tensor in dst_tensor]
             print("-----\ndst_tensor {} <= operator_idx {} <= src {}".format(dst_tensor, operator_idx, src_tensor))
+            for tensor_idx in dst_tensor+src_tensor:
+                qnt = self.get_tensor_quantization(tensor_idx)
+                print("  tensor_idx {}:{}".format("%4d"%tensor_idx, qnt))
             exec_operation(self, dst_tensors_npy, operator_idx, src_tensors_npy)
             if order==100:break
         if verbose: print("----- INVOKING DONE -----")
