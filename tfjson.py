@@ -7,6 +7,8 @@ class graph:
     def __init__(self,json_text='detect.json'):
         with open(json_text) as j: root = json.load(j)
 
+        self.invoke_layer = 1000
+
         # datas_list   = /buffers/data
         cleanup_lambda = lambda i: i.get('data') if i.get('data') is not None else []
         self.datas_list     = [cleanup_lambda(i) for i in root['buffers']]
@@ -170,7 +172,7 @@ class graph:
                 qnt = self.get_tensor_quantization(tensor_idx)
                 print("  tensor_idx {}:{}".format("%4d"%tensor_idx, qnt))
             exec_operation(self, dst_tensors_npy, operator_idx, src_tensors_npy)
-            if order==0:break
+            if order==self.invoke_layer:break
         if verbose: print("----- INVOKING DONE -----")
 
 def exec_operation(graph, np_dst, operator_idx, np_src):
@@ -185,8 +187,16 @@ def exec_operation(graph, np_dst, operator_idx, np_src):
     ))
 #    set_trace()
 
-g=graph('detect.json')
-#g.walk_from(g.outputs_list, exec_operation, verbose=True)
-g.allocate_graph()
-g.invoke()
+if __name__ == '__main__':
+    import argparse
+    args = argparse.ArgumentParser()
+    def chF(f): return f if os.path.exists(f) else sys.exit(-1)
+    args.add_argument('-j',"--json",       type=chF, default='detect.json')
+    args.add_argument('-i',"--invoke_layer", type=int, default=0)
+    args = args.parse_args()
+
+    g=graph(args.json)
+    g.invoke_layer = args.invoke_layer
+    g.allocate_graph()
+    g.invoke()
 
