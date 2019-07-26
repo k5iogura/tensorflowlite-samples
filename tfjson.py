@@ -40,7 +40,7 @@ class graph:
         self.operator_codes_list = root['operator_codes']
 
         self.reset_refs()
-        self.order_list     = []
+        self.operate_order_list     = []
 
     def reset_refs(self): self.operator_refs = [0]*len(self.operators_list)
 
@@ -140,7 +140,7 @@ class graph:
         for o, t in zip(operators, tensors):
             if self.refs(o)>0:continue
             self.walk_from(t, func, verbose)
-            self.order_list.append(o)
+            self.operate_order_list.append(o)
             if verbose: self.print_operator(o)
 
             if func is not None:
@@ -159,7 +159,7 @@ class graph:
 
     def invoke(self, verbose=True):
         if verbose: print("----- INVOKING      -----")
-        for order, operator_idx in enumerate(self.order_list):
+        for order, operator_idx in enumerate(self.operate_order_list):
             operator   = self.operators_list[operator_idx]
             src_tensor = operator.get('inputs')
             dst_tensor = operator.get('outputs')
