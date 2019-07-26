@@ -348,8 +348,16 @@ class network:
 if __name__ == '__main__':
 
     net = network(lr = 0.001, epochs = 10)
-    img = np.zeros((300,300,3),np.float32)
-    net.params['conv1_bias'] = np.zeros(24,np.float32)
-    net.params['conv1_filter'] = np.zeros((24,3,3,3),np.float32)
+    if False:
+        img                        = np.zeros((300,300,3),np.float32)
+        net.params['conv1_bias']   = np.zeros(24).astype(np.float32)
+        net.params['conv1_filter'] = np.zeros((24,3,3,3)).astype(np.float32)
+    else:
+        img                        = np.random.randn(300,300,3).astype(np.float32)
+        net.params['conv1_bias']   = np.random.randn(24).astype(np.float32)
+        net.params['conv1_filter'] = np.random.randn(24,3,3,3).astype(np.float32)
+
     x = net.conv(img, name='conv1', filter_count=24, stride=2, padding=1)
-    #net.train()
+
+    #net.train()    # Original Training function()
+
