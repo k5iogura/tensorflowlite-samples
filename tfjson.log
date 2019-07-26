@@ -1,0 +1,13 @@
+dist_tensor [173] <= operator 61(code 1) = src [7, 17, 27, 37, 47, 57] :data_idx [119] <= [153, 138, 160, 102, 169, 173]
+dist_tensor [174] <= operator 62(code 3) = src [173] :data_idx [174] <= [119]
+dist_tensor [167, 168, 169, 170] <= operator 63(code 5) = src [165, 174, 171] :data_idx [74, 40, 164, 101] <= [147, 174, 90]
+----- INVOKING      -----
+-----
+dst_tensor [85] <= operator_idx 0 <= src [175, 86, 84]
+  tensor_idx   85:{u'max': [5.999762], u'scale': [0.023528], u'zero_point': [0], u'min': [0.0]}
+  tensor_idx  175:{u'max': [0.992188], u'scale': [0.007812], u'zero_point': [128], u'min': [-1.0]}
+  tensor_idx   86:{u'max': [1.11439], u'scale': [0.010797], u'zero_point': [152], u'min': [-1.638728]}
+  tensor_idx   84:{u'scale': [8.4e-05], u'zero_point': [0]}
+  dst_shape:[(1, 150, 150, 24)] <= (u'CONV_2D',) <= src_shape:[(1, 300, 300, 3), (24, 3, 3, 3), (24,)]
+----- INVOKING DONE -----
+
