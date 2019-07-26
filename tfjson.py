@@ -170,7 +170,7 @@ class graph:
                 qnt = self.get_tensor_quantization(tensor_idx)
                 print("  tensor_idx {}:{}".format("%4d"%tensor_idx, qnt))
             exec_operation(self, dst_tensors_npy, operator_idx, src_tensors_npy)
-            if order==100:break
+            if order==0:break
         if verbose: print("----- INVOKING DONE -----")
 
 def exec_operation(graph, np_dst, operator_idx, np_src):
