@@ -107,6 +107,22 @@ class graph:
         idx = self.tensors_list[tensor_idx].get('buffer')
         return self.datas_npy_list[idx]
 
+    def get_tensor_npy_f32(self, tensor_idx):
+        npy_tensor = self.get_tensor_npy(tensor_idx)
+        qnt        = self.get_tensor_quantization(tensor_idx)
+        qnt_min    = qnt.get('min')   if qnt.get('min') is not None else 0.0
+        qnt_scale  = qnt.get('scale') if qnt.get('scale') is not None else 0.0
+        qnt_zero   = qnt.get('zero_point')
+        assert qnt_zero is not None
+        if npy_tensor.dtype == np.uint8:
+            ui8_tensor = npy_tensor.copy().astype(np.int32)
+            ui8_tensor[ui8_tensor <  qnt_zero]*=-1                  # Negative Value
+            ui8_tensor[ui8_tensor >= qnt_zero]-=qnt_zero            # Positive Value
+            f32_tensor = qnt_scale * ui8_tensor.astype(np.float32)  # as float32
+        if npy_tensor.dtype == np.int32:
+            f32_tensor = qnt_scale * npy_tensor
+        return f32_tensor
+
     def get_tensor(self, tensor_idx):
         idx = self.tensors_list[tensor_idx].get('buffer')
         shp = self.tensors_list[tensor_idx].get('shape')
@@ -165,8 +181,8 @@ class graph:
             operator   = self.operators_list[operator_idx]
             src_tensor = operator.get('inputs')
             dst_tensor = operator.get('outputs')
-            src_tensors_npy = [self.get_tensor_npy(tensor) for tensor in src_tensor]
-            dst_tensors_npy = [self.get_tensor_npy(tensor) for tensor in dst_tensor]
+            src_tensors_npy = [self.get_tensor_npy_f32(tensor) for tensor in src_tensor]
+            dst_tensors_npy = [self.get_tensor_npy_f32(tensor) for tensor in dst_tensor]
             print("-----\ndst_tensor {} <= operator_idx {} <= src {}".format(dst_tensor, operator_idx, src_tensor))
             for tensor_idx in dst_tensor+src_tensor:
                 qnt = self.get_tensor_quantization(tensor_idx)
