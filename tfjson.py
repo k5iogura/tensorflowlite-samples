@@ -24,7 +24,13 @@ class graph:
         self.operators_list = subgraph_dict['operators']
         self.tensors_list   = subgraph_dict['tensors']
 
+        self.tensors_npy_list = [[]]*len(self.tensors_list)
+        self.tensors_f32_list = [[]]*len(self.tensors_list)
+        self.tensors_shp_list = [[]]*len(self.tensors_list)
+        self.tensors_typ_list = [[]]*len(self.tensors_list)
+        self.tensors_qnt_list = [[]]*len(self.tensors_list)
         self.datas_npy_list = [[]]*len(self.datas_list)
+        self.datas_f32_list = [[]]*len(self.datas_list)
         self.datas_shp_list = [[]]*len(self.datas_list)
         self.datas_typ_list = [None]*len(self.datas_list)
         self.datas_qnt_list = [[]]*len(self.datas_list)
@@ -33,10 +39,11 @@ class graph:
             data_shp = self.tensors_list[idx].get('shape')
             data_typ = self.tensors_list[idx].get('type')
             data_qnt = self.tensors_list[idx].get('quantization')
-            self.datas_shp_list[data_idx] = data_shp
-            self.datas_npy_list[data_idx] = self.get_tensor(idx)
-            self.datas_typ_list[data_idx] = data_typ
-            self.datas_qnt_list[data_idx] = data_qnt
+            self.tensors_npy_list[idx] = self.datas_npy_list[data_idx] = self.get_tensor(idx)
+            self.tensors_f32_list[idx] = self.datas_f32_list[data_idx] = self.get_tensor_npy_f32(idx)
+            self.tensors_shp_list[idx] = self.datas_shp_list[data_idx] = data_shp
+            self.tensors_typ_list[idx] = self.datas_typ_list[data_idx] = data_typ
+            self.tensors_qnt_list[idx] = self.datas_qnt_list[data_idx] = data_qnt
 
         # operator_codes = /operator_codes
         self.operator_codes_list = root['operator_codes']
@@ -111,17 +118,14 @@ class graph:
         npy_tensor = self.get_tensor_npy(tensor_idx)
         qnt        = self.get_tensor_quantization(tensor_idx)
         qnt_min    = qnt.get('min')   if qnt.get('min') is not None else 0.0
-        qnt_scale  = qnt.get('scale') if qnt.get('scale') is not None else 0.0
+        qnt_scale  = qnt.get('scale') if qnt.get('scale') is not None else 1.0
         qnt_zero   = qnt.get('zero_point')
-        assert qnt_zero is not None
         if npy_tensor.dtype == np.uint8:
             ui8_tensor = npy_tensor.copy().astype(np.int32)
-            ui8_tensor[ui8_tensor <  qnt_zero]*=-1                  # Negative Value
-            ui8_tensor[ui8_tensor >= qnt_zero]-=qnt_zero            # Positive Value
-            f32_tensor = qnt_scale * ui8_tensor.astype(np.float32)  # as float32
+            f32_tensor = qnt_scale * ui8_tensor.astype(np.float32) + qnt_min
         if npy_tensor.dtype == np.int32:
             f32_tensor = qnt_scale * npy_tensor
-        return f32_tensor
+        return f32_tensor.astype(np.float32)
 
     def get_tensor(self, tensor_idx):
         idx = self.tensors_list[tensor_idx].get('buffer')
@@ -181,26 +185,41 @@ class graph:
             operator   = self.operators_list[operator_idx]
             src_tensor = operator.get('inputs')
             dst_tensor = operator.get('outputs')
-            src_tensors_npy = [self.get_tensor_npy_f32(tensor) for tensor in src_tensor]
-            dst_tensors_npy = [self.get_tensor_npy_f32(tensor) for tensor in dst_tensor]
+            src_tensors_npy = [self.tensors_f32_list[tensor] for tensor in src_tensor]
+            dst_tensors_npy = [self.tensors_f32_list[tensor] for tensor in dst_tensor]
+            builtin_name = self.get_builtin_code(operator_idx),
             print("-----\ndst_tensor {} <= operator_idx {} <= src {}".format(dst_tensor, operator_idx, src_tensor))
+            print(
+                "operator {} {} {} {}".format(
+                operator_idx,
+                builtin_name,
+                operator.get('builtin_options_type'),
+                operator.get('builtin_options')
+            ))
             for tensor_idx in dst_tensor+src_tensor:
                 qnt = self.get_tensor_quantization(tensor_idx)
                 print("  tensor_idx {}:{}".format("%4d"%tensor_idx, qnt))
+            print(
+                "  dst_shape:{} <= {} <= src_shape:{}".format(
+                [i.shape for i in dst_tensors_npy],
+                builtin_name,
+                [j.shape for j in src_tensors_npy]
+            ))
             exec_operation(self, dst_tensors_npy, operator_idx, src_tensors_npy)
             if order==self.invoke_layer:break
         if verbose: print("----- INVOKING DONE -----")
+        return src_tensors_npy, dst_tensors_npy
 
 def exec_operation(graph, np_dst, operator_idx, np_src):
     opcode_index = graph.get_opcode_index(operator_idx)
     operator     = graph.operators_list[operator_idx]
-    builtin_name = graph.get_builtin_code(operator_idx),
-    print(
-        "  dst_shape:{} <= {} <= src_shape:{}".format(
-        [i.shape for i in np_dst],
-        builtin_name,
-        [j.shape for j in np_src]
-    ))
+    #builtin_name = graph.get_builtin_code(operator_idx),
+    #print(
+        #"  dst_shape:{} <= {} <= src_shape:{}".format(
+        #[i.shape for i in np_dst],
+        #builtin_name,
+        #[j.shape for j in np_src]
+    #))
 #    set_trace()
 
 if __name__ == '__main__':
@@ -214,5 +233,5 @@ if __name__ == '__main__':
     g=graph(args.json)
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
-    g.invoke()
+    src,dst = g.invoke()
 
