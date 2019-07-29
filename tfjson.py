@@ -3,6 +3,10 @@ import json
 import numpy as np
 from pdb import *
 
+import numpy_operator
+net = numpy_operator.nn_operator()
+
+
 class graph:
     def __init__(self,json_text='detect.json'):
         with open(json_text) as j: root = json.load(j)
@@ -178,6 +182,8 @@ class graph:
 
     def allocate_graph(self, verbose=True):
         self.walk_from(self.outputs_list, None, verbose)
+        for order, operator_idx in enumerate(self.operate_order_list):
+            pass
 
     def invoke(self, verbose=True):
         if verbose: print("----- INVOKING      -----")
@@ -205,22 +211,16 @@ class graph:
                 builtin_name,
                 [j.shape for j in src_tensors_npy]
             ))
-            exec_operation(self, dst_tensors_npy, operator_idx, src_tensors_npy)
+            x = exec_operation(self, dst_tensors_npy, operator_idx, src_tensors_npy)
             if order==self.invoke_layer:break
         if verbose: print("----- INVOKING DONE -----")
-        return src_tensors_npy, dst_tensors_npy
+        return x, src_tensors_npy, dst_tensors_npy
 
 def exec_operation(graph, np_dst, operator_idx, np_src):
     opcode_index = graph.get_opcode_index(operator_idx)
     operator     = graph.operators_list[operator_idx]
-    #builtin_name = graph.get_builtin_code(operator_idx),
-    #print(
-        #"  dst_shape:{} <= {} <= src_shape:{}".format(
-        #[i.shape for i in np_dst],
-        #builtin_name,
-        #[j.shape for j in np_src]
-    #))
-#    set_trace()
+    net.add_CONV_2D('conv1', np_src[1], np_src[2], operator.get('builtin_options'))
+    return net.CONV_2D('conv1', np.zeros((300,300,3),np.float32))
 
 if __name__ == '__main__':
     import argparse
@@ -233,5 +233,6 @@ if __name__ == '__main__':
     g=graph(args.json)
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
-    src,dst = g.invoke()
+    x, src, dst = g.invoke()
+
 
