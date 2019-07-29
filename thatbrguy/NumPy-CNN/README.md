@@ -1,5 +1,7 @@
 # NumPy-CNN
-A convolutional neural network fully implemented using NumPy
+A convolutional neural network fully implemented using NumPy  
+
+### [Original Site](https://github.com/thatbrguy/NumPy-CNN)  
 
 ### Requirements:
 - NumPy (obviously)
