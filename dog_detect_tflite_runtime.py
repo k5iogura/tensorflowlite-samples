@@ -47,7 +47,7 @@ for i in range(int(Ndets[0])):
     class_id    = int(classes[0][i])
     print("%.3f(%.3f %.3f %.3f %.3f) %d"%(score,tl[0],tl[1],rb[0],rb[1],class_id))
     label_txt = "%d-%s"%(class_id,LABELS[class_id])
-    res = cv2.rectangle(org,tl,rb,(255,255,255),1)
-    res = cv2.putText(res,label_txt,tl,cv2.FONT_HERSHEY_SIMPLEX,1.0,(255,255,255),2)
-    cv2.imwrite("result.jpg",res)
+    cv2.rectangle(org,tl,rb,(255,255,255),1)
+    cv2.putText(org,label_txt,tl,cv2.FONT_HERSHEY_SIMPLEX,1.0,(255,255,255),2)
+assert cv2.imwrite("result.jpg",org)
 
