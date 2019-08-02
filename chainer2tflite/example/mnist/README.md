@@ -1,4 +1,6 @@
-# mnist example
+# mnist example  
+
+## [original is chainer2tflite gihub](https://github.com/lighttransport/chainer2tflite/tree/devel)  
 
 ## Convert Chainer model to tflite
 
