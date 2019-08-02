@@ -1,0 +1,124 @@
+Platform: Linux-4.15.0-55-generic-x86_64-with-Ubuntu-16.04-xenial
+Chainer: 6.2.0
+NumPy: 1.17.0
+CuPy: Not Available
+iDeep: Not Available
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : DBG: Chainer input name = input0
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : # of inputs = 1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : # of outputs = 1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : output name[0] = output0
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input names = ['input0']
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : -- list of nodes -------------------
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : =============================
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : 0, 140305931343688, LinearFunction
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[0].shape = (1, 784)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[1].shape = (100, 784)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[2].shape = (100,)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   output[0].shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : =============================
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : 1, 140305854215672, ReLU
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[0].shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   output[0].shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : =============================
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : 2, 140305854214328, LinearFunction
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[0].shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[1].shape = (100, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[2].shape = (100,)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   output[0].shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : =============================
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : 3, 140305854215280, ReLU
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[0].shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   output[0].shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : =============================
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : 4, 140305854215336, LinearFunction
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[0].shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[1].shape = (10, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   input[2].shape = (10,)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   output[0].shape = (1, 10)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : ------------------------------------
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : outputs = (1, 10), float32
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = input0
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = W
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = b
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : label = LinearFunction
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : len(inputs) = 3
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : top = LinearFunction-0-1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : parent_layer_names = ['data', 'data', 'data']
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear in (1, 784), float32-0-1(id 140305858589080)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear in (100, 784), float32-0-1(id 140306018672368)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear in (100), float32-0-1(id 140305854156248)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Tensor[0] name = input0, shape = (1, 784)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Tensor[1] name = data, shape = (100, 784)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear output.id = 140305854215168
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : output.shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Tensor[2] name = LinearFunction-0-1_0, shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : fully_connected. input = 0, output = 2, W = 1, b = -1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = None
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : label = ReLU
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : len(inputs) = 1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : top = ReLU-1-1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : parent_layer_names = ['LinearFunction-0-1']
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : ReLU.input.id = 140305854215168
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : ReLU.output.id = 140305854215560
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : ReLU.output.shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Tensor[3] name = ReLU-1-1_0, shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = None
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = W
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = b
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : label = LinearFunction
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : len(inputs) = 3
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : top = LinearFunction-2-1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : parent_layer_names = ['ReLU-1-1', 'data', 'data']
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear in (1, 100), float32-2-1(id 140305854215560)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear in (100, 100), float32-0-1(id 140305854156528)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear in (100), float32-0-2(id 140305854214216)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Tensor[4] name = data, shape = (100, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear output.id = 140305854215784
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : output.shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Tensor[5] name = LinearFunction-2-1_0, shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : fully_connected. input = 3, output = 5, W = 4, b = -1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = None
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : label = ReLU
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : len(inputs) = 1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : top = ReLU-3-1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : parent_layer_names = ['LinearFunction-2-1']
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : ReLU.input.id = 140305854215784
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : ReLU.output.id = 140305854218024
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : ReLU.output.shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Tensor[6] name = ReLU-3-1_0, shape = (1, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = None
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = W
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : input name = b
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : label = LinearFunction
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : len(inputs) = 3
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : top = LinearFunction-4-1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : parent_layer_names = ['ReLU-3-1', 'data', 'data']
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear in (1, 100), float32-4-1(id 140305854218024)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear in (10, 100), float32-0-1(id 140305854214496)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear in (10), float32-0-1(id 140305854214776)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Tensor[7] name = data, shape = (10, 100)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Linear output.id = 140305854216120
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : output.shape = (1, 10)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Tensor[8] name = LinearFunction-4-1_0, shape = (1, 10)
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : fully_connected. input = 6, output = 8, W = 7, b = -1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Num inputs = 1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   [0]
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Num outputs = 1
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export :   [8]
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Num tensors = 9
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Num operators = 5
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : self.tensors = 9
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tensor_pos = 358256
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tensor_pos = 358204
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tensor_pos = 354120
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tensor_pos = 354032
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tensor_pos = 353980
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tensor_pos = 313884
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tensor_pos = 313780
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tensor_pos = 313716
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tensor_pos = 44
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : code = 9
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tf_opcode = 358472
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : code = 19
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : tf_opcode = 358484
+[2019/08/02 18:23:37] INFO (12462) chainer2tflite.export : Wrote a file: mnist.tflite (358548 bytes)
