@@ -8,6 +8,7 @@ sess = tf.InteractiveSession()
 
 # Create the model
 x = tf.placeholder(tf.float32, [None, 784])
+tf.identity(x,name='input')
 y_ = tf.placeholder(tf.float32, [None, 10])
 W = tf.Variable(tf.zeros([784, 10]))
 b = tf.Variable(tf.zeros([10]))
@@ -57,6 +58,7 @@ W_fc2 = weight_variable([1024, 10])
 b_fc2 = bias_variable([10])
 
 y_conv=tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+tf.identity(y_conv,name='output')
 
 cross_entropy = -tf.reduce_sum(y_*tf.log(y_conv))
 train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
@@ -71,7 +73,10 @@ sess.run(tf.initialize_all_variables())
 #with tf.Session() as sess:
     #sess.run(init_op)
 
-for i in range(20000):
+step = 20000
+step = 1000
+saved_file_prefix = "mnist_model_%d_epoch_50_batch"%(step)
+for i in range(step):
     batch = mnist.train.next_batch(50)
     if i%100 == 0:
         train_accuracy = accuracy.eval(feed_dict={
@@ -79,7 +84,11 @@ for i in range(20000):
         print("step %d, training accuracy %g"%(i, train_accuracy))
         train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
-save_path = saver.save(sess, "mnist_model_20000_epoch_50_batch.ckpt")
+graph = tf.Graph()
+with graph.as_default():
+    tf.io.write_graph(graph,".",saved_file_prefix+".pb",as_text=False)
+
+save_path = saver.save(sess, saved_file_prefix+".ckpt")
 print ("Model saved in file: ", save_path)
 
 print("test accuracy %g"%accuracy.eval(feed_dict={
