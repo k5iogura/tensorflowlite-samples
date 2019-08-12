@@ -12,7 +12,7 @@ with graph.as_default():
 
     # Create the model
     x = tf.placeholder(tf.float32, [None, 784])
-    tf.identity(x,name='input')
+    tf.identity(x,name='input_image')
     y_ = tf.placeholder(tf.float32, [None, 10])
     W = tf.Variable(tf.zeros([784, 10]))
     b = tf.Variable(tf.zeros([10]))
@@ -78,8 +78,8 @@ with graph.as_default():
     #with tf.Session() as sess:
         #sess.run(init_op)
 
-    step = 1000
     step = 20000
+    step = 1000
     saved_file_prefix = "mnist_model_%d_epoch_50_batch"%(step)
     for i in range(step):
         batch = mnist.train.next_batch(50)
