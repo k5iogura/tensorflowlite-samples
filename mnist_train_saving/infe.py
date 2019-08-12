@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.python.platform import gfile
+from pdb import *
 
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("data/", one_hot=True)
@@ -26,4 +27,5 @@ with tf.Graph().as_default() as graph: # Set default graph as graph
             #[inference_op],
             #feed_dict={image_placeholder:batch[0]}
         #)
+        set_trace()
 
