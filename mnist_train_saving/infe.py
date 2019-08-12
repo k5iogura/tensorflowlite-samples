@@ -2,39 +2,28 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.python.platform import gfile
 
+from tensorflow.examples.tutorials.mnist import input_data
+mnist = input_data.read_data_sets("data/", one_hot=True)
+
 with tf.Graph().as_default() as graph: # Set default graph as graph
 
    with tf.Session() as sess:
         # Load the graph in graph_def
         print("load graph")
 
-        # We load the protobuf file from the disk and parse it to retrive the unserialized graph_drf
-        with gfile.FastGFile("mnist.pb",'rb') as f:
-
+        with open('mnist_model_20000_epoch_50_batch.pb','rb') as g:
             graph_def = tf.GraphDef()
-            graph_def.ParseFromString(f.read())
-            sess.graph.as_default()
+            graph_def.ParseFromString(g.read())
+            _ = tf.import_graph_def(graph_def,name='')
 
-            # Import a graph_def into the current default Graph (In this case, the weights are (typically) embedded in the graph)
+        image_placeholder = tf.get_default_graph().get_tensor_by_name('Placeholder:0')
 
-            tf.import_graph_def(
-            graph_def,
-            input_map=None,
-            return_elements=None,
-            name="",
-            op_dict=None,
-            producer_op_list=None
-            )
+        inference_op = tf.get_default_graph().get_tensor_by_name('output:0')
 
-            # Print the name of operations in the session
-            for op in graph.get_operations():
-                    print("Operation Name :",op.name)        # Operation name
-                    print("Tensor Stats :",str(op.values()))     # Tensor name
-
-            input = tf.placeholder(np.float32, shape = [None, 32, 32, 3], name='input')
-            dropout_rate = tf.placeholder(tf.float32, shape = [], name = 'dropout_rate')
-
-            tf.import_graph_def(graph_def, {'input': input, 'dropout_rate': dropout_rate})
-
-            output_tensor = graph.get_tensor_by_name("import/cnn/output:0")
+        print(image_placeholder)
+        #batch = mnist.train.next_batch(50)
+        #_ = sess.run(
+            #[inference_op],
+            #feed_dict={image_placeholder:batch[0]}
+        #)
 
