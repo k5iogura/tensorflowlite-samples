@@ -1,13 +1,15 @@
+import os,sys
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
 #import data
 mnist = input_data.read_data_sets("data/", one_hot=True)
 
-sess = tf.InteractiveSession()
-
 graph = tf.Graph()
 with graph.as_default():
+
+    sess = tf.InteractiveSession()
+
     # Create the model
     x = tf.placeholder(tf.float32, [None, 784])
     tf.identity(x,name='input')
@@ -76,8 +78,8 @@ with graph.as_default():
     #with tf.Session() as sess:
         #sess.run(init_op)
 
-    step = 20000
     step = 1000
+    step = 20000
     saved_file_prefix = "mnist_model_%d_epoch_50_batch"%(step)
     for i in range(step):
         batch = mnist.train.next_batch(50)
@@ -87,12 +89,20 @@ with graph.as_default():
             print("step %d, training accuracy %g"%(i, train_accuracy))
             train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
-    tf.io.write_graph(graph,"./",saved_file_prefix+".pb")
-    graph_def = tf.compat.v1.GraphDef()
+#    tf.io.write_graph(graph,"./",saved_file_prefix+".pb")
+#    graph_def = tf.compat.v1.GraphDef()
+    graph_def = sess.graph_def
+    frzdef = tf.graph_util.convert_variables_to_constants(
+        sess,
+        sess.graph_def,
+        ['output']
+    )
     nodes = [n.name + ' => ' +  n.op for n in graph_def.node if n.op in ('Placeholder')]
+    print(nodes)
+    with open(saved_file_prefix+'.pb','wb') as f:f.write(frzdef.SerializeToString())
 
-    save_path = saver.save(sess, saved_file_prefix+".ckpt")
-    print ("Model saved in file: ", save_path)
+    save_path = saver.save(sess, "./param/"+saved_file_prefix+".ckpt")
+    print ("Model saved in file: ", "./param")
 
     print("test accuracy %g"%accuracy.eval(feed_dict={
         x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
