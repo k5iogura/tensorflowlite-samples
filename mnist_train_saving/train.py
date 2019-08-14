@@ -99,6 +99,7 @@ with graph.as_default():
     )
     nodes = [n.name + ' => ' +  n.op for n in graph_def.node if n.op in ('Placeholder')]
     print(nodes)
+    tf.saved_model.simple_save(sess, './models', inputs={"input": x}, outputs={"output": y_conv})
     with open(saved_file_prefix+'.pb','wb') as f:f.write(frzdef.SerializeToString())
 
     save_path = saver.save(sess, "./param/"+saved_file_prefix+".ckpt")
