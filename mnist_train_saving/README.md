@@ -1,6 +1,9 @@
 # mnist train and saving model example  
 [Original GIST](https://gist.github.com/bigsnarfdude/95c19664f5f8aa5b8b403308c5d42b23)
 
+This is training and inference from ground. Training process outputs ckpt directory and frozen protobuff file. You can infer MNIST task with ckpt directory or frozen pb file or tflite file.  
+Need tflite_convert tool on tensorflow-v1.10.  
+
 ### Train  
 ```
  $ python mnist4ML.py
