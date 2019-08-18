@@ -25,7 +25,10 @@ It does'nt work fine.
  # apt install python-numpy
  # pip install numpy
 
- # git clone https://github.com/tensorflow/tensorflow
+ # git clone https://github.com/k5iogura/tensorflowlite-samples
+ # cd tensorflowlite-samples/
+ # git submodule init
+ # git submodule update
  # cd tensorflow
  # ./tensorflow/lite/tools/pip_package/build_pip_package.sh
  # find /tmp/ -iname \*.whl
