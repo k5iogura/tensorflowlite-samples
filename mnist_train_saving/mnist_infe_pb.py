@@ -45,7 +45,7 @@ print "--- MNISTデータの読み込み完了 ---"
 # Sessionを開始する
 # runすることで初めて実行開始される（run(init)しないとinitが実行されない）
 
-sess = tf.InteractiveSession()
+sess = tf.Session()
 #   sess.run(init)
 
 # 1000回の訓練（train_step）を実行する
