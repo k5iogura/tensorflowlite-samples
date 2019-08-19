@@ -25,7 +25,8 @@ class operator():
         self.opcode_index    = operator_json.get('opcode_index') if operator_json.get('opcode_index') is not None else 0
         self.builtin_options = operator_json.get('builtin_options')
         name = self.opcode_name = operator_codes[self.opcode_index].builtin_code
-        return
+
+    def eval(self, name):
         if   name == 'ADD': sys.exit(-1)
         elif name == 'AVERAGE_POOL_2D': sys.exit(-1)
         elif name == 'CONCATENATION': sys.exit(-1)
@@ -127,59 +128,35 @@ class graph:
         self.datas_list     = [cleanup_lambda(i) for i in root['buffers']]
 
         # subgraph          = /subgraphs[0]
-        subgraph_dict       = root['subgraphs'][0]
+        self.subgraph_dict  = subgraph_dict = root['subgraphs'][0]
         # inputs            = /subgraphs[0]/inputs
         # outputs           = /subgraphs[0]/outputs
         # operators         = /subgraphs[0]/operators
         # tensors           = /subgraphs[0]/tensors
-        self.inputs_list    = subgraph_dict['inputs']
-        self.outputs_list   = subgraph_dict['outputs']
-        self.operators_list = subgraph_dict['operators']
-        self.tensors_list   = subgraph_dict['tensors']
-
-        self.tensors_npy_list = [[]]*len(self.tensors_list)
-        self.tensors_f32_list = [[]]*len(self.tensors_list)
-        self.tensors_shp_list = [[]]*len(self.tensors_list)
-        self.tensors_typ_list = [[]]*len(self.tensors_list)
-        self.tensors_qnt_list = [[]]*len(self.tensors_list)
-        self.datas_npy_list = [[]]*len(self.datas_list)
-        self.datas_f32_list = [[]]*len(self.datas_list)
-        self.datas_shp_list = [[]]*len(self.datas_list)
-        self.datas_typ_list = [None]*len(self.datas_list)
-        self.datas_qnt_list = [[]]*len(self.datas_list)
-        for idx in range(len(self.tensors_list)):
-            data_idx = self.tensors_list[idx].get('buffer')
-            data_shp = self.tensors_list[idx].get('shape')
-            data_typ = self.tensors_list[idx].get('type')
-            data_qnt = self.tensors_list[idx].get('quantization')
-            self.tensors_npy_list[idx] = self.datas_npy_list[data_idx] = self.get_tensor(idx)
-            self.tensors_f32_list[idx] = self.datas_f32_list[data_idx] = self.get_tensor_npy_f32(idx)
-            self.tensors_shp_list[idx] = self.datas_shp_list[data_idx] = data_shp
-            self.tensors_typ_list[idx] = self.datas_typ_list[data_idx] = data_typ
-            self.tensors_qnt_list[idx] = self.datas_qnt_list[data_idx] = data_qnt
-        self.operator_codes_list = root['operator_codes']
+        self.inputs         = subgraph_dict['inputs']
+        self.outputs        = subgraph_dict['outputs']
 
         self.tensors = []
-        for idx in range(len(self.tensors_list)):
-            gtnsr = tensor(idx, subgraph_dict['tensors'][idx], root['buffers'])
+        for idx, t in enumerate(subgraph_dict['tensors']):
+            gtnsr = tensor(idx, t, root['buffers'])
             self.tensors.append(gtnsr)
             gtnsr.view()
 
         self.operator_codes = []
-        for idx in range(len(self.operator_codes_list)):
-            oprtr_cd = operator_code(root['operator_codes'][idx])
+        for idx, o in enumerate(root['operator_codes']):
+            oprtr_cd = operator_code(o)
             self.operator_codes.append(oprtr_cd)
 
         self.operators = []
-        for idx in range(len(subgraph_dict['operators'])):
-            oprtr = operator(idx, subgraph_dict['operators'][idx], self.operator_codes)
+        for idx, o in enumerate(subgraph_dict['operators']):
+            oprtr = operator(idx, o, self.operator_codes)
             self.operators.append(oprtr)
             oprtr.view()
 
         self.reset_refs()
         self.operate_order_list     = []
 
-    def reset_refs(self): self.operator_refs = [0]*len(self.operators_list)
+    def reset_refs(self): self.operator_refs = [0]*len(self.operators)
 
     def refs(self, operator_idx):
         refs = self.operator_refs[operator_idx]
@@ -190,70 +167,33 @@ class graph:
         # find subgraph input operator index
         output_operators_idxes = []
         source_tensor_idxes    = []
-        for ope_idx, ope in enumerate(self.operators_list):
-            ope_outs = ope['outputs']
+        for ope_idx, ope in enumerate(self.operators):
+            ope_outs = ope.outputs
             if len(set(ope_outs+tensors)) != len(ope_outs+tensors):
                 output_operators_idxes.append(ope_idx)
-                source_tensor_idxes.append(ope['inputs'])
+                source_tensor_idxes.append(ope.inputs)
         return output_operators_idxes, source_tensor_idxes
 
     def consumers(self, tensors):
         # find subgraph output operator index
         input_operators_idxes = []
         distin_tensor_idxes   = []
-        for ope_idx, ope in enumerate(self.operators_list):
-            ope_ins = ope['inputs']
+        for ope_idx, ope in enumerate(self.operators):
+            ope_ins = ope.inputs
             if len(set(ope_ins+tensors)) != len(ope_ins+tensors):
                 input_operators_idxes.append(ope_idx)
-                distin_tensor_idxes.append(ope['outputs'])
+                distin_tensor_idxes.append(ope.outputs)
         return input_operators_idxes, distin_tensor_idxes
 
     def print_operator(self, operator_idx):
-        opcode= self.get_opcode_index(operator_idx)
-        o_obj = self.operators_list[operator_idx]
+        opcode = self.operators[operator_idx].idx
+        o_obj  = self.operators[operator_idx]
         print("dist_tensor {} <= operator {}(code {}) = src {} data_idx    {} <= {}".format(
-                o_obj['outputs'], operator_idx, opcode, o_obj['inputs'],
-                [self.tensors_list[i].get('buffer') for i in o_obj['outputs']],
-                [self.tensors_list[i].get('buffer') for i in o_obj['inputs']]
+                o_obj.outputs, operator_idx, opcode, o_obj.inputs,
+                [self.tensors[i].buffer for i in o_obj.outputs],
+                [self.tensors[i].buffer for i in o_obj.inputs ]
             )
         )
-
-    def get_tensor_quantization(self,tensor_idx):
-        return self.tensors_list[tensor_idx].get('quantization')
-
-    def get_builtin_code(self,operator_idx):
-        opcode_index = self.get_opcode_index(operator_idx)
-        builtin_code = self.operator_codes_list[opcode_index].get('builtin_code')
-        return builtin_code if builtin_code is not None else 'Undefind'
-
-    def get_opcode_index(self,operator_idx):
-        opcode_index = self.operators_list[operator_idx].get('opcode_index')
-        return opcode_index if opcode_index is not None else 0
-
-    def list2int(self, bdy, idx, Nbyte):
-        val = 0
-        for s, i in enumerate(range(idx, idx+Nbyte)): val += bdy[i]<<(8*s)
-        return val
-
-    def list2float(self, bdy, idx, Nbyte):
-        return np.float32(self.list2int(bdy,idx,Nbyte))
-
-    def get_tensor_npy(self, tensor_idx):
-        idx = self.tensors_list[tensor_idx].get('buffer')
-        return self.datas_npy_list[idx]
-
-    def get_tensor_npy_f32(self, tensor_idx):
-        npy_tensor = self.get_tensor_npy(tensor_idx)
-        qnt        = self.get_tensor_quantization(tensor_idx)
-        qnt_min    = qnt.get('min')   if qnt.get('min') is not None else 0.0
-        qnt_scale  = qnt.get('scale') if qnt.get('scale') is not None else 1.0
-        qnt_zero   = qnt.get('zero_point')
-        if npy_tensor.dtype == np.uint8:
-            ui8_tensor = npy_tensor.copy().astype(np.int32)
-            f32_tensor = qnt_scale * ui8_tensor.astype(np.float32) + qnt_min
-        if npy_tensor.dtype == np.int32:
-            f32_tensor = qnt_scale * npy_tensor
-        return f32_tensor.astype(np.float32)
 
     def get_tensor(self, tensor_idx):
         idx = self.tensors_list[tensor_idx].get('buffer')
@@ -294,11 +234,12 @@ class graph:
             if verbose: self.print_operator(o)
 
     def allocate_graph(self, verbose=True):
-        self.walk_from(self.outputs_list, verbose)
+        self.walk_from(self.outputs, verbose)
         for order, operator_idx in enumerate(self.operate_order_list):
             pass
 
     def invoke(self, verbose=True):
+        return
         if verbose: print("----- INVOKING      -----")
         for order, operator_idx in enumerate(self.operate_order_list):
             operator   = self.operators_list[operator_idx]
