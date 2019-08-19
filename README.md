@@ -3,6 +3,7 @@
 ## [To json from tflite with flatbuffers](./README_flatbuffers.md)  
 ## [Standalone tensorflow-lite.a](CNN_NumberDetector/05_TensorflowLite_CPP/README.md)  
 ## [Standalone tensorflow-lite pip](README_pip_standalone.md)  
+## [tensorflow without AVX and GPU](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)  
 ## [chainer2tflite](chainer2tflite/example/mnist/README.md)  
 
 ## On rock64 requesties
