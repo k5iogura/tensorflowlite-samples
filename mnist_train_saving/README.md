@@ -29,7 +29,15 @@ Need tflite_convert tool on tensorflow-v1.10.
 
 ### Infer with tflite by tensorflow-lite.  
 ```
+ $ tflite_convert --graph_def_file mnist_frozen.pb --input_arrays=inputX --output_arrays=outputX  --output_file=mnist.tflite
+ $ ls *.tflite
+   mnist.tflite
  $ python mnist_infe_tflite.py
+   incorrect truth:prediction = 2 : 3
+   incorrect truth:prediction = 9 : 4
+   incorrect truth:prediction = 8 : 7
+   incorrect truth:prediction = 2 : 1
+   incorrect truth:prediction = 3 : 8
    精度
    0.9002
 ```
