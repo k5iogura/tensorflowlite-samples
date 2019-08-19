@@ -8,6 +8,12 @@ from mnist import MNIST
 # MNISTを読み込むためinput_data.pyを同じディレクトリに置きインポートする
 # input_data.pyはチュートリアル内にリンクがあるのでそこから取得する
 # https://tensorflow.googlesource.com/tensorflow/+/master/tensorflow/examples/tutorials/mnist/input_data.py
+# If on proxy then below,
+# mkdir MNIST_data;cd MNIST_data
+# curl -O http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz
+# curl -O http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz
+# curl -O http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz
+# curl -O http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz
 import tensorflow.examples.tutorials.mnist.input_data as input_data
 
 import time
