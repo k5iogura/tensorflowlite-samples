@@ -7,12 +7,63 @@ import numpy_operator
 net = numpy_operator.nn_operator()
 
 
+class operator_code():
+    def __init__(self, code_json):
+        self.json         = code_json
+        self.builtin_code = code_json.get('builtin_code')
+        self.custom_code  = code_json.get('custom_code')
+
+    def view(self):
+        print(self.builtin_code)
+
+class operator():
+    def __init__(self, operator_idx, operator_json, operator_codes):
+        self.idx     = operator_idx
+        self.json    = operator_json
+        self.inputs  = operator_json.get('inputs')  if operator_json.get('inputs')  is not None else []
+        self.outputs = operator_json.get('outputs') if operator_json.get('outputs') is not None else []
+        self.opcode_index    = operator_json.get('opcode_index') if operator_json.get('opcode_index') is not None else 0
+        self.builtin_options = operator_json.get('builtin_options')
+        name = self.opcode_name = operator_codes[self.opcode_index].builtin_code
+        return
+        if   name == 'ADD': sys.exit(-1)
+        elif name == 'AVERAGE_POOL_2D': sys.exit(-1)
+        elif name == 'CONCATENATION': sys.exit(-1)
+        elif name == 'CONV_2D': sys.exit(-1)
+        elif name == 'DEPTHWISE_CONV_2D': sys.exit(-1)
+        elif name == 'EMBEDDING_LOOKUP': sys.exit(-1)
+        elif name == 'FULLY_CONNECTED': sys.exit(-1)
+        elif name == 'HASHTABLE_LOOKUP': sys.exit(-1)
+        elif name == 'L2_NORMALIZATION': sys.exit(-1)
+        elif name == 'L2_POOL_2D': sys.exit(-1)
+        elif name == 'LOCAL_RESPONSE_NORMALIZATION': sys.exit(-1)
+        elif name == 'LOGISTIC': sys.exit(-1)
+        elif name == 'LSH_PROJECTION': sys.exit(-1)
+        elif name == 'LSTM': sys.exit(-1)
+        elif name == 'MAX_POOL_2D': sys.exit(-1)
+        elif name == 'RELU': sys.exit(-1)
+        elif name == 'RELU6': sys.exit(-1)
+        elif name == 'RESHAPE': sys.exit(-1)
+        elif name == 'RESIZE_BILINEAR': sys.exit(-1)
+        elif name == 'RNN': sys.exit(-1)
+        elif name == 'SOFTMAX': sys.exit(-1)
+        elif name == 'SPACE_TO_DEPTH': sys.exit(-1)
+        elif name == 'SVDF': sys.exit(-1)
+        elif name == 'TANH': sys.exit(-1)
+        elif name == 'CONCAT_EMBEDDINGS': sys.exit(-1)
+        elif name == 'SKIP_GRAM': sys.exit(-1)
+        elif name == 'CALL': sys.exit(-1)
+        elif name == 'CUSTOM': sys.exit(-1)
+
+    def view(self):
+        print(self.idx, self.inputs, self.outputs, self.opcode_index, self.opcode_name)
+
 class tensor():
     def __init__(self, tensor_idx, tensor_json, buffers):
         self.idx    = tensor_idx
         self.json   = tensor_json
         self.shape  = tensor_json.get('shape')  if tensor_json.get('shape')  is not None else []
-        self.type   = tensor_json.get('type')   if tensor_json.get('type')   is not None else 'INT32'
+        self.type   = tensor_json.get('type')   if tensor_json.get('type')   is not None else 'FLOAT32'
         self.name   = tensor_json.get('name')   if tensor_json.get('name')   is not None else 'nothing'
         self.buffer = tensor_json.get('buffer')
 
@@ -29,12 +80,10 @@ class tensor():
             data = buffers[self.buffer].get('data')
             if data is not None:
                 self.data = self.dataWtype(data, self.type, self.shape)
-                #self.data = np.asarray(data,dtype=self.type2np(self.type)).reshape(tuple(self.shape))
             else:
                 self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
         else:
             self.buffer = -1
-        #set_trace()
 
     def list2int(self, bdy, idx, Nbyte):
         val = 0
@@ -54,11 +103,11 @@ class tensor():
 
     def dataWtype(self, bdy, type_string, shp):
         np_type = self.type2np(type_string)
-        if   type_string=='FLOAT32': data = np.asarray( [self.list2float(bdy, i, 4) for i in range(0,len(bdy),4)], np_type )
-        elif type_string=='FLOAT16': data = np.asarray( [self.list2float(bdy, i, 2) for i in range(0,len(bdy),2)], np_type )
-        elif type_string=='INT32':   data = np.asarray( [self.list2int(  bdy, i, 4) for i in range(0,len(bdy),4)], np_type )
-        elif type_string=='INT64':   data = np.asarray( [self.list2int(  bdy, i, 8) for i in range(0,len(bdy),8)], np_type )
-        elif type_string=='UINT8':   data = np.asarray(bdy, np.uint8)
+        if   type_string=='FLOAT32': data = np.asarray([self.list2float(bdy, i, 4) for i in range(0,len(bdy),4)], np_type)
+        elif type_string=='FLOAT16': data = np.asarray([self.list2float(bdy, i, 2) for i in range(0,len(bdy),2)], np_type)
+        elif type_string=='INT32':   data = np.asarray([self.list2int(  bdy, i, 4) for i in range(0,len(bdy),4)], np_type)
+        elif type_string=='INT64':   data = np.asarray([self.list2int(  bdy, i, 8) for i in range(0,len(bdy),8)], np_type)
+        elif type_string=='UINT8':   data = np.asarray(                 bdy,                                      np_type)
         else : assert True, "Unsupported type"+type_string
         return data.reshape(tuple(shp))
 
@@ -108,12 +157,24 @@ class graph:
             self.tensors_shp_list[idx] = self.datas_shp_list[data_idx] = data_shp
             self.tensors_typ_list[idx] = self.datas_typ_list[data_idx] = data_typ
             self.tensors_qnt_list[idx] = self.datas_qnt_list[data_idx] = data_qnt
-
-        for i in range(len(self.tensors_list)):
-            tensor(i, subgraph_dict['tensors'][i], root['buffers']).view()
-
-        # operator_codes = /operator_codes
         self.operator_codes_list = root['operator_codes']
+
+        self.tensors = []
+        for idx in range(len(self.tensors_list)):
+            gtnsr = tensor(idx, subgraph_dict['tensors'][idx], root['buffers'])
+            self.tensors.append(gtnsr)
+            gtnsr.view()
+
+        self.operator_codes = []
+        for idx in range(len(self.operator_codes_list)):
+            oprtr_cd = operator_code(root['operator_codes'][idx])
+            self.operator_codes.append(oprtr_cd)
+
+        self.operators = []
+        for idx in range(len(subgraph_dict['operators'])):
+            oprtr = operator(idx, subgraph_dict['operators'][idx], self.operator_codes)
+            self.operators.append(oprtr)
+            oprtr.view()
 
         self.reset_refs()
         self.operate_order_list     = []
@@ -224,27 +285,16 @@ class graph:
     #                   |        |
     #Tensor ____ ope ___|        |____ ope --- Tensor
     #List                                      List
-    def walk_from(self, tensor_idx, func=None, verbose=True):
+    def walk_from(self, tensor_idx, verbose=True):
         operators, tensors = self.generators(tensor_idx)
         for o, t in zip(operators, tensors):
             if self.refs(o)>0:continue
-            self.walk_from(t, func, verbose)
+            self.walk_from(t, verbose)
             self.operate_order_list.append(o)
             if verbose: self.print_operator(o)
 
-            if func is not None:
-                opcode_index = self.get_opcode_index(o)
-                src_numpy_list = []
-                src_tensors_list = self.operators_list[o].get('inputs')
-                for t in src_tensors_list: src_numpy_list.append(self.get_tensor(t))
-
-                dst_numpy_list = []
-                dst_tensors_list = self.operators_list[o].get('outputs')
-                for t in dst_tensors_list: dst_numpy_list.append(self.get_tensor(t))
-                func(dst_numpy_list, opcode_index, src_numpy_list)
-
     def allocate_graph(self, verbose=True):
-        self.walk_from(self.outputs_list, None, verbose)
+        self.walk_from(self.outputs_list, verbose)
         for order, operator_idx in enumerate(self.operate_order_list):
             pass
 
