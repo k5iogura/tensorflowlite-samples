@@ -20,6 +20,7 @@ class operator():
     def __init__(self, operator_idx, operator_json, operator_codes):
         self.idx     = operator_idx
         self.json    = operator_json
+        lambda x,y,z:x+y+z
         self.inputs  = operator_json.get('inputs')  if operator_json.get('inputs')  is not None else []
         self.outputs = operator_json.get('outputs') if operator_json.get('outputs') is not None else []
         self.opcode_index    = operator_json.get('opcode_index') if operator_json.get('opcode_index') is not None else 0
