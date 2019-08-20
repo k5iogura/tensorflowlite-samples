@@ -47,7 +47,6 @@ class operator():
         elif name == 'DEPTHWISE_CONV_2D': sys.exit(-1)
         elif name == 'EMBEDDING_LOOKUP': sys.exit(-1)
         elif name == 'FULLY_CONNECTED':
-            print('FULLY_CONNECTED')
             x = self.tensors[self.inputs[0]].data
             w = self.tensors[self.inputs[1]].data
             b = self.tensors[self.inputs[2]].data
@@ -67,10 +66,9 @@ class operator():
         elif name == 'RESIZE_BILINEAR': sys.exit(-1)
         elif name == 'RNN': sys.exit(-1)
         elif name == 'SOFTMAX':
-            print('SOFTMAX')
             x  = np.exp(self.tensors[self.inputs[0]].data - np.max(self.tensors[self.inputs[0]].data))
             r  = self.tensors[self.outputs[0]].data = x/np.sum(x)
-            return x
+            return r
         elif name == 'SPACE_TO_DEPTH': sys.exit(-1)
         elif name == 'SVDF': sys.exit(-1)
         elif name == 'TANH': sys.exit(-1)
@@ -163,7 +161,7 @@ class graph:
         for idx, t in enumerate(subgraph_dict['tensors']):
             gtnsr = tensor(idx, t, root['buffers'])
             self.tensors.append(gtnsr)
-            gtnsr.view()
+            #gtnsr.view()
 
         self.operator_codes = []
         for idx, o in enumerate(root['operator_codes']):
@@ -174,7 +172,7 @@ class graph:
         for idx, o in enumerate(subgraph_dict['operators']):
             oprtr = operator(idx, o, self.operator_codes, self.tensors)
             self.operators.append(oprtr)
-            oprtr.view()
+            #oprtr.view()
 
         self.reset_refs()
         self.operate_order_list     = []
@@ -263,36 +261,41 @@ class graph:
             pass
 
     def invoke(self, verbose=True):
-        return
         if verbose: print("----- INVOKING      -----")
+        y=np.asarray([])
         for order, operator_idx in enumerate(self.operate_order_list):
-            operator   = self.operators_list[operator_idx]
-            src_tensor = operator.get('inputs')
-            dst_tensor = operator.get('outputs')
-            src_tensors_npy = [self.tensors_f32_list[tensor] for tensor in src_tensor]
-            dst_tensors_npy = [self.tensors_f32_list[tensor] for tensor in dst_tensor]
-            builtin_name = self.get_builtin_code(operator_idx),
-            print("-----\ndst_tensor {} <= operator_idx {} <= src {}".format(dst_tensor, operator_idx, src_tensor))
-            print(
-                "operator {} {} {} {}".format(
-                operator_idx,
-                builtin_name,
-                operator.get('builtin_options_type'),
-                operator.get('builtin_options')
-            ))
-            for tensor_idx in dst_tensor+src_tensor:
-                qnt = self.get_tensor_quantization(tensor_idx)
-                print("  tensor_idx {}:{}".format("%4d"%tensor_idx, qnt))
-            print(
-                "  dst_shape:{} <= {} <= src_shape:{}".format(
-                [i.shape for i in dst_tensors_npy],
-                builtin_name,
-                [j.shape for j in src_tensors_npy]
-            ))
-            x = exec_operation(self, dst_tensors_npy, operator_idx, src_tensors_npy)
-            if order==self.invoke_layer:break
-        if verbose: print("----- INVOKING DONE -----")
-        return x, src_tensors_npy, dst_tensors_npy
+            operator = self.operators[operator_idx]
+            ans = operator.eval()
+            operator.view()
+        if verbose: print("----- DONE --------------")
+        return ans
+#        for order, operator_idx in enumerate(self.operate_order_list):
+#            operator   = self.operators_list[operator_idx]
+#            src_tensor = operator.get('inputs')
+#            dst_tensor = operator.get('outputs')
+#            src_tensors_npy = [self.tensors_f32_list[tensor] for tensor in src_tensor]
+#            dst_tensors_npy = [self.tensors_f32_list[tensor] for tensor in dst_tensor]
+#            builtin_name = self.get_builtin_code(operator_idx),
+#            print("-----\ndst_tensor {} <= operator_idx {} <= src {}".format(dst_tensor, operator_idx, src_tensor))
+#            print(
+#                "operator {} {} {} {}".format(
+#                operator_idx,
+#                builtin_name,
+#                operator.get('builtin_options_type'),
+#                operator.get('builtin_options')
+#            ))
+#            for tensor_idx in dst_tensor+src_tensor:
+#                qnt = self.get_tensor_quantization(tensor_idx)
+#                print("  tensor_idx {}:{}".format("%4d"%tensor_idx, qnt))
+#            print(
+#                "  dst_shape:{} <= {} <= src_shape:{}".format(
+#                [i.shape for i in dst_tensors_npy],
+#                builtin_name,
+#                [j.shape for j in src_tensors_npy]
+#            ))
+#            x = exec_operation(self, dst_tensors_npy, operator_idx, src_tensors_npy)
+#            if order==self.invoke_layer:break
+#        return x, src_tensors_npy, dst_tensors_npy
 
 def exec_operation(graph, np_dst, operator_idx, np_src):
     opcode_index = graph.get_opcode_index(operator_idx)
@@ -312,9 +315,10 @@ if __name__ == '__main__':
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
     #x, src, dst = g.invoke()
-    g.operators[0].eval()
-    g.operators[1].eval()
-    print(g.tensors[2].data)
-    print(g.tensors[4].data)
+    y = g.invoke()
+    #g.operators[0].eval()
+    #g.operators[1].eval()
+    #print(g.tensors[2].data)
+    #print(g.tensors[4].data)
 
 
