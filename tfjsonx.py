@@ -19,24 +19,40 @@ class operator_code():
         print(self.builtin_code)
 
 class operator():
-    def __init__(self, operator_idx, operator_json, operator_codes):
+    def __init__(self, operator_idx, operator_json, operator_codes, tensors):
         self.idx     = operator_idx
         self.json    = operator_json
+        self.tensors = tensors
         self.inputs  = getordef(operator_json, 'inputs',  [])
         self.outputs = getordef(operator_json, 'outputs', [])
         self.opcode_index    = getordef(operator_json, 'opcode_index',    0)
         self.builtin_options = getordef(operator_json, 'builtin_options', None)
 
-        name = self.opcode_name = operator_codes[self.opcode_index].builtin_code
+        self.name    = self.opcode_name = operator_codes[self.opcode_index].builtin_code
 
-    def eval(self, name):
+    def fully_connected(self, x, W, b):
+        # x : width  x height
+        # W : height x width
+        # b : height
+        y = np.sum(x*W,axis=1)
+        z = y+b
+        return z
+
+    def eval(self):
+        name = self.name
         if   name == 'ADD': sys.exit(-1)
         elif name == 'AVERAGE_POOL_2D': sys.exit(-1)
         elif name == 'CONCATENATION': sys.exit(-1)
         elif name == 'CONV_2D': sys.exit(-1)
         elif name == 'DEPTHWISE_CONV_2D': sys.exit(-1)
         elif name == 'EMBEDDING_LOOKUP': sys.exit(-1)
-        elif name == 'FULLY_CONNECTED': sys.exit(-1)
+        elif name == 'FULLY_CONNECTED':
+            print('FULLY_CONNECTED')
+            x = self.tensors[self.inputs[0]].data
+            w = self.tensors[self.inputs[1]].data
+            b = self.tensors[self.inputs[2]].data
+            r = self.tensors[self.outputs[0]].data = self.fully_connected(x,w,b)
+            return r
         elif name == 'HASHTABLE_LOOKUP': sys.exit(-1)
         elif name == 'L2_NORMALIZATION': sys.exit(-1)
         elif name == 'L2_POOL_2D': sys.exit(-1)
@@ -50,7 +66,11 @@ class operator():
         elif name == 'RESHAPE': sys.exit(-1)
         elif name == 'RESIZE_BILINEAR': sys.exit(-1)
         elif name == 'RNN': sys.exit(-1)
-        elif name == 'SOFTMAX': sys.exit(-1)
+        elif name == 'SOFTMAX':
+            print('SOFTMAX')
+            x  = np.exp(self.tensors[self.inputs[0]].data - np.max(self.tensors[self.inputs[0]].data))
+            r  = self.tensors[self.outputs[0]].data = x/np.sum(x)
+            return x
         elif name == 'SPACE_TO_DEPTH': sys.exit(-1)
         elif name == 'SVDF': sys.exit(-1)
         elif name == 'TANH': sys.exit(-1)
@@ -130,10 +150,6 @@ class graph:
 
         self.invoke_layer = 1000
 
-        # datas_list   = /buffers/data
-#        cleanup_lambda = lambda i: i.get('data') if i.get('data') is not None else []
-#        self.datas_list     = [cleanup_lambda(i) for i in root['buffers']]
-
         # subgraph          = /subgraphs[0]
         # inputs            = /subgraphs[0]/inputs
         # outputs           = /subgraphs[0]/outputs
@@ -156,7 +172,7 @@ class graph:
 
         self.operators = []
         for idx, o in enumerate(subgraph_dict['operators']):
-            oprtr = operator(idx, o, self.operator_codes)
+            oprtr = operator(idx, o, self.operator_codes, self.tensors)
             self.operators.append(oprtr)
             oprtr.view()
 
@@ -296,5 +312,9 @@ if __name__ == '__main__':
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
     #x, src, dst = g.invoke()
+    g.operators[0].eval()
+    g.operators[1].eval()
+    print(g.tensors[2].data)
+    print(g.tensors[4].data)
 
 
