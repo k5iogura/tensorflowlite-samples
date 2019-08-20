@@ -160,7 +160,6 @@ class graph:
         for idx, t in enumerate(subgraph_dict['tensors']):
             gtnsr = tensor(idx, t, root['buffers'])
             self.tensors.append(gtnsr)
-            #gtnsr.view()
 
         self.operator_codes = []
         for idx, o in enumerate(root['operator_codes']):
@@ -171,7 +170,6 @@ class graph:
         for idx, o in enumerate(subgraph_dict['operators']):
             oprtr = operator(idx, o, self.operator_codes, self.tensors)
             self.operators.append(oprtr)
-            #oprtr.view()
 
         self.reset_refs()
         self.operate_order_list     = []
@@ -240,7 +238,7 @@ class graph:
         for order, operator_idx in enumerate(self.operate_order_list):
             operator = self.operators[operator_idx]
             ans = operator.eval()
-            operator.view()
+            if verbose: operator.view()
         if verbose: print("----- DONE --------------")
         return ans
 
@@ -257,12 +255,17 @@ if __name__ == '__main__':
     g=graph(args.json)
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
-    for i in range(100):
+    questions=100
+    corrects =0
+    for i in range(questions):
         number_img, number_out = mnist.test.next_batch(1)
         g.tensors[g.inputs[0]].set(number_img)
-        y = g.invoke()
+        y = g.invoke(verbose=False)
         gt = np.argmax(number_out)
         pr = np.argmax(y)
         if gt!=pr:
             print("incorrenct:",gt,pr)
+        else:
+            corrects+=1
+    print("accurracy %.3f %d/%d"%(1.0*corrects/questions,corrects,questions))
 

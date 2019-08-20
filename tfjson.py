@@ -23,7 +23,7 @@ if __name__ == '__main__':
     for i in range(100):
         number_img, number_out = mnist.test.next_batch(1)
         g.tensors[g.inputs[0]].set(number_img)
-        y = g.invoke()
+        y = g.invoke(verbose=False)
         gt = np.argmax(number_out)
         pr = np.argmax(y)
         if gt!=pr:
