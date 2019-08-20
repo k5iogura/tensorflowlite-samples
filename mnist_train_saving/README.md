@@ -41,3 +41,23 @@ Need tflite_convert tool on tensorflow-v1.10.
    精度
    0.9002
 ```
+
+### Infe with json file by python using numpy only  
+```
+ $ flatc --strict-json -t schema_v3.fbs -- mnist.tflite
+ $ ls *.json
+   mnist.json
+ $ python tfjson.py -j mnist.json
+   dist_tensor [2] <= operator 0(code 0) = src [3, 1, 0] data_idx    [3] <= [5, 1, 4]
+   dist_tensor [4] <= operator 1(code 1) = src [2] data_idx    [2] <= [3] 
+   ('incorrenct:', 9, 3)
+   ('incorrenct:', 5, 3)
+   ('incorrenct:', 5, 9)
+   ('incorrenct:', 7, 9)
+   ('incorrenct:', 9, 3)
+   ('incorrenct:', 7, 4)
+   ('incorrenct:', 8, 5)
+   accurracy 0.930 93/100
+```
+
+**Aug.20,2019**  
