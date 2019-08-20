@@ -80,6 +80,23 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 print "精度"
 print(sess.run(accuracy, feed_dict={net.x: mnist.test.images, y_: mnist.test.labels}))
 
+frzdef = tf.compat.v1.graph_util.convert_variables_to_constants(
+    sess,
+    sess.graph_def,
+    ['outputX']
+)
+
+prefix = 'mnist_'
+
+with open(prefix+'frozen.pb', 'wb') as f:
+    f.write(frzdef.SerializeToString())
+
+tf.train.write_graph(
+    sess.graph_def, '.',
+    prefix+'frozen.pbtxt',
+    as_text=True
+)
+
 # 終了時刻
 end_time = time.time()
 print "終了時刻: " + str(end_time)

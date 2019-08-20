@@ -21,7 +21,7 @@ def max_pool_2x2(x):
                           strides=[1, 2, 2, 1], padding='SAME')
 
 class MNIST():
-    def __init__(self):
+    def __init__(self,train=True):
         #PF
         self.x = tf.placeholder("float", shape=[None, 784], name='inputX')
         #y_ = tf.placeholder("float", shape=[None, 10])
@@ -45,12 +45,16 @@ class MNIST():
         h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])
         h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
+        if train:
         #Dropout
-        self.keep_prob = tf.placeholder("float")
-        h_fc1_drop = tf.nn.dropout(h_fc1, self.keep_prob)
+            self.keep_prob = tf.placeholder("float")
+            h_fc1_drop = tf.nn.dropout(h_fc1, self.keep_prob)
 
         #FC2
         W_fc2 = weight_variable([1024, 10])
         b_fc2 = bias_variable([10])
-        self.y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2, name='outputX')
+        if train:
+            self.y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2, name='outputX')
+        else:
+            self.y_conv = tf.nn.softmax(tf.matmul(h_fc1     , W_fc2) + b_fc2, name='outputX')
 
