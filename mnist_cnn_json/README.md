@@ -20,6 +20,8 @@ Need tflite_convert tool on tensorflow-v1.10.
    0.9002
 ```
 
+**Aug.20,2019**  
+
 ### Infer with frozen pb.  
 ```
  $ python mnist_infe_pb.py
@@ -59,5 +61,3 @@ Need tflite_convert tool on tensorflow-v1.10.
    ('incorrenct:', 8, 5)
    accurracy 0.930 93/100
 ```
-
-**Aug.20,2019**  
