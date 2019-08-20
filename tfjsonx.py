@@ -1,4 +1,5 @@
 import os,sys
+import struct
 import json
 import numpy as np
 from pdb import *
@@ -94,7 +95,11 @@ class tensor():
         return val
 
     def list2float(self, bdy, idx, Nbyte):
-        return np.float32(self.list2int(bdy,idx,Nbyte))
+        val = self.list2int(bdy,idx,Nbyte)
+        sp  = "%08x"%val
+        flt = struct.unpack('!f',sp.decode('hex'))[0]
+        return flt
+        #return np.float32(self.list2int(bdy,idx,Nbyte))
 
     def type2np(self,type_string):
         if type_string == 'FLOAT32': return np.float32
@@ -116,7 +121,7 @@ class tensor():
 
 
     def view(self):
-        print(self.json)
+        print(self.idx, self.json)
         print(self.idx, self.data)
 
 class graph:
