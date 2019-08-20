@@ -4,10 +4,6 @@ import json
 import numpy as np
 from pdb import *
 
-import numpy_operator
-net = numpy_operator.nn_operator()
-
-
 getordef = lambda json,key,default:json.get(key) if json.get(key) is not None else default
 class operator_code():
     def __init__(self, code_json):
@@ -137,6 +133,9 @@ class tensor():
         else : assert True, "Unsupported type"+type_string
         return data.reshape(tuple(shp))
 
+    def set(self, img):
+        self.data = img
+        return self.data
 
     def view(self):
         print(self.idx, self.json)
@@ -216,31 +215,6 @@ class graph:
             )
         )
 
-    def get_tensor(self, tensor_idx):
-        pass
-#        idx = self.tensors_list[tensor_idx].get('buffer')
-#        shp = self.tensors_list[tensor_idx].get('shape')
-#        typ = self.tensors_list[tensor_idx].get('type')
-#        bdy = self.datas_list[idx]
-#        if   typ == 'FLOAT32':
-#            if len(bdy)==0: return np.zeros(shp, np.float32)
-#            return np.asarray( [self.list2float(bdy, i, 4) for i in range(0,len(bdy),4)], np.float32 ).reshape(shp)
-#        elif typ == 'FLOAT16':
-#            if len(bdy)==0: return np.zeros(shp, np.float16)
-#            return np.asarray( [self.list2float(bdy, i, 2) for i in range(0,len(bdy),2)], np.float16 ).reshape(shp)
-#        elif typ == 'INT32':
-#            if len(bdy)==0: return np.zeros(shp, np.int32)
-#            return np.asarray( [self.list2int(bdy, i, 4) for i in range(0,len(bdy),4)], np.int32 ).reshape(shp)
-#        elif typ == 'UINT8':
-#            if len(bdy)==0: return np.zeros(shp, np.uint8)
-#            return np.asarray(bdy, np.uint8).reshape(shp)
-#        elif typ == 'INT64':
-#            if len(bdy)==0: return np.zeros(shp, np.int64)
-#            return np.asarray( [self.list2int(bdy, i, 8) for i in range(0,len(bdy),8)], np.int64 ).reshape(shp)
-#        elif typ == None and shp is not None:
-#            return np.zeros(shp, np.uint8).reshape(shp)
-#        assert False, "tensor_idx={} shape:{} type:{} bdy:{}".format(tensor_idx, shp, typ, bdy)
-
     #     Generators      Focus        Consumers
     #Tensor ---- ope ---+ Tensor +---- ope --- Tensor
     #List               | List   |             List
@@ -269,42 +243,11 @@ class graph:
             operator.view()
         if verbose: print("----- DONE --------------")
         return ans
-#        for order, operator_idx in enumerate(self.operate_order_list):
-#            operator   = self.operators_list[operator_idx]
-#            src_tensor = operator.get('inputs')
-#            dst_tensor = operator.get('outputs')
-#            src_tensors_npy = [self.tensors_f32_list[tensor] for tensor in src_tensor]
-#            dst_tensors_npy = [self.tensors_f32_list[tensor] for tensor in dst_tensor]
-#            builtin_name = self.get_builtin_code(operator_idx),
-#            print("-----\ndst_tensor {} <= operator_idx {} <= src {}".format(dst_tensor, operator_idx, src_tensor))
-#            print(
-#                "operator {} {} {} {}".format(
-#                operator_idx,
-#                builtin_name,
-#                operator.get('builtin_options_type'),
-#                operator.get('builtin_options')
-#            ))
-#            for tensor_idx in dst_tensor+src_tensor:
-#                qnt = self.get_tensor_quantization(tensor_idx)
-#                print("  tensor_idx {}:{}".format("%4d"%tensor_idx, qnt))
-#            print(
-#                "  dst_shape:{} <= {} <= src_shape:{}".format(
-#                [i.shape for i in dst_tensors_npy],
-#                builtin_name,
-#                [j.shape for j in src_tensors_npy]
-#            ))
-#            x = exec_operation(self, dst_tensors_npy, operator_idx, src_tensors_npy)
-#            if order==self.invoke_layer:break
-#        return x, src_tensors_npy, dst_tensors_npy
-
-def exec_operation(graph, np_dst, operator_idx, np_src):
-    opcode_index = graph.get_opcode_index(operator_idx)
-    operator     = graph.operators_list[operator_idx]
-    net.add_CONV_2D('conv1', np_src[1], np_src[2], operator.get('builtin_options'))
-    return net.CONV_2D('conv1', np.zeros((300,300,3),np.float32))
 
 if __name__ == '__main__':
+    import tensorflow.examples.tutorials.mnist.input_data as input_data
     import argparse
+    mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
     args = argparse.ArgumentParser()
     def chF(f): return f if os.path.exists(f) else sys.exit(-1)
     args.add_argument('-j',"--json",       type=chF, default='detect.json')
@@ -314,11 +257,12 @@ if __name__ == '__main__':
     g=graph(args.json)
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
-    #x, src, dst = g.invoke()
-    y = g.invoke()
-    #g.operators[0].eval()
-    #g.operators[1].eval()
-    #print(g.tensors[2].data)
-    #print(g.tensors[4].data)
-
+    for i in range(100):
+        number_img, number_out = mnist.test.next_batch(1)
+        g.tensors[g.inputs[0]].set(number_img)
+        y = g.invoke()
+        gt = np.argmax(number_out)
+        pr = np.argmax(y)
+        if gt!=pr:
+            print("incorrenct:",gt,pr)
 
