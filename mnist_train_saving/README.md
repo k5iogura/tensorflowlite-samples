@@ -44,7 +44,7 @@ Need tflite_convert tool on tensorflow-v1.10.
 
 ### Infe with json file by python using numpy only  
 ```
- $ flatc --strict-json -t schema_v3.fbs -- mnist.tflite
+ $ flatc --strict-json -t ../schema_v3.fbs -- mnist.tflite
  $ ls *.json
    mnist.json
  $ python tfjson.py -j mnist.json
