@@ -99,7 +99,6 @@ class tensor():
         sp  = "%08x"%val
         flt = struct.unpack('!f',sp.decode('hex'))[0]
         return flt
-        #return np.float32(self.list2int(bdy,idx,Nbyte))
 
     def type2np(self,type_string):
         if type_string == 'FLOAT32': return np.float32
@@ -131,15 +130,15 @@ class graph:
         self.invoke_layer = 1000
 
         # datas_list   = /buffers/data
-        cleanup_lambda = lambda i: i.get('data') if i.get('data') is not None else []
-        self.datas_list     = [cleanup_lambda(i) for i in root['buffers']]
+#        cleanup_lambda = lambda i: i.get('data') if i.get('data') is not None else []
+#        self.datas_list     = [cleanup_lambda(i) for i in root['buffers']]
 
         # subgraph          = /subgraphs[0]
-        self.subgraph_dict  = subgraph_dict = root['subgraphs'][0]
         # inputs            = /subgraphs[0]/inputs
         # outputs           = /subgraphs[0]/outputs
         # operators         = /subgraphs[0]/operators
         # tensors           = /subgraphs[0]/tensors
+        self.subgraph_dict  = subgraph_dict = root['subgraphs'][0]
         self.inputs         = subgraph_dict['inputs']
         self.outputs        = subgraph_dict['outputs']
 
