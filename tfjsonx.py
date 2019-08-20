@@ -96,7 +96,7 @@ class tensor():
 
     def list2float(self, bdy, idx, Nbyte):
         val = self.list2int(bdy,idx,Nbyte)
-        sp  = "%08x"%val
+        sp  = "%0"+2*Nbyte+"x"%val
         flt = struct.unpack('!f',sp.decode('hex'))[0]
         return flt
 
