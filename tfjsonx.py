@@ -7,6 +7,7 @@ import numpy_operator
 net = numpy_operator.nn_operator()
 
 
+getordef = lambda json,key,default:json.get(key) if json.get(key) is not None else default
 class operator_code():
     def __init__(self, code_json):
         self.json         = code_json
@@ -20,11 +21,11 @@ class operator():
     def __init__(self, operator_idx, operator_json, operator_codes):
         self.idx     = operator_idx
         self.json    = operator_json
-        lambda x,y,z:x+y+z
-        self.inputs  = operator_json.get('inputs')  if operator_json.get('inputs')  is not None else []
-        self.outputs = operator_json.get('outputs') if operator_json.get('outputs') is not None else []
-        self.opcode_index    = operator_json.get('opcode_index') if operator_json.get('opcode_index') is not None else 0
-        self.builtin_options = operator_json.get('builtin_options')
+        self.inputs  = getordef(operator_json, 'inputs',  [])
+        self.outputs = getordef(operator_json, 'outputs', [])
+        self.opcode_index    = getordef(operator_json, 'opcode_index',    0)
+        self.builtin_options = getordef(operator_json, 'builtin_options', None)
+
         name = self.opcode_name = operator_codes[self.opcode_index].builtin_code
 
     def eval(self, name):
@@ -64,17 +65,17 @@ class tensor():
     def __init__(self, tensor_idx, tensor_json, buffers):
         self.idx    = tensor_idx
         self.json   = tensor_json
-        self.shape  = tensor_json.get('shape')  if tensor_json.get('shape')  is not None else []
-        self.type   = tensor_json.get('type')   if tensor_json.get('type')   is not None else 'FLOAT32'
-        self.name   = tensor_json.get('name')   if tensor_json.get('name')   is not None else 'nothing'
-        self.buffer = tensor_json.get('buffer')
+        self.shape  = getordef(tensor_json, 'shape', [])
+        self.type   = getordef(tensor_json, 'type',  'FLOAT32')
+        self.name   = getordef(tensor_json, 'name',  'nothing')
+        self.buffer = getordef(tensor_json, 'buffer', None)
 
         if tensor_json.get('quantization') is not None:
             quantization = self.quantization = tensor_json.get('quantization')
-            qmax = self.max = quantization.get('max') if quantization.get('max') is not None else 0.
-            qmin = self.min = quantization.get('min') if quantization.get('min') is not None else 0.
-            scale= self.scale      = quantization.get('scale')      if quantization.get('scale') is not None else 0.
-            zero = self.zero_point = quantization.get('zero_point') if quantization.get('zero_point') is not None else 0
+            self.max   = getordef(quantization, 'max', 0.)
+            self.min   = getordef(quantization, 'min', 0.)
+            self.scale = getordef(quantization, 'scale', 0.)
+            self.zero_point = getordef(quantization, 'zero_point', 0)
         else:
             self.quantization = {}
 
@@ -197,28 +198,29 @@ class graph:
         )
 
     def get_tensor(self, tensor_idx):
-        idx = self.tensors_list[tensor_idx].get('buffer')
-        shp = self.tensors_list[tensor_idx].get('shape')
-        typ = self.tensors_list[tensor_idx].get('type')
-        bdy = self.datas_list[idx]
-        if   typ == 'FLOAT32':
-            if len(bdy)==0: return np.zeros(shp, np.float32)
-            return np.asarray( [self.list2float(bdy, i, 4) for i in range(0,len(bdy),4)], np.float32 ).reshape(shp)
-        elif typ == 'FLOAT16':
-            if len(bdy)==0: return np.zeros(shp, np.float16)
-            return np.asarray( [self.list2float(bdy, i, 2) for i in range(0,len(bdy),2)], np.float16 ).reshape(shp)
-        elif typ == 'INT32':
-            if len(bdy)==0: return np.zeros(shp, np.int32)
-            return np.asarray( [self.list2int(bdy, i, 4) for i in range(0,len(bdy),4)], np.int32 ).reshape(shp)
-        elif typ == 'UINT8':
-            if len(bdy)==0: return np.zeros(shp, np.uint8)
-            return np.asarray(bdy, np.uint8).reshape(shp)
-        elif typ == 'INT64':
-            if len(bdy)==0: return np.zeros(shp, np.int64)
-            return np.asarray( [self.list2int(bdy, i, 8) for i in range(0,len(bdy),8)], np.int64 ).reshape(shp)
-        elif typ == None and shp is not None:
-            return np.zeros(shp, np.uint8).reshape(shp)
-        assert False, "tensor_idx={} shape:{} type:{} bdy:{}".format(tensor_idx, shp, typ, bdy)
+        pass
+#        idx = self.tensors_list[tensor_idx].get('buffer')
+#        shp = self.tensors_list[tensor_idx].get('shape')
+#        typ = self.tensors_list[tensor_idx].get('type')
+#        bdy = self.datas_list[idx]
+#        if   typ == 'FLOAT32':
+#            if len(bdy)==0: return np.zeros(shp, np.float32)
+#            return np.asarray( [self.list2float(bdy, i, 4) for i in range(0,len(bdy),4)], np.float32 ).reshape(shp)
+#        elif typ == 'FLOAT16':
+#            if len(bdy)==0: return np.zeros(shp, np.float16)
+#            return np.asarray( [self.list2float(bdy, i, 2) for i in range(0,len(bdy),2)], np.float16 ).reshape(shp)
+#        elif typ == 'INT32':
+#            if len(bdy)==0: return np.zeros(shp, np.int32)
+#            return np.asarray( [self.list2int(bdy, i, 4) for i in range(0,len(bdy),4)], np.int32 ).reshape(shp)
+#        elif typ == 'UINT8':
+#            if len(bdy)==0: return np.zeros(shp, np.uint8)
+#            return np.asarray(bdy, np.uint8).reshape(shp)
+#        elif typ == 'INT64':
+#            if len(bdy)==0: return np.zeros(shp, np.int64)
+#            return np.asarray( [self.list2int(bdy, i, 8) for i in range(0,len(bdy),8)], np.int64 ).reshape(shp)
+#        elif typ == None and shp is not None:
+#            return np.zeros(shp, np.uint8).reshape(shp)
+#        assert False, "tensor_idx={} shape:{} type:{} bdy:{}".format(tensor_idx, shp, typ, bdy)
 
     #     Generators      Focus        Consumers
     #Tensor ---- ope ---+ Tensor +---- ope --- Tensor
