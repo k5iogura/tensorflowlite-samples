@@ -7,8 +7,7 @@ Need tflite_convert tool on tensorflow-v1.10.
 ### Train  
 ```
  $ python mnist4ML.py
- $ ls ckpt *.pb
-   mnist_frozen.pb
+ $ ls ckpt
    ckpt:
    checkpoint  mnist.ckpt-100.data-00000-of-00001  mnist.ckpt-100.index  mnist.ckpt-100.meta
 ```
@@ -18,6 +17,8 @@ Need tflite_convert tool on tensorflow-v1.10.
  $ python mnist_infe_ckpt.py
    精度
    0.9002
+ $ ls *.pb
+   mnist_frozen.pb
 ```
 
 **Aug.20,2019**  
