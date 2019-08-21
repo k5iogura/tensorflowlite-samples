@@ -97,6 +97,12 @@ tf.train.write_graph(
     as_text=True
 )
 
+tf.saved_model.simple_save(
+    sess,
+    './models',
+    inputs={"input":net.x},
+    outputs={"output":net.y_conv}
+)
 # 終了時刻
 end_time = time.time()
 print "終了時刻: " + str(end_time)
