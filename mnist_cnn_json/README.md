@@ -12,7 +12,7 @@ Need tflite_convert tool on tensorflow-v1.10.
    checkpoint  mnist.ckpt-100.data-00000-of-00001  mnist.ckpt-100.index  mnist.ckpt-100.meta
 ```
 
-### Infer with ckpt directory.  
+### Infer and create frozen pb file without Dropout layer with ckpt directory.  
 ```
  $ python mnist_infe_ckpt.py
    精度
@@ -21,14 +21,14 @@ Need tflite_convert tool on tensorflow-v1.10.
    mnist_frozen.pb
 ```
 
-**Aug.20,2019**  
-
 ### Infer with frozen pb.  
 ```
  $ python mnist_infe_pb.py
    精度
    0.9002
 ```
+
+**Aug.21, 2019**  
 
 ### Infer with tflite by tensorflow-lite.  
 ```
