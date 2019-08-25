@@ -58,7 +58,11 @@ class operator():
         elif name == 'MAX_POOL_2D': sys.exit(-1)
         elif name == 'RELU': sys.exit(-1)
         elif name == 'RELU6': sys.exit(-1)
-        elif name == 'RESHAPE': sys.exit(-1)
+        elif name == 'RESHAPE':
+            x = self.tensors[self.inputs[0]].data
+            s = self.tensors[self.inputs[1]].data
+            r = x.reshape(tuple(s))
+            return r
         elif name == 'RESIZE_BILINEAR': sys.exit(-1)
         elif name == 'RNN': sys.exit(-1)
         elif name == 'SOFTMAX':
