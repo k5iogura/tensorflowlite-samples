@@ -26,6 +26,10 @@ class operator():
 
         self.name    = self.opcode_name = operator_codes[self.opcode_index].builtin_code
 
+    def unsupported(self):
+        print(self.name+" IS NOT SUPPORTED",self.outputs,self.name,self.inputs)
+        #sys.exit(-1)
+
     def fully_connected(self, x, W, b):
         # x : width  x height
         # W : height x width
@@ -36,46 +40,46 @@ class operator():
 
     def eval(self):
         name = self.name
-        if   name == 'ADD': sys.exit(-1)
-        elif name == 'AVERAGE_POOL_2D': sys.exit(-1)
-        elif name == 'CONCATENATION': sys.exit(-1)
-        elif name == 'CONV_2D': sys.exit(-1)
-        elif name == 'DEPTHWISE_CONV_2D': sys.exit(-1)
-        elif name == 'EMBEDDING_LOOKUP': sys.exit(-1)
+        if   name == 'ADD': self.unsupported()
+        elif name == 'AVERAGE_POOL_2D': self.unsupported()
+        elif name == 'CONCATENATION': self.unsupported()
+        elif name == 'CONV_2D': self.unsupported()
+        elif name == 'DEPTHWISE_CONV_2D': self.unsupported()
+        elif name == 'EMBEDDING_LOOKUP': self.unsupported()
         elif name == 'FULLY_CONNECTED':
-            x = self.tensors[self.inputs[0]].data
+            x = self.tensors[self.inputs[0]].data.reshape(-1)
             w = self.tensors[self.inputs[1]].data
             b = self.tensors[self.inputs[2]].data
             r = self.tensors[self.outputs[0]].data = self.fully_connected(x,w,b)
             return r
-        elif name == 'HASHTABLE_LOOKUP': sys.exit(-1)
-        elif name == 'L2_NORMALIZATION': sys.exit(-1)
-        elif name == 'L2_POOL_2D': sys.exit(-1)
-        elif name == 'LOCAL_RESPONSE_NORMALIZATION': sys.exit(-1)
-        elif name == 'LOGISTIC': sys.exit(-1)
-        elif name == 'LSH_PROJECTION': sys.exit(-1)
-        elif name == 'LSTM': sys.exit(-1)
-        elif name == 'MAX_POOL_2D': sys.exit(-1)
-        elif name == 'RELU': sys.exit(-1)
-        elif name == 'RELU6': sys.exit(-1)
+        elif name == 'HASHTABLE_LOOKUP': self.unsupported()
+        elif name == 'L2_NORMALIZATION': self.unsupported()
+        elif name == 'L2_POOL_2D': self.unsupported()
+        elif name == 'LOCAL_RESPONSE_NORMALIZATION': self.unsupported()
+        elif name == 'LOGISTIC': self.unsupported()
+        elif name == 'LSH_PROJECTION': self.unsupported()
+        elif name == 'LSTM': self.unsupported()
+        elif name == 'MAX_POOL_2D': self.unsupported()
+        elif name == 'RELU': self.unsupported()
+        elif name == 'RELU6': self.unsupported()
         elif name == 'RESHAPE':
             x = self.tensors[self.inputs[0]].data
             s = self.tensors[self.inputs[1]].data
             r = x.reshape(tuple(s))
             return r
-        elif name == 'RESIZE_BILINEAR': sys.exit(-1)
-        elif name == 'RNN': sys.exit(-1)
+        elif name == 'RESIZE_BILINEAR': self.unsupported()
+        elif name == 'RNN': self.unsupported()
         elif name == 'SOFTMAX':
             x  = np.exp(self.tensors[self.inputs[0]].data - np.max(self.tensors[self.inputs[0]].data))
             r  = self.tensors[self.outputs[0]].data = x/np.sum(x)
             return r
-        elif name == 'SPACE_TO_DEPTH': sys.exit(-1)
-        elif name == 'SVDF': sys.exit(-1)
-        elif name == 'TANH': sys.exit(-1)
-        elif name == 'CONCAT_EMBEDDINGS': sys.exit(-1)
-        elif name == 'SKIP_GRAM': sys.exit(-1)
-        elif name == 'CALL': sys.exit(-1)
-        elif name == 'CUSTOM': sys.exit(-1)
+        elif name == 'SPACE_TO_DEPTH': self.unsupported()
+        elif name == 'SVDF': self.unsupported()
+        elif name == 'TANH': self.unsupported()
+        elif name == 'CONCAT_EMBEDDINGS': self.unsupported()
+        elif name == 'SKIP_GRAM': self.unsupported()
+        elif name == 'CALL': self.unsupported()
+        elif name == 'CUSTOM': self.unsupported()
 
     def view(self):
         print(self.idx, self.inputs, self.outputs, self.opcode_index, self.opcode_name)
@@ -259,7 +263,7 @@ if __name__ == '__main__':
     g=graph(args.json)
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
-    questions=100
+    questions=1
     corrects =0
     for i in range(questions):
         number_img, number_out = mnist.test.next_batch(1)
