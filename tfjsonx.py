@@ -58,7 +58,11 @@ class operator():
         elif name == 'MAX_POOL_2D': sys.exit(-1)
         elif name == 'RELU': sys.exit(-1)
         elif name == 'RELU6': sys.exit(-1)
-        elif name == 'RESHAPE': sys.exit(-1)
+        elif name == 'RESHAPE':
+            x = self.tensors[self.inputs[0]].data
+            s = self.tensors[self.inputs[1]].data
+            r = x.reshape(tuple(s))
+            return r
         elif name == 'RESIZE_BILINEAR': sys.exit(-1)
         elif name == 'RNN': sys.exit(-1)
         elif name == 'SOFTMAX':
@@ -204,7 +208,7 @@ class graph:
         return input_operators_idxes, distin_tensor_idxes
 
     def print_operator(self, operator_idx):
-        opcode = self.operators[operator_idx].idx
+        opcode = self.operators[operator_idx].opcode_index
         o_obj  = self.operators[operator_idx]
         print("dist_tensor {} <= operator {}(code {}) = src {} data_idx    {} <= {}".format(
                 o_obj.outputs, operator_idx, opcode, o_obj.inputs,
