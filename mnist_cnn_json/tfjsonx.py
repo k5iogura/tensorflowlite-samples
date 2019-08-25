@@ -40,46 +40,46 @@ class operator():
 
     def eval(self):
         name = self.name
-        if   name == 'ADD': self.unsupported()
-        elif name == 'AVERAGE_POOL_2D': self.unsupported()
-        elif name == 'CONCATENATION': self.unsupported()
-        elif name == 'CONV_2D': self.unsupported()
+        if   name == 'ADD':               self.unsupported()
+        elif name == 'AVERAGE_POOL_2D':   self.unsupported()
+        elif name == 'CONCATENATION':     self.unsupported()
+        elif name == 'CONV_2D':           self.unsupported()
         elif name == 'DEPTHWISE_CONV_2D': self.unsupported()
-        elif name == 'EMBEDDING_LOOKUP': self.unsupported()
+        elif name == 'EMBEDDING_LOOKUP':  self.unsupported()
         elif name == 'FULLY_CONNECTED':
             x = self.tensors[self.inputs[0]].data.reshape(-1)
             w = self.tensors[self.inputs[1]].data
             b = self.tensors[self.inputs[2]].data
             r = self.tensors[self.outputs[0]].data = self.fully_connected(x,w,b)
             return r
-        elif name == 'HASHTABLE_LOOKUP': self.unsupported()
-        elif name == 'L2_NORMALIZATION': self.unsupported()
-        elif name == 'L2_POOL_2D': self.unsupported()
+        elif name == 'HASHTABLE_LOOKUP':  self.unsupported()
+        elif name == 'L2_NORMALIZATION':  self.unsupported()
+        elif name == 'L2_POOL_2D':        self.unsupported()
         elif name == 'LOCAL_RESPONSE_NORMALIZATION': self.unsupported()
-        elif name == 'LOGISTIC': self.unsupported()
-        elif name == 'LSH_PROJECTION': self.unsupported()
-        elif name == 'LSTM': self.unsupported()
-        elif name == 'MAX_POOL_2D': self.unsupported()
-        elif name == 'RELU': self.unsupported()
-        elif name == 'RELU6': self.unsupported()
+        elif name == 'LOGISTIC':          self.unsupported()
+        elif name == 'LSH_PROJECTION':    self.unsupported()
+        elif name == 'LSTM':              self.unsupported()
+        elif name == 'MAX_POOL_2D':       self.unsupported()
+        elif name == 'RELU':              self.unsupported()
+        elif name == 'RELU6':             self.unsupported()
         elif name == 'RESHAPE':
             x = self.tensors[self.inputs[0]].data
             s = self.tensors[self.inputs[1]].data
             r = x.reshape(tuple(s))
             return r
-        elif name == 'RESIZE_BILINEAR': self.unsupported()
-        elif name == 'RNN': self.unsupported()
+        elif name == 'RESIZE_BILINEAR':   self.unsupported()
+        elif name == 'RNN':               self.unsupported()
         elif name == 'SOFTMAX':
             x  = np.exp(self.tensors[self.inputs[0]].data - np.max(self.tensors[self.inputs[0]].data))
             r  = self.tensors[self.outputs[0]].data = x/np.sum(x)
             return r
-        elif name == 'SPACE_TO_DEPTH': self.unsupported()
-        elif name == 'SVDF': self.unsupported()
-        elif name == 'TANH': self.unsupported()
+        elif name == 'SPACE_TO_DEPTH':    self.unsupported()
+        elif name == 'SVDF':              self.unsupported()
+        elif name == 'TANH':              self.unsupported()
         elif name == 'CONCAT_EMBEDDINGS': self.unsupported()
-        elif name == 'SKIP_GRAM': self.unsupported()
-        elif name == 'CALL': self.unsupported()
-        elif name == 'CUSTOM': self.unsupported()
+        elif name == 'SKIP_GRAM':         self.unsupported()
+        elif name == 'CALL':              self.unsupported()
+        elif name == 'CUSTOM':            self.unsupported()
 
     def view(self):
         print(self.idx, self.inputs, self.outputs, self.opcode_index, self.opcode_name)

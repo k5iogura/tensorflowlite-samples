@@ -21,6 +21,7 @@ if __name__ == '__main__':
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
     questions=100
+    questions=1
     corrects =0
     for i in range(questions):
         number_img, number_out = mnist.test.next_batch(1)
