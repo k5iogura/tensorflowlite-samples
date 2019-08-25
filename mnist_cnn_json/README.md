@@ -60,28 +60,16 @@ Need tflite_convert tool on tensorflow-v1.10.
    dist_tensor [15] <= operator 6(code 2) = src [8, 14, 2] data_idx    [8]  <= [11, 2, 9]
    dist_tensor [17] <= operator 7(code 5) = src [15]       data_idx    [13] <= [8]
 ```
-Included operator in mnist.tflite via mnist.json.  
+Included operators in mnist.tflite.  
 ```
   "operator_codes": [
-    {
-      "builtin_code": "CONV_2D"
-    },
-    {
-      "builtin_code": "DEPTHWISE_CONV_2D"
-    },
-    {
-      "builtin_code": "FULLY_CONNECTED"
-    },
-    {
-      "builtin_code": "MAX_POOL_2D"
-    },
-    {
-      "builtin_code": "RESHAPE"
-    },
-    {
-      "builtin_code": "SOFTMAX"
-    }
-  ],
+    { "builtin_code": "CONV_2D" },
+    { "builtin_code": "DEPTHWISE_CONV_2D" },
+    { "builtin_code": "FULLY_CONNECTED" },
+    { "builtin_code": "MAX_POOL_2D" },
+    { "builtin_code": "RESHAPE" },
+    { "builtin_code": "SOFTMAX" }
+  ]
 ```
 As of 25.Aug,2019, unsupported operators are CONV_2D, DEPTHWISE_CONV_2D, MAX_POOL_2D, RESHAPE.  
 
