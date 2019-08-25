@@ -204,7 +204,7 @@ class graph:
         return input_operators_idxes, distin_tensor_idxes
 
     def print_operator(self, operator_idx):
-        opcode = self.operators[operator_idx].idx
+        opcode = self.operators[operator_idx].opcode_index
         o_obj  = self.operators[operator_idx]
         print("dist_tensor {} <= operator {}(code {}) = src {} data_idx    {} <= {}".format(
                 o_obj.outputs, operator_idx, opcode, o_obj.inputs,
