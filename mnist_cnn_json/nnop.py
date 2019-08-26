@@ -8,7 +8,7 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     getordef = lambda json,key,default:json.get(key) if json.get(key) is not None else default
 
     stride           = getordef(operator.builtin_options, 'stride_h', 2)
-    padding          = getordef(operator.builtin_options, 'padding',  0)
+    padding          = getordef(operator.builtin_options, 'padding',  1)
     depth_multiplier = getordef(operator.builtin_options, 'depth_multiplier',  1)
     activate         = getordef(operator.builtin_options, 'fused_activation_function', None)
     tensor_idx_input, tensor_idx_filter, tensor_idx_bias = inputs
@@ -24,6 +24,12 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     # Calculating output shape
     output_height = (tensor_input.shape[0] - filter_size + 2*padding) / stride + 1
     output_width  = (tensor_input.shape[1] - filter_size + 2*padding) / stride + 1
+    if True:
+        # SAME
+        output_height = int(np.ceil(tensor_input.data.shape[1] / float(stride)))
+        output_width  = int(np.ceil(tensor_input.data.shape[2] / float(stride)))
+    else:
+        output_height = int(np.ceil(tensor_input.data.shape[1] / float(stride)))
     
     # (32,32) -> (32,32,1)
     if tensor_input.data.ndim == 2: tensor_input.data = np.expand_dims(tensor_input.data, axis = 2)
@@ -41,7 +47,8 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
         pad_horizontal = (padding, padding)
     
     # Padding along height and width
-    tensor_input.data = np.pad(tensor_input.data, (pad_horizontal, pad_vertical, (0,0)), mode='constant')
+    set_trace()
+    #tensor_input.data = np.pad(tensor_input.data, (pad_horizontal, pad_vertical, (0,0)), mode='constant')
     
     # Appending current input for backpropagation
     #self.inputs[name] = tensor_input.data
@@ -57,15 +64,15 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
             row_end = row_start + filter_size
             col_start = col*stride
             col_end = col_start + filter_size
-            patches.append(img[row_start:row_end, col_start:col_end, :]) ##M
-    
+            patches.append(tensor_input.data[row_start:row_end, col_start:col_end, :]) ##M
+    set_trace()
     # Performing convolution with each patch, for every filter. (Technically, correlation).
     for filter_, bias in zip(F, B):
         temp_ = []
         for patch_idx, patch in enumerate(patches):
             temp_.append(np.sum(patch * filter_) + bias)
         output_.append(np.array(temp_).reshape(int(output_height), int(output_width)))
-    
+    set_trace()
     output_ = np.transpose(np.array(output_), (1,2,0))
     
     # Printing model summary after initialization
