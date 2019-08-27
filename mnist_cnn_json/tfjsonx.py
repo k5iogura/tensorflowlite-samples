@@ -3,6 +3,7 @@ import struct
 import json
 import numpy as np
 from pdb import *
+from nnop import CONV_2D
 
 getordef = lambda json,key,default:json.get(key) if json.get(key) is not None else default
 class operator_code():
@@ -44,7 +45,8 @@ class operator():
         elif name == 'AVERAGE_POOL_2D':   self.unsupported()
         elif name == 'CONCATENATION':     self.unsupported()
         elif name == 'CONV_2D':           self.unsupported()
-        elif name == 'DEPTHWISE_CONV_2D': self.unsupported()
+        elif name == 'DEPTHWISE_CONV_2D':
+            CONV_2D(self, self.outputs, self.inputs)
         elif name == 'EMBEDDING_LOOKUP':  self.unsupported()
         elif name == 'FULLY_CONNECTED':
             x = self.tensors[self.inputs[0]].data.reshape(-1)

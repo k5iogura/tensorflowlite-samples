@@ -4,7 +4,6 @@ import json
 import numpy as np
 from pdb import *
 
-from nnop import CONV_2D
 from tfjsonx import graph
 
 import tensorflow.examples.tutorials.mnist.input_data as input_data
