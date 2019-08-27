@@ -9,13 +9,20 @@ from pdb import *
 # CHWC : filter tensor shape   = ( out_ch, k, k, in_ch ) at CONV_2D
 # C    : bias   tensor shape   = ( in_ch               )
 
+def RELUx(numpy_in, val=0):
+    assert numpy_in.dtype != np.uint8,"RELU not supports {}".format(np.uint8)
+    numpy_out = numpy_in.copy()
+    numpy_out[numpy_out<0] = 0
+    if val > 0: numpy_out[numpy_out>=val] = val
+    return numpy_out
+
 def CONV_2D(operator, outputs, inputs, verbose=True):
     getordef = lambda json,key,default:json.get(key) if json.get(key) is not None else default
 
     stride           = getordef(operator.builtin_options, 'stride_h', 2)
     padding          = getordef(operator.builtin_options, 'padding',  0)
     depth_multiplier = getordef(operator.builtin_options, 'depth_multiplier',  0)
-    activate         = getordef(operator.builtin_options, 'fused_activation_function', None)
+    _activation_     = getordef(operator.builtin_options, 'fused_activation_function', None)
     tensor_idx_input, tensor_idx_filter, tensor_idx_bias = inputs
     tensor_input     = operator.tensors[tensor_idx_input]
     tensor_idx_output= outputs[0]
@@ -105,7 +112,12 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
         # output_.append(np.array(temp_).reshape(int(output_height), int(output_width))) # for CONV
     #output_ = np.transpose(np.array(output_), (1,2,0)) # for CONV
     output_ = np.asarray(temp_).reshape((1, output_height, output_width, -1))
+    if   "RELU"  in _activation_: output_ = RELUx(output_, 0)
+    elif "RELU1" in _activation_: output_ = RELUx(output_, 1)
+    elif "RELU6" in _activation_: output_ = RELUx(output_, 6)
+    else: print(_activation_+' not found')
     assert output_.shape == tensor_output.data.shape
+    tensor_output.data = output_
     # Printing model summary after initialization
     #if verbose:
     #    print(name, '(input):', shape)
