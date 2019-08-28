@@ -67,7 +67,7 @@ class operator():
         elif name == 'RESHAPE':
             x = self.tensors[self.inputs[0]].data
             s = self.tensors[self.inputs[1]].data
-            r = x.reshape(tuple(s))
+            r = self.tensors[self.outputs[0]].data = x.reshape(tuple(s))
             return r
         elif name == 'RESIZE_BILINEAR':   self.unsupported()
         elif name == 'RNN':               self.unsupported()
