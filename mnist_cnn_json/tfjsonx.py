@@ -1,4 +1,4 @@
-import os,sys
+import os,sys,re
 import struct
 import json
 import numpy as np
@@ -26,6 +26,7 @@ class operator():
         self.builtin_options = getordef(operator_json, 'builtin_options', None)
 
         self.name    = self.opcode_name = operator_codes[self.opcode_index].builtin_code
+        self.nick    = re.sub('[_AIUEO0-9]','',self.name)[:5]
 
     def unsupported(self):
         print(self.name+" IS NOT SUPPORTED",self.outputs,self.name,self.inputs)
@@ -216,8 +217,9 @@ class graph:
     def print_operator(self, operator_idx):
         opcode = self.operators[operator_idx].opcode_index
         o_obj  = self.operators[operator_idx]
-        print("dist_tensor {} <= operator {}(code {}) = src {} data_idx    {} <= {}".format(
-                o_obj.outputs, operator_idx, opcode, o_obj.inputs,
+        o_nick = self.operators[operator_idx].nick
+        print("dist_tensor {} <= operator {} {}(code {}) = src {} data_idx    {} <= {}".format(
+                o_obj.outputs, o_nick, operator_idx, opcode, o_obj.inputs,
                 [self.tensors[i].buffer for i in o_obj.outputs],
                 [self.tensors[i].buffer for i in o_obj.inputs ]
             )
