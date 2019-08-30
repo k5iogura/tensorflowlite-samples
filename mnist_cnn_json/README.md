@@ -43,23 +43,22 @@ Need tflite_convert tool on tensorflow-v1.10.
    0.9002
 ```
 
-**Aug.25, 2019**  
-
-### Infe with json file by python using numpy only  
+### Infer with json file by python using numpy only  
 ```
  $ flatc --strict-json -t ../schema_v3.fbs -- mnist.tflite
  $ ls *.json
    mnist.json
  $ python tfjson.py -j mnist.json
-   dist_tensor [9] <= operator 0(code 4)  = src [16, 10]   data_idx    [15] <= [10, 16]
-   dist_tensor [6] <= operator 1(code 1)  = src [9, 11, 1] data_idx    [14] <= [15, 18, 12]
-   dist_tensor [4] <= operator 2(code 3)  = src [6]        data_idx    [17] <= [14]
-   dist_tensor [7] <= operator 3(code 0)  = src [4, 12, 0] data_idx    [7]  <= [17, 5, 4]
-   dist_tensor [5] <= operator 4(code 3)  = src [7]        data_idx    [6]  <= [7]
-   dist_tensor [8] <= operator 5(code 2)  = src [5, 13, 3] data_idx    [11] <= [6, 3, 1]
-   dist_tensor [15] <= operator 6(code 2) = src [8, 14, 2] data_idx    [8]  <= [11, 2, 9]
-   dist_tensor [17] <= operator 7(code 5) = src [15]       data_idx    [13] <= [8]
+   dist_tensor [9]  <= operator RSHP  0(code 4) = src [16, 10]   data_idx    [15] <= [10, 16]
+   dist_tensor [6]  <= operator DPTHW 1(code 1) = src [9, 11, 1] data_idx    [14] <= [15, 18, 12]
+   dist_tensor [4]  <= operator MXPLD 2(code 3) = src [6]        data_idx    [17] <= [14]
+   dist_tensor [7]  <= operator CNVD  3(code 0) = src [4, 12, 0] data_idx    [7]  <= [17, 5, 4]
+   dist_tensor [5]  <= operator MXPLD 4(code 3) = src [7]        data_idx    [6]  <= [7]
+   dist_tensor [8]  <= operator FLLYC 5(code 2) = src [5, 13, 3] data_idx    [11] <= [6, 3, 1]
+   dist_tensor [15] <= operator FLLYC 6(code 2) = src [8, 14, 2] data_idx    [8]  <= [11, 2, 9]
+   dist_tensor [17] <= operator SFTMX 7(code 5) = src [15]       data_idx    [13] <= [8]
 ```
+
 Included operators in mnist.tflite.  
 ```
   "operator_codes": [
@@ -71,5 +70,8 @@ Included operators in mnist.tflite.
     { "builtin_code": "SOFTMAX" }
   ]
 ```
-As of 25.Aug,2019, unsupported operators are CONV_2D, DEPTHWISE_CONV_2D, MAX_POOL_2D, RESHAPE.  
+As of 30.Aug,2019, supported operators are **CONV_2D, DEPTHWISE_CONV_2D, MAX_POOL_2D, RESHAPE, FULLY_CONNECTED**.  
 
+### For debug of own implemented operator see [TensorFlow Lite Interpreter get_tensor() #23384](../README_get_tensor.md)  
+
+**Aug.30, 2019**  
