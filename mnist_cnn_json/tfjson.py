@@ -17,14 +17,16 @@ if __name__ == '__main__':
     args.add_argument('-i',"--invoke_layer", type=int, default=0)
     args = args.parse_args()
 
+    print("** Setup")
     g=graph(args.json)
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
+    print("** Done\n** Invoke inference")
     questions=100
     questions=1
     corrects =0
     for i in range(questions):
-        number_img = mnist.test.images[0]
+        number_img = mnist.test.images[0].reshape(-1,28,28,1)
         number_gt  = mnist.test.labels[0]
         g.tensors[g.inputs[0]].set(number_img)
         y = g.invoke(verbose=False)

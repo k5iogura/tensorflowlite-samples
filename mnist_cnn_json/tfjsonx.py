@@ -3,7 +3,7 @@ import struct
 import json
 import numpy as np
 from pdb import *
-from nnop import CONV_2D
+from nnop import DEPTHWISE_CONV_2D, MAX_POOL_2D, CONV_2D, RELUx
 
 getordef = lambda json,key,default:json.get(key) if json.get(key) is not None else default
 class operator_code():
@@ -45,15 +45,24 @@ class operator():
         if   name == 'ADD':               self.unsupported()
         elif name == 'AVERAGE_POOL_2D':   self.unsupported()
         elif name == 'CONCATENATION':     self.unsupported()
-        elif name == 'CONV_2D':           self.unsupported()
-        elif name == 'DEPTHWISE_CONV_2D':
+        elif name == 'CONV_2D':
             CONV_2D(self, self.outputs, self.inputs)
+        elif name == 'DEPTHWISE_CONV_2D':
+            DEPTHWISE_CONV_2D(self, self.outputs, self.inputs)
         elif name == 'EMBEDDING_LOOKUP':  self.unsupported()
         elif name == 'FULLY_CONNECTED':
             x = self.tensors[self.inputs[0]].data.reshape(-1)
             w = self.tensors[self.inputs[1]].data
             b = self.tensors[self.inputs[2]].data
-            r = self.tensors[self.outputs[0]].data = self.fully_connected(x,w,b)
+            r = self.fully_connected(x,w,b)
+            _activation_ = getordef(self.builtin_options, 'fused_activation_function', None)
+            set_trace()
+            if _activation_ is not None:
+                if   "RELU"  in _activation_: r = RELUx(r, 0)
+                elif "RELU1" in _activation_: r = RELUx(r, 1)
+                elif "RELU6" in _activation_: r = RELUx(r, 6)
+                else: print(_activation_+' not supported')
+            self.tensors[self.outputs[0]].data = r
             return r
         elif name == 'HASHTABLE_LOOKUP':  self.unsupported()
         elif name == 'L2_NORMALIZATION':  self.unsupported()
@@ -62,7 +71,8 @@ class operator():
         elif name == 'LOGISTIC':          self.unsupported()
         elif name == 'LSH_PROJECTION':    self.unsupported()
         elif name == 'LSTM':              self.unsupported()
-        elif name == 'MAX_POOL_2D':       self.unsupported()
+        elif name == 'MAX_POOL_2D':
+            MAX_POOL_2D(self, self.outputs, self.inputs)
         elif name == 'RELU':              self.unsupported()
         elif name == 'RELU6':             self.unsupported()
         elif name == 'RESHAPE':
@@ -73,7 +83,12 @@ class operator():
         elif name == 'RESIZE_BILINEAR':   self.unsupported()
         elif name == 'RNN':               self.unsupported()
         elif name == 'SOFTMAX':
-            x  = np.exp(self.tensors[self.inputs[0]].data - np.max(self.tensors[self.inputs[0]].data))
+            assert len(self.inputs) == 1, "SOFTMAX not support dim {}".format(self.inputs)
+            beta = getordef(self.builtin_options, 'beta', 1.0)
+            assert beta != 0, "SOFTMAX not support beta {}".format(beta)
+            # x  = np.exp(self.tensors[self.inputs[0]].data - np.max(self.tensors[self.inputs[0]].data))
+            input_tensor = self.tensors[self.inputs[0]]
+            x  = np.exp(beta*(input_tensor.data - np.max(input_tensor.data)))
             r  = self.tensors[self.outputs[0]].data = x/np.sum(x)
             return r
         elif name == 'SPACE_TO_DEPTH':    self.unsupported()
