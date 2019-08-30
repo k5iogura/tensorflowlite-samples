@@ -9,11 +9,19 @@ from pdb import *
 # CHWC : filter tensor shape   = ( out_ch, k, k, in_ch ) at CONV_2D
 # C    : bias   tensor shape   = ( in_ch               )
 
-def RELUx(numpy_in, val=0):
+def RELUx(numpy_in, val=0, leaky=None):
     assert numpy_in.dtype != np.uint8,"RELU not supports {}".format(np.uint8)
     numpy_out = numpy_in.copy()
-    numpy_out[numpy_out<0] = 0
-    if val > 0: numpy_out[numpy_out>=val] = val
+    if val > 1:                    # RELUx
+        numpy_out[numpy_out < 0]   = 0
+        numpy_out[numpy_out > val] = val
+    elif val == 1:                 # RELU1
+        numpy_out[numpy_out < -1]  = -1
+        numpy_out[numpy_out > val] =  1
+    elif leaky is not None:        # LEAKY RELU
+        numpy_out[numpy_out < 0]  *= leaky
+    else:                          # RELU
+        numpy_out[numpy_out < 0]   = 0
     return numpy_out
 
 def CONV_2D(operator, outputs, inputs, verbose=True):
