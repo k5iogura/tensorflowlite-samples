@@ -43,9 +43,7 @@ Need tflite_convert tool on tensorflow-v1.10.
    0.9002
 ```
 
-**Aug.25, 2019**  
-
-### Infe with json file by python using numpy only  
+### Infer with json file by python using numpy only  
 ```
  $ flatc --strict-json -t ../schema_v3.fbs -- mnist.tflite
  $ ls *.json
@@ -71,5 +69,8 @@ Included operators in mnist.tflite.
     { "builtin_code": "SOFTMAX" }
   ]
 ```
-As of 25.Aug,2019, unsupported operators are CONV_2D, DEPTHWISE_CONV_2D, MAX_POOL_2D, RESHAPE.  
+As of 30.Aug,2019, supported operators are CONV_2D, DEPTHWISE_CONV_2D, MAX_POOL_2D, RESHAPE, FULLY_CONNECTED.  
 
+### For debug of own implemented operator see [TensorFlow Lite Interpreter get_tensor() #23384](../README_get_tensor.md)  
+
+**Aug.30, 2019**  
