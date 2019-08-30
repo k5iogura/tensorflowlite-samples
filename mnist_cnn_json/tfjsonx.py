@@ -42,7 +42,13 @@ class operator():
 
     def eval(self):
         name = self.name
-        if   name == 'ADD':               self.unsupported()
+        if   name == 'ADD':     # Untested yet
+            r = self.tensors[0].data
+            for i in self.inputs[1:]:
+                assert self.tensors[0].shape == self.tensors[i].shape,"Unmatch {} {}".format(
+                                                    r.shape, self.tensors[i].shape)
+                r += self.tensors[i].data
+            return r
         elif name == 'AVERAGE_POOL_2D':   self.unsupported()
         elif name == 'CONCATENATION':     self.unsupported()
         elif name == 'CONV_2D':
@@ -56,7 +62,6 @@ class operator():
             b = self.tensors[self.inputs[2]].data
             r = self.fully_connected(x,w,b)
             _activation_ = getordef(self.builtin_options, 'fused_activation_function', None)
-            set_trace()
             if _activation_ is not None:
                 if   "RELU"  in _activation_: r = RELUx(r, 0)
                 elif "RELU1" in _activation_: r = RELUx(r, 1)
@@ -73,8 +78,14 @@ class operator():
         elif name == 'LSTM':              self.unsupported()
         elif name == 'MAX_POOL_2D':
             MAX_POOL_2D(self, self.outputs, self.inputs)
-        elif name == 'RELU':              self.unsupported()
-        elif name == 'RELU6':             self.unsupported()
+        elif name == 'RELU':
+            x = self.tensors[self.inputs[0]].data
+            r = self.tensors[self.outputs[0]].data = RELUx(x, 0)
+            return r
+        elif name == 'RELU6':
+            x = self.tensors[self.inputs[0]].data
+            r = self.tensors[self.outputs[0]].data = RELUx(x, 6)
+            return r
         elif name == 'RESHAPE':
             x = self.tensors[self.inputs[0]].data
             s = self.tensors[self.inputs[1]].data
@@ -261,9 +272,12 @@ class graph:
 
     def invoke(self, verbose=True):
         if verbose: print("----- INVOKING      -----")
-        y=np.asarray([])
         for order, operator_idx in enumerate(self.operate_order_list):
             operator = self.operators[operator_idx]
+            for i in operator.inputs:   # Check only
+                input_ = self.tensors[i]
+                assert input_.shape == input_.data.shape,"Input shape mismatch {} {}".format(
+                        self.tensors[i].shape, self.tensors[i].data.shape)
             ans = operator.eval()
             if verbose: operator.view()
         if verbose: print("----- DONE --------------")
