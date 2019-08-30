@@ -274,7 +274,7 @@ class graph:
             operator = self.operators[operator_idx]
             for i in operator.inputs:   # Check only
                 input_ = self.tensors[i]
-                assert input_.shape == input_.data.shape,"Input shape mismatch {} {}".format(
+                assert tuple(input_.shape)==input_.data.shape,"Input shape mismatch {} {}".format(
                         self.tensors[i].shape, self.tensors[i].data.shape)
             ans = operator.eval()
             if verbose: operator.view()
