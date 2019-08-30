@@ -75,7 +75,7 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     # Padding along height and width
     #set_trace()
     #tensor_input.data = np.pad(tensor_input.data, (pad_horizontal, pad_vertical, (0,0)), mode='constant')
-    tensor_input.data = np.pad(tensor_input.data, ((0,0),(_pad,_pad),(_pad,_pad),(0,0)), mode='constant')
+    tensor_input.data = np.pad(tensor_input.data, ((0,0),(_pad,_pad),(_pad,_pad),(0,0)), mode='constant', constant_values=(0,0))
     # output 1,28,28,32
     # input  1,34,34,32 <= changed
     # filter 1,5,5,32
@@ -103,6 +103,7 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     # Performing convolution with each patch, for every filter. (Technically, correlation).
     temp_ = []  # for DepthSizeConv
     for filter_, bias in zip(F, B):
+        # temp_ = []  # for CONV
         # filter_ 5,5,32
         for patch_idx, patch_ in enumerate(patches):
             # patch_ 5,5,32
