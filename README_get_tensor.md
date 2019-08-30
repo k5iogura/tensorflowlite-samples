@@ -20,7 +20,7 @@ I am doing this to try and verify the intermediate outputs with my own calculati
 tflite_tensor_outputter.py modifys output tensor index of network in tflite binary file. After modified and invoke(), you can retrieve correct tensor vlaues.   
 
 ### My solution  
-Transform binary tflite to json format and change output tensor index to needed one in json file and re-compile it to binary tflite file instead of directory binary tflite file editing.  
+Transform binary tflite to json format and change output tensor index to need in json file and re-compile it to binary tflite file instead of directory binary tflite file editing.  
 ```
  $ flatc --strict-json -t schema_v3.fbs -- some.tflite  // transform to json
  $ ls some.json
