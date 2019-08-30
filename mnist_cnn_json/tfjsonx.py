@@ -274,10 +274,10 @@ class graph:
         if verbose: print("----- INVOKING      -----")
         for order, operator_idx in enumerate(self.operate_order_list):
             operator = self.operators[operator_idx]
-            for i in operator.inputs:   # Check only
+            for i in self.inputs:   # Check only
                 input_ = self.tensors[i]
-                assert input_.shape == input_.data.shape,"Input shape mismatch {} {}".format(
-                        self.tensors[i].shape, self.tensors[i].data.shape)
+                assert tuple(input_.shape)==input_.data.shape,"Input shape mismatch {} {} {}".format(
+                        i, self.tensors[i].shape, self.tensors[i].data.shape)
             ans = operator.eval()
             if verbose: operator.view()
         if verbose: print("----- DONE --------------")

@@ -26,9 +26,9 @@ if __name__ == '__main__':
     questions=1
     corrects =0
     for i in range(questions):
-        number_img = mnist.test.images[0].reshape(-1,28,28,1)
+        number_img = mnist.test.images[0]
         number_gt  = mnist.test.labels[0]
-        g.tensors[g.inputs[0]].set(number_img)
+        g.tensors[g.inputs[0]].set(number_img[np.newaxis,:])
         y = g.invoke(verbose=False)
         gt = np.argmax(number_gt)
         pr = np.argmax(y)
