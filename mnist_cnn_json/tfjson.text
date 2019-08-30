@@ -1,0 +1,19 @@
+With Reshape
+dist_tensor [9] <= operator RSHP 0(code 4) = src [16, 10] data_idx    [15] <= [10, 16]
+dist_tensor [6] <= operator DPTHW 1(code 1) = src [9, 11, 1] data_idx    [14] <= [15, 18, 12]
+dist_tensor [4] <= operator MXPLD 2(code 3) = src [6] data_idx    [17] <= [14]
+dist_tensor [7] <= operator CNVD 3(code 0) = src [4, 12, 0] data_idx    [7] <= [17, 5, 4]
+dist_tensor [5] <= operator MXPLD 4(code 3) = src [7] data_idx    [6] <= [7]
+dist_tensor [8] <= operator FLLYC 5(code 2) = src [5, 13, 3] data_idx    [11] <= [6, 3, 1]
+dist_tensor [15] <= operator FLLYC 6(code 2) = src [8, 14, 2] data_idx    [8] <= [11, 2, 9]
+dist_tensor [17] <= operator SFTMX 7(code 5) = src [15] data_idx    [13] <= [8]
+
+Without Reshape
+dist_tensor [6] <= operator DPTHW 0(code 1) = src [14, 9, 1] data_idx    [14] <= [8, 16, 12]
+dist_tensor [4] <= operator MXPLD 1(code 3) = src [6] data_idx    [15] <= [14]
+dist_tensor [7] <= operator CNVD 2(code 0) = src [4, 10, 0] data_idx    [7] <= [15, 5, 4]
+dist_tensor [5] <= operator MXPLD 3(code 3) = src [7] data_idx    [6] <= [7]
+dist_tensor [8] <= operator FLLYC 4(code 2) = src [5, 11, 3] data_idx    [11] <= [6, 3, 1]
+dist_tensor [13] <= operator FLLYC 5(code 2) = src [8, 12, 2] data_idx    [9] <= [11, 2, 10]
+dist_tensor [15] <= operator SFTMX 6(code 4) = src [13] data_idx    [13] <= [9]
+
