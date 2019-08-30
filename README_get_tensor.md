@@ -1,6 +1,7 @@
 ## [TensorFlow Lite Interpreter get_tensor() #23384](https://github.com/tensorflow/tensorflow/issues/23384)  
 
-There are no guaranty
+Intermediate tensors are **not guaranteed to have useful data, only the graph output(s).**　　
+
 **Describe the problem**  
 "When trying to write out tensors to file using the TensorFlow Lite Interpreter::get_tensor() function, mostly incorrect data is being returned. For the attached input, gray128.jpg, an image with all pixels set to RGB(128, 128, 128), I expect the layer outputs to be fairly repetitive, but it is not.  
 
