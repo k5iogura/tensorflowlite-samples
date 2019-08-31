@@ -1,4 +1,7 @@
-# mnist train and saving CNN model example  
+# MobilenetーSSD inference example  
+
+** 30.Aug,2019**  
+
 [Reference Page](https://qiita.com/haminiku/items/36982ae65a770565458d)
 
 This is training and inference from ground. Training process outputs ckpt directory and frozen protobuff file. You can infer MNIST task with ckpt directory or frozen pb file or tflite file.  
