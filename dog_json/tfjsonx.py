@@ -27,6 +27,7 @@ class operator():
 
         self.name    = self.opcode_name = operator_codes[self.opcode_index].builtin_code
         self.nick    = re.sub('[_AIUEO0-9]','',self.name)[:5]
+        self.padding = 0
 
     def unsupported(self):
         print(self.name+" IS NOT SUPPORTED",self.outputs,self.name,self.inputs)
@@ -111,8 +112,13 @@ class operator():
         elif name == 'CALL':              self.unsupported()
         elif name == 'CUSTOM':            self.unsupported()
 
-    def view(self):
-        print(self.idx, self.inputs, self.outputs, self.opcode_index, self.opcode_name)
+    def view(self, msg=None, cont=True):
+        if msg is not None: print("\n***\n*** "+msg+"\n***")
+        print("operator[{}]({}:{}) outputs {} inpus {}".format(self.idx, self.nick, self.opcode_index, self.outputs, self.inputs))
+        print("  builtin_options : {} padding@run {}".format(self.builtin_options, self.padding))
+        for o in self.outputs: self.tensors[o].view()
+        for i in self.inputs:  self.tensors[i].view()
+        assert cont,"Fatal Error occurrence at operator"
 
 class tensor():
     def __init__(self, tensor_idx, tensor_json, buffers):
@@ -176,9 +182,12 @@ class tensor():
         self.data = img
         return self.data
 
-    def view(self):
-        print(self.idx, self.json)
-        print(self.idx, self.data)
+    def view(self, msg=None, cont=True):
+        if msg is not None: print("\n***\n*** "+msg+"\n***")
+        print("tensors[{}]({}) buffer:{} type:{}".format(self.idx, self.name, self.buffer, self.type))
+        print("  shape@json:{} shape@run:{}".format(self.shape, self.data.shape))
+        print("  quantization:{}".format(self.quantization))
+        assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
     def __init__(self,json_text='detect.json'):
