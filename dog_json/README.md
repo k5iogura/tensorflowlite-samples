@@ -1,4 +1,4 @@
-# MobilenetーSSD inference example  
+# Mobilenet-SSD inference example  
 
 ** 30.Aug,2019**  
 
