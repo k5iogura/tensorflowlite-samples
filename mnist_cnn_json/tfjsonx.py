@@ -51,7 +51,15 @@ class operator():
                 r += self.tensors[i].data
             return r
         elif name == 'AVERAGE_POOL_2D':   self.unsupported()
-        elif name == 'CONCATENATION':     self.unsupported()
+        elif name == 'CONCATENATION':
+            _axis_ = getordef(self.builtin_options,'axis',None)
+            if _axis_ is None:self.view('Invalid conatenation axis',cont=False)
+            temp_ = []
+            for t in self.inputs:
+                temp_.append(self.tensors[t].data.tolist())
+            assert len(temp_) > 0, "Invalid concatenation list"
+            r = self.tensors[self.outputs[0]].data = np.concatenate(temp_, axis = _axis_)
+            return r
         elif name == 'CONV_2D':
             CONV_2D(self, self.outputs, self.inputs)
         elif name == 'DEPTHWISE_CONV_2D':
