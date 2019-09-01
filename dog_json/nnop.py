@@ -52,18 +52,17 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
 
     # <by padding>
     _pad = ((output_height - 1)*stride - input_shape[1] + filter_size)/2.
-    _pad = Decimal(_pad).quantize(Decimal(0), rounding=ROUND_HALF_UP)
-    _pad = int(_pad)
+    _pad = int(math.ceil(_pad))
     operator.padding = _pad
     #_pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
     # Padding along height and width
-    if _pad >= 0:
+    if _pad > 0:
         tensor_input.data = np.pad(
             tensor_input.data,
             ((0,0),(_pad,_pad),(_pad,_pad),(0,0)),
             mode='constant', constant_values=(0,0)
         )
-    else:
+    elif _pad < 0:
         operator.view("Invalid padding size",cont=False)
     # output 1,14,14,64
     # input  1,14,14,32
@@ -154,19 +153,18 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
 
     # <by padding>
     _pad = ((output_height - 1)*stride - input_shape[1] + filter_size)/2.
-    _pad = Decimal(_pad).quantize(Decimal(0), rounding=ROUND_HALF_UP)
-    _pad = int(_pad)
+    _pad = int(math.ceil(_pad))
     operator.padding = _pad
     #_pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
     # Padding along height and width
-    if _pad != 0:
+    if _pad > 0:
         tensor_input.data = np.pad(
             tensor_input.data,
             ((0,0),(_pad,_pad),(_pad,_pad),(0,0)),
             mode='constant', constant_values=(0,0)
         )
-    else:
-        operator.view(cont=False)
+    elif _pad < 0:
+        operator.view("Invalid padding size",cont=False)
     # output 1,28,28,32
     # input  1,34,34,32 <= changed
     # filter 1,5,5,32
@@ -237,14 +235,14 @@ def MAX_POOL_2D(operator, outputs, inputs, verbose=True):
     _pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
     operator.padding = _pad
     # Padding along height and width
-    if _pad != 0:
+    if _pad > 0:
         tensor_input.data = np.pad(
             tensor_input.data,
             ((0,0),(_pad,_pad),(_pad,_pad),(0,0)),
             mode='constant', constant_values=(0,0)
         )
-    else:
-        operator.view(cont=False)
+    elif _pad < 0:
+        operator.view("Invalid padding size",cont=False)
     # input  1,28,28,32
     # output 1,14,14,32
     for row in range(int(output_height)):

@@ -51,7 +51,15 @@ class operator():
                 r += self.tensors[i].data
             return r
         elif name == 'AVERAGE_POOL_2D':   self.unsupported()
-        elif name == 'CONCATENATION':     self.unsupported()
+        elif name == 'CONCATENATION':
+            _axis_ = getordef(self.builtin_options,'axis',None)
+            if _axis_ is None:self.view('Invalid conatenation axis',cont=False)
+            temp_ = []
+            for t in self.inputs:
+                temp_.append(self.tensors[t].data.tolist())
+            assert len(temp_) > 0, "Invalid concatenation list"
+            r = self.tensors[self.outputs[0]].data = np.concatenate(temp_, axis = _axis_)
+            return r
         elif name == 'CONV_2D':
             CONV_2D(self, self.outputs, self.inputs)
         elif name == 'DEPTHWISE_CONV_2D':
@@ -138,15 +146,21 @@ class tensor():
         else:
             self.buffer = -1
 
-        if tensor_json.get('quantization') is not None:
-            quantization = self.quantization = tensor_json.get('quantization')
-            self.max   = getordef(quantization, 'max', 0.)
-            self.min   = getordef(quantization, 'min', 0.)
-            self.scale = getordef(quantization, 'scale', 0.)
-            self.zero_point = getordef(quantization, 'zero_point', 0)
-            self.data  = self.scale*(self.data.astype(np.int32) - self.zero_point)
-        else:
-            self.quantization = {}
+        self.quantization = getordef(tensor_json,'quantization',{})
+        self.scale = self.max = self.min = self.zero_point = None
+        if self.quantization != {}:
+            self.scale      = getordef(self.quantization, 'scale', [1.0])
+            self.max        = getordef(self.quantization, 'max', None)
+            self.min        = getordef(self.quantization, 'min', None)
+            self.zero_point = getordef(self.quantization, 'zero_point', None)
+
+            if self.zero_point is not None:
+                assert len(self.zero_point) == 1,"Json format error len(min)="+str(len(self.zero_point))
+                self.data  = self.scale * (self.data.astype(np.int32) - self.zero_point)
+
+            elif self.min is not None:
+                assert len(self.min) == 1,"Json format error len(min)="+str(len(self.min))
+                self.data  = self.scale * self.data + self.min
 
     def list2int(self, bdy, idx, Nbyte):
         val = 0
