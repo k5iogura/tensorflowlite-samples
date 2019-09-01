@@ -56,14 +56,17 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     operator.padding = _pad
     #_pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
     # Padding along height and width
+    before_padding = None
     if _pad > 0:
+        before_padding = tensor_input.data
         tensor_input.data = np.pad(
             tensor_input.data,
             ((0,0),(_pad,_pad),(_pad,_pad),(0,0)),
             mode='constant', constant_values=(0,0)
         )
     elif _pad < 0:
-        operator.view("Invalid padding size",cont=False)
+        operator.view("Invalid padding size",cont=True)
+        set_trace()
     # output 1,14,14,64
     # input  1,14,14,32
     # filter 64,5,5,32
@@ -114,6 +117,8 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
                             output_.shape,tensor_output.data.shape)
     tensor_output.data = output_
 
+    if before_padding is not None:
+        tensor_input.data = before_padding
     return output_
 
 def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
@@ -157,7 +162,9 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
     operator.padding = _pad
     #_pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
     # Padding along height and width
+    before_padding = None
     if _pad > 0:
+        before_padding = tensor_input.data
         tensor_input.data = np.pad(
             tensor_input.data,
             ((0,0),(_pad,_pad),(_pad,_pad),(0,0)),
@@ -208,6 +215,8 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
                             output_.shape,tensor_output.data.shape)
     tensor_output.data = output_
 
+    if before_padding is not None:
+        tensor_input.data = before_padding
     return output_
 
 def MAX_POOL_2D(operator, outputs, inputs, verbose=True):
@@ -235,7 +244,9 @@ def MAX_POOL_2D(operator, outputs, inputs, verbose=True):
     _pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
     operator.padding = _pad
     # Padding along height and width
+    before_padding = None
     if _pad > 0:
+        before_padding = tensor_input.data
         tensor_input.data = np.pad(
             tensor_input.data,
             ((0,0),(_pad,_pad),(_pad,_pad),(0,0)),
@@ -270,5 +281,7 @@ def MAX_POOL_2D(operator, outputs, inputs, verbose=True):
     assert output_.shape == tensor_output.data.shape
     tensor_output.data = output_
 
+    if before_padding is not None:
+        tensor_input.data = before_padding
     return output_
 
