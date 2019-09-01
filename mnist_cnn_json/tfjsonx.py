@@ -138,15 +138,21 @@ class tensor():
         else:
             self.buffer = -1
 
-        if tensor_json.get('quantization') is not None:
-            quantization = self.quantization = tensor_json.get('quantization')
-            self.max   = getordef(quantization, 'max', None)
-            self.min   = getordef(quantization, 'min', None)
-            self.scale = getordef(quantization, 'scale', None)
-            self.zero_point = getordef(quantization, 'zero_point', None)
-            #self.data  = self.scale*(self.data.astype(np.int32) - self.zero_point)
-        else:
-            self.quantization = {}
+        self.quantization = getordef(tensor_json,'quantization',{})
+        self.scale = self.max = self.min = self.zero_point = None
+        if self.quantization != {}:
+            self.scale      = getordef(self.quantization, 'scale', [1.0])
+            self.max        = getordef(self.quantization, 'max', None)
+            self.min        = getordef(self.quantization, 'min', None)
+            self.zero_point = getordef(self.quantization, 'zero_point', None)
+
+            if self.zero_point is not None:
+                assert len(self.zero_point) == 1,"Json format error len(min)="+str(len(self.zero_point))
+                self.data  = self.scale * (self.data.astype(np.int32) - self.zero_point)
+
+            elif self.min is not None:
+                assert len(self.min) == 1,"Json format error len(min)="+str(len(self.min))
+                self.data  = self.scale * self.data + self.min
 
     def list2int(self, bdy, idx, Nbyte):
         val = 0

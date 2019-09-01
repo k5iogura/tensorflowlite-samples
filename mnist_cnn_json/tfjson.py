@@ -22,8 +22,10 @@ if __name__ == '__main__':
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
     print("** Done\n** Invoke inference")
+    questions=100
     questions=20
     questions=1
+    questions=2
     corrects =0
     for i in range(questions):
         number_img = mnist.test.images[i]
