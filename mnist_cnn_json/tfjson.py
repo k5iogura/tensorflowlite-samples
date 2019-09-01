@@ -22,12 +22,12 @@ if __name__ == '__main__':
     g.invoke_layer = args.invoke_layer
     g.allocate_graph()
     print("** Done\n** Invoke inference")
-    questions=100
+    questions=20
     questions=1
     corrects =0
     for i in range(questions):
-        number_img = mnist.test.images[0]
-        number_gt  = mnist.test.labels[0]
+        number_img = mnist.test.images[i]
+        number_gt  = mnist.test.labels[i]
         g.tensors[g.inputs[0]].set(number_img[np.newaxis,:])
         y = g.invoke(verbose=False)
         gt = np.argmax(number_gt)

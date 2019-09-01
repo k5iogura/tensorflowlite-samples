@@ -1,6 +1,7 @@
 import numpy as np
 import sys,os
 import math
+from decimal import Decimal, ROUND_HALF_UP, ROUND_HALF_EVEN
 from pdb import *
 
 # NHWC : input  tensor shape   = ( batch,  h, w, in_ch )
@@ -50,15 +51,19 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     # bias   64
 
     # <by padding>
-    _pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
+    _pad = ((output_height - 1)*stride - input_shape[1] + filter_size)/2.
+    _pad = int(math.ceil(_pad))
+    operator.padding = _pad
+    #_pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
     # Padding along height and width
-    assert _pad>=0, "Invalid padding size "+str(_pad)
-    if _pad != 0:
+    if _pad > 0:
         tensor_input.data = np.pad(
             tensor_input.data,
             ((0,0),(_pad,_pad),(_pad,_pad),(0,0)),
             mode='constant', constant_values=(0,0)
         )
+    elif _pad < 0:
+        operator.view("Invalid padding size",cont=False)
     # output 1,14,14,64
     # input  1,14,14,32
     # filter 64,5,5,32
@@ -76,6 +81,8 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
             #patches.append(tensor_input.data[:, row_start:row_end, col_start:col_end, :]) ##M
             # apatch 1,5,5,32
             apatch=tensor_input.data[:, row_start:row_end, col_start:col_end, :]
+            if apatch.shape[1:]!=tensor_filter.data.shape[1:]:
+                set_trace()
             assert apatch.shape[1:]==tensor_filter.data.shape[1:],"Failed {} {}".format(
                                                 apatch.shape, tensor_filter.data.shape)
             patches.append(apatch.tolist())
@@ -145,15 +152,19 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
     # bias   32
 
     # <by padding>
-    _pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
+    _pad = ((output_height - 1)*stride - input_shape[1] + filter_size)/2.
+    _pad = int(math.ceil(_pad))
+    operator.padding = _pad
+    #_pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
     # Padding along height and width
-    assert _pad>=0, "Invalid padding size "+str(_pad)
-    if _pad != 0:
+    if _pad > 0:
         tensor_input.data = np.pad(
             tensor_input.data,
             ((0,0),(_pad,_pad),(_pad,_pad),(0,0)),
             mode='constant', constant_values=(0,0)
         )
+    elif _pad < 0:
+        operator.view("Invalid padding size",cont=False)
     # output 1,28,28,32
     # input  1,34,34,32 <= changed
     # filter 1,5,5,32
@@ -222,14 +233,16 @@ def MAX_POOL_2D(operator, outputs, inputs, verbose=True):
 
     # <by padding>
     _pad = int(math.ceil(((output_height - 1)*stride - input_shape[1] + filter_size)/2))
+    operator.padding = _pad
     # Padding along height and width
-    assert _pad>=0, "Invalid padding size "+str(_pad)
-    if _pad != 0:
+    if _pad > 0:
         tensor_input.data = np.pad(
             tensor_input.data,
             ((0,0),(_pad,_pad),(_pad,_pad),(0,0)),
             mode='constant', constant_values=(0,0)
         )
+    elif _pad < 0:
+        operator.view("Invalid padding size",cont=False)
     # input  1,28,28,32
     # output 1,14,14,32
     for row in range(int(output_height)):

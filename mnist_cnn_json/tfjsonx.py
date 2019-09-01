@@ -27,6 +27,7 @@ class operator():
 
         self.name    = self.opcode_name = operator_codes[self.opcode_index].builtin_code
         self.nick    = re.sub('[_AIUEO0-9]','',self.name)[:5]
+        self.padding = 0
 
     def unsupported(self):
         print(self.name+" IS NOT SUPPORTED",self.outputs,self.name,self.inputs)
@@ -87,8 +88,9 @@ class operator():
             r = self.tensors[self.outputs[0]].data = RELUx(x, 6)
             return r
         elif name == 'RESHAPE':
+            s = getordef(self.builtin_options, 'new_shape', None)
             x = self.tensors[self.inputs[0]].data
-            s = self.tensors[self.inputs[1]].data
+            if s is None: s = self.tensors[self.inputs[1]].data
             r = self.tensors[self.outputs[0]].data = x.reshape(tuple(s))
             return r
         elif name == 'RESIZE_BILINEAR':   self.unsupported()
@@ -110,8 +112,13 @@ class operator():
         elif name == 'CALL':              self.unsupported()
         elif name == 'CUSTOM':            self.unsupported()
 
-    def view(self):
-        print(self.idx, self.inputs, self.outputs, self.opcode_index, self.opcode_name)
+    def view(self, msg=None, cont=True):
+        if msg is not None: print("\n***\n*** "+msg+"\n***")
+        print("operator[{}]({}:{}) outputs {} inpus {}".format(self.idx, self.nick, self.opcode_index, self.outputs, self.inputs))
+        print("  builtin_options : {} padding@run {}".format(self.builtin_options, self.padding))
+        for o in self.outputs: self.tensors[o].view()
+        for i in self.inputs:  self.tensors[i].view()
+        assert cont,"Fatal Error occurrence at operator"
 
 class tensor():
     def __init__(self, tensor_idx, tensor_json, buffers):
@@ -122,15 +129,6 @@ class tensor():
         self.name   = getordef(tensor_json, 'name',  'nothing')
         self.buffer = getordef(tensor_json, 'buffer', None)
 
-        if tensor_json.get('quantization') is not None:
-            quantization = self.quantization = tensor_json.get('quantization')
-            self.max   = getordef(quantization, 'max', 0.)
-            self.min   = getordef(quantization, 'min', 0.)
-            self.scale = getordef(quantization, 'scale', 0.)
-            self.zero_point = getordef(quantization, 'zero_point', 0)
-        else:
-            self.quantization = {}
-
         if self.buffer is not None:
             data = buffers[self.buffer].get('data')
             if data is not None:
@@ -139,6 +137,16 @@ class tensor():
                 self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
         else:
             self.buffer = -1
+
+        if tensor_json.get('quantization') is not None:
+            quantization = self.quantization = tensor_json.get('quantization')
+            self.max   = getordef(quantization, 'max', None)
+            self.min   = getordef(quantization, 'min', None)
+            self.scale = getordef(quantization, 'scale', None)
+            self.zero_point = getordef(quantization, 'zero_point', None)
+            #self.data  = self.scale*(self.data.astype(np.int32) - self.zero_point)
+        else:
+            self.quantization = {}
 
     def list2int(self, bdy, idx, Nbyte):
         val = 0
@@ -174,15 +182,16 @@ class tensor():
         self.data = img
         return self.data
 
-    def view(self):
-        print(self.idx, self.json)
-        print(self.idx, self.data)
+    def view(self, msg=None, cont=True):
+        if msg is not None: print("\n***\n*** "+msg+"\n***")
+        print("tensors[{}]({}) buffer:{} type:{}".format(self.idx, self.name, self.buffer, self.type))
+        print("  shape@json:{} shape@run:{}".format(self.shape, self.data.shape))
+        print("  quantization:{}".format(self.quantization))
+        assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
     def __init__(self,json_text='detect.json'):
         with open(json_text) as j: root = json.load(j)
-
-        self.invoke_layer = 1000
 
         # subgraph          = /subgraphs[0]
         # inputs            = /subgraphs[0]/inputs
@@ -274,10 +283,10 @@ class graph:
         if verbose: print("----- INVOKING      -----")
         for order, operator_idx in enumerate(self.operate_order_list):
             operator = self.operators[operator_idx]
-            for i in self.inputs:   # Check only
-                input_ = self.tensors[i]
-                assert tuple(input_.shape)==input_.data.shape,"Input shape mismatch {} {} {}".format(
-                        i, self.tensors[i].shape, self.tensors[i].data.shape)
+            #for i in self.inputs:   # Check only
+            #    input_ = self.tensors[i]
+            #    assert tuple(input_.shape)==input_.data.shape,"Input shape mismatch {} {}".format(
+            #            self.tensors[i].shape, self.tensors[i].data.shape)
             ans = operator.eval()
             if verbose: operator.view()
         if verbose: print("----- DONE --------------")
@@ -290,11 +299,9 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser()
     def chF(f): return f if os.path.exists(f) else sys.exit(-1)
     args.add_argument('-j',"--json",       type=chF, default='detect.json')
-    args.add_argument('-i',"--invoke_layer", type=int, default=0)
     args = args.parse_args()
 
     g=graph(args.json)
-    g.invoke_layer = args.invoke_layer
     g.allocate_graph()
     questions=1
     corrects =0
