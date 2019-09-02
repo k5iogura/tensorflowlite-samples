@@ -82,7 +82,11 @@ class operator():
         elif name == 'L2_NORMALIZATION':  self.unsupported()
         elif name == 'L2_POOL_2D':        self.unsupported()
         elif name == 'LOCAL_RESPONSE_NORMALIZATION': self.unsupported()
-        elif name == 'LOGISTIC':          self.unsupported()
+        elif name == 'LOGISTIC':
+            sigmoid = lambda x : 1 / (1 + np.exp(-x))
+            x = self.tensors[self.inputs[0]].data
+            r = self.tensors[self.outputs[0]].data = sigmoid(np.clip(x,-100,100))
+            return r
         elif name == 'LSH_PROJECTION':    self.unsupported()
         elif name == 'LSTM':              self.unsupported()
         elif name == 'MAX_POOL_2D':
@@ -154,13 +158,13 @@ class tensor():
             self.min        = getordef(self.quantization, 'min', None)
             self.zero_point = getordef(self.quantization, 'zero_point', None)
 
-            if self.zero_point is not None:
-                assert len(self.zero_point) == 1,"Json format error len(min)="+str(len(self.zero_point))
-                self.data  = self.scale * (self.data.astype(np.int32) - self.zero_point)
-
-            elif self.min is not None:
+            if self.min is not None:
                 assert len(self.min) == 1,"Json format error len(min)="+str(len(self.min))
                 self.data  = self.scale * self.data + self.min
+
+            elif self.zero_point is not None:
+                assert len(self.zero_point) == 1,"Json format error len(min)="+str(len(self.zero_point))
+                self.data  = self.scale * (self.data.astype(np.int32) - self.zero_point)
 
     def list2int(self, bdy, idx, Nbyte):
         val = 0
