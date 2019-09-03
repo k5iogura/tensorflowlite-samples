@@ -41,6 +41,15 @@ class operator():
         z = y+b
         return z
 
+    def clipping(self, tensor_idx):
+        tensor = self.tensors[tensor_idx[0]]
+        if tensor.min is not None and tensor.max is not None:
+            tensor.data = np.clip(tensor.data, tensor.min, tensor.max)
+        elif tensor.min is not None:
+            tensor.data = np.maximum(tensor.data, tensor.max)
+        elif tensor.max is not None:
+            tensor.data = np.minimum(tensor.data, tensor.min)
+
     def eval(self):
         name = self.name
         if   name == 'ADD':     # Untested yet
@@ -49,6 +58,7 @@ class operator():
                 assert self.tensors[0].shape == self.tensors[i].shape,"Unmatch {} {}".format(
                                                     r.shape, self.tensors[i].shape)
                 r += self.tensors[i].data
+            self.clipping(self.outputs)
             return r
         elif name == 'AVERAGE_POOL_2D':   self.unsupported()
         elif name == 'CONCATENATION':
@@ -62,8 +72,10 @@ class operator():
             return r
         elif name == 'CONV_2D':
             CONV_2D(self, self.outputs, self.inputs)
+            self.clipping(self.outputs)
         elif name == 'DEPTHWISE_CONV_2D':
             DEPTHWISE_CONV_2D(self, self.outputs, self.inputs)
+            self.clipping(self.outputs)
         elif name == 'EMBEDDING_LOOKUP':  self.unsupported()
         elif name == 'FULLY_CONNECTED':
             x = self.tensors[self.inputs[0]].data.reshape(-1)
@@ -77,6 +89,7 @@ class operator():
                 elif "RELU6" in _activation_: r = RELUx(r, 6)
                 else: print(_activation_+' not supported')
             self.tensors[self.outputs[0]].data = r
+            self.clipping(self.outputs)
             return r
         elif name == 'HASHTABLE_LOOKUP':  self.unsupported()
         elif name == 'L2_NORMALIZATION':  self.unsupported()
@@ -91,6 +104,7 @@ class operator():
         elif name == 'LSTM':              self.unsupported()
         elif name == 'MAX_POOL_2D':
             MAX_POOL_2D(self, self.outputs, self.inputs)
+            self.clipping(self.outputs)
         elif name == 'RELU':
             x = self.tensors[self.inputs[0]].data
             r = self.tensors[self.outputs[0]].data = RELUx(x, 0)
@@ -142,9 +156,9 @@ class tensor():
         self.buffer = getordef(tensor_json, 'buffer', None)
 
         if self.buffer is not None:
-            data = buffers[self.buffer].get('data')
-            if data is not None:
-                self.data = self.dataWtype(data, self.type, self.shape)
+            self.buffers = buffers[self.buffer].get('data')
+            if self.buffers is not None:
+                self.data = self.dataWtype(self.buffers, self.type, self.shape)
             else:
                 self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
         else:
@@ -153,18 +167,33 @@ class tensor():
         self.quantization = getordef(tensor_json,'quantization',{})
         self.scale = self.max = self.min = self.zero_point = None
         if self.quantization != {}:
-            self.scale      = getordef(self.quantization, 'scale', [1.0])
+            self.scale      = getordef(self.quantization, 'scale', None)
             self.max        = getordef(self.quantization, 'max', None)
             self.min        = getordef(self.quantization, 'min', None)
             self.zero_point = getordef(self.quantization, 'zero_point', None)
 
+            if self.scale is not None:
+                assert len(self.scale) == 1,"Json format error len(scale)="+str(len(self.scale))
+                self.scale = self.scale[0]
+            elif self.max is not None or self.min is not None or self.zero_point is not None:
+                self.scale = 1.0
+
+            if self.max is not None:
+                assert len(self.max) == 1,"Json format error len(max)="+str(len(self.max))
+                self.max = self.max[0]
+
+            if self.zero_point is not None:
+                assert len(self.zero_point) == 1,"Json format error len(zero_point)="+str(len(self.zero_point))
+                self.zero_point = self.zero_point[0]
+
             if self.min is not None:
                 assert len(self.min) == 1,"Json format error len(min)="+str(len(self.min))
-                self.data  = self.scale * self.data + self.min
+                self.data  = (self.scale * self.data + self.min).astype(np.float32)
+                self.min   = self.min[0]
 
             elif self.zero_point is not None:
-                assert len(self.zero_point) == 1,"Json format error len(min)="+str(len(self.zero_point))
-                self.data  = self.scale * (self.data.astype(np.int32) - self.zero_point)
+                self.min   =  self.scale * self.zero_point
+                self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
 
     def list2int(self, bdy, idx, Nbyte):
         val = 0
