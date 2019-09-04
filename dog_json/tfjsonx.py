@@ -158,7 +158,8 @@ class tensor():
         if self.buffer is not None:
             self.buffers = buffers[self.buffer].get('data')
             if self.buffers is not None:
-                self.data = self.dataWtype(self.buffers, self.type, self.shape)
+                self.buffers = self.dataWtype(self.buffers, self.type, self.shape)
+                self.data = self.buffers.copy()
             else:
                 self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
         else:
@@ -229,7 +230,7 @@ class tensor():
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
         assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
         if (self.max < img.max() or self.min > img.min()):
-            print("Warning: Suppoted float32 only so coverting input to float32")
+            print("Warnning: Suppoted float32 only so coverting input to float32")
             img = ( self.scale * img + self.min ).astype(np.float32)
         self.data = img
         return self.data
