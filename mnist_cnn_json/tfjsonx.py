@@ -237,7 +237,8 @@ class tensor():
 
     def view(self, msg=None, cont=True):
         if msg is not None: print("\n***\n*** "+msg+"\n***")
-        print("tensors[{}]({}) buffer:{} type:{}".format(self.idx, self.name, self.buffer, self.type))
+        print("tensors[{}]({}) buffer:{}".format(self.idx, self.name, self.buffer))
+        print("  type@json :{} type@run :{}".format(self.type,self.data.dtype))
         print("  shape@json:{} shape@run:{}".format(self.shape, self.data.shape))
         print("  quantization:{}".format(self.quantization))
         assert cont,"Fatal Error occurrence at tensor"
