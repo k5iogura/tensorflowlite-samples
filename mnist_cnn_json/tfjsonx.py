@@ -226,6 +226,11 @@ class tensor():
         return data.reshape(tuple(shp))
 
     def set(self, img):
+        assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
+        assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
+        if (self.max < img.max() or self.min > img.min()):
+            print("Warning: Suppoted float32 only so coverting input to float32")
+            img = ( self.scale * img + self.min ).astype(np.float32)
         self.data = img
         return self.data
 
