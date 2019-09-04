@@ -23,7 +23,7 @@ if __name__ == '__main__':
     corrects =0
     for i in range(questions):
         img = cv2.imread(args.image)
-        img = cv2.resize(img, (300,300))/255.
+        img = cv2.resize(img, (300,300))
         img = img[np.newaxis,:]
         g.tensors[g.inputs[0]].set(img)
         y = g.invoke(verbose=False)
