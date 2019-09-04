@@ -156,10 +156,10 @@ class tensor():
         self.buffer = getordef(tensor_json, 'buffer', None)
 
         if self.buffer is not None:
-            self.buffers = buffers[self.buffer].get('data')
-            if self.buffers is not None:
-                self.buffers = self.dataWtype(self.buffers, self.type, self.shape)
-                self.data = self.buffers.copy()
+            self.buff = buffers[self.buffer].get('data')
+            if self.buff is not None:
+                self.buff = self.dataWtype(self.buff, self.type, self.shape)
+                self.data = self.buff.copy()
             else:
                 self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
         else:
