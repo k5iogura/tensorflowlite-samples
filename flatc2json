@@ -1,0 +1,3 @@
+#!/bin/bash -v
+
+flatc --strict-json -t $1 -- $2

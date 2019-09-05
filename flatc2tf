@@ -1,0 +1,4 @@
+#!/bin/bash -v
+
+echo $1
+flatc -b -c $1 $2
