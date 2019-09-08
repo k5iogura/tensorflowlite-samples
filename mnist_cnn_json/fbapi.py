@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
+import os, sys, argparse
 import numpy as np
+from   pdb import set_trace
+from   inspect import getmembers
+
+import struct
 
 import tflite
 from tflite.Model import Model
@@ -29,6 +34,89 @@ def read_tflite_model(file):
     model = Model.GetRootAsModel(buf, 0)
     return model
 
+def TensorType2String(TensorType):
+    if TensorType == tflite.TensorType.TensorType.FLOAT32:
+        return "FLOAT32"
+    elif TensorType == tflite.TensorType.TensorType.FLOAT16:
+        return "FLOAT16"
+    elif TensorType == tflite.TensorType.TensorType.INT32:
+        return "INT32"
+    elif TensorType == tflite.TensorType.TensorType.INT8:
+        return "INT8"
+    elif TensorType == tflite.TensorType.TensorType.UINT8:
+        return "UINT8"
+    elif TensorType == tflite.TensorType.TensorType.INT64:
+        return "INT64"
+    elif TensorType == tflite.TensorType.TensorType.STRING:
+        return "STRING"
+    else:
+        assert False,"Unknown:TensorType2String(TensorType)"+str(TensorType)
+
+class tensor():
+    def __init__(self, tensor_idx, tensor_fb, buffers_fb):
+        self.idx    = tensor_idx
+        self.shape  = list(tensor_fb.ShapeAsNumpy())
+        self.type   = TensorType2String(tensor_fb.Type())
+        self.name   = tensor_fb.Name()
+        self.buffer = tensor_fb.Buffer()
+
+        if buffers_fb[self.buffer].DataLength() > 0:
+            self.buff = buffers_fb[self.buffer].DataAsNumpy()
+            if self.buff is not None:
+                self.buff = self.dataWtype(self.buff, self.type, self.shape)
+                self.data = self.buff.copy()
+            else:
+                self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
+        else:
+            self.buffer = -1
+
+    def list2int(self, bdy, idx, Nbyte):
+        val = 0
+        for s, i in enumerate(range(idx, idx+Nbyte)): val += bdy[i]<<(8*s)
+        return val
+
+    def list2float(self, bdy, idx, Nbyte):
+        val = self.list2int(bdy,idx,Nbyte)
+        frm = "%0"+str(2*Nbyte)+"x"
+        sp  = frm%val
+        flt = struct.unpack('!f',sp.decode('hex'))[0]
+        return flt
+
+    def type2np(self,type_string):
+        if type_string == 'FLOAT32': return np.float32
+        if type_string == 'FLOAT16': return np.float16
+        if type_string == 'INT32': return np.int32
+        if type_string == 'INT64': return np.int64
+        if type_string == 'UINT8': return np.uint8
+        return np.float
+
+    def dataWtype(self, bdy, type_string, shp):
+        np_type = self.type2np(type_string)
+        assert type(bdy) == np.ndarray,"tensor:{} {}".format(self.idx, type(bdy))
+        if   type_string=='FLOAT32': data = np.asarray([self.list2float(bdy, i, 4) for i in range(0,len(bdy),4)], np_type)
+        elif type_string=='FLOAT16': data = np.asarray([self.list2float(bdy, i, 2) for i in range(0,len(bdy),2)], np_type)
+        elif type_string=='INT32':   data = np.asarray([self.list2int(  bdy, i, 4) for i in range(0,len(bdy),4)], np_type)
+        elif type_string=='INT64':   data = np.asarray([self.list2int(  bdy, i, 8) for i in range(0,len(bdy),8)], np_type)
+        elif type_string=='UINT8':   data = np.asarray(                 bdy,                                      np_type)
+        else : assert True, "Unsupported type"+type_string
+        return data.reshape(tuple(shp))
+
+class graph:
+    def __init__(self,tflite='mnist.tflite'):
+        self.model    = read_tflite_model(tflite)
+        self.subgraph = self.model.Subgraphs(0)
+        self.inputs   = list(self.subgraph.InputsAsNumpy())
+        self.outputs  = list(self.subgraph.OutputsAsNumpy())
+        buffers_fb    = [ self.model.Buffers(b) for b in range(self.model.BuffersLength()) ]
+        self.tensors  = []
+        for idx in range(self.subgraph.TensorsLength()):
+            tensor_fb = self.subgraph.Tensors(idx)
+            gtnsr = tensor(idx, tensor_fb, buffers_fb)
+            self.tensors.append(gtnsr)
+
+g = graph()
+
+set_trace()
 model = read_tflite_model('mnist.tflite')
 sgl = model.SubgraphsLength()
 if sgl!=0:
@@ -107,31 +195,6 @@ for idx in range(opl):
         print(padding, stridew, strideh, _activation_,filterwidth, filterheight)
     else:
         assert False,"Unknown:BuiltinOptions:"+str(op.BuiltinOptionsType())
-
-def TensorType2String(TensorType):
-    if TensorType == tflite.TensorType.TensorType.FLOAT32:
-        print("FLOAT32")
-        return np.float32
-    elif TensorType == tflite.TensorType.TensorType.FLOAT16:
-        print("FLOAT16")
-        return np.float16
-    elif TensorType == tflite.TensorType.TensorType.INT32:
-        print("INT32")
-        return np.int32
-    elif TensorType == tflite.TensorType.TensorType.INT8:
-        print("INT8")
-        return np.int8
-    elif TensorType == tflite.TensorType.TensorType.UINT8:
-        print("UINT8")
-        return np.uint8
-    elif TensorType == tflite.TensorType.TensorType.INT64:
-        print("INT64")
-        return np.int64
-    elif TensorType == tflite.TensorType.TensorType.STRING:
-        print("STRING")
-        return np.str
-    else:
-        assert False,"Unknown:TensorType2String(TensorType)"+str(TensorType)
 
 s=TensorType2String(ts.Type())
 
