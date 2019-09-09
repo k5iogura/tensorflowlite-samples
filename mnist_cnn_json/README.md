@@ -43,6 +43,51 @@ Need tflite_convert tool on tensorflow-v1.10.
    0.9002
 ```
 
+### Infer with tflite by python(fbapi.py) using numpy only  
+
+Step.1 to make tflite flatbuffers api.  
+```
+ $ flatc --python ../schema_v3.fbs
+   or
+ $ ./make_tflite.sh
+ $ ls tflite/*.py
+tflite/ActivationFunctionType.py   tflite/__init__.py                           tflite/QuantizationParameters.py
+tflite/AddOptions.py               tflite/L2NormOptions.py                      tflite/ReshapeOptions.py
+tflite/Buffer.py                   tflite/LocalResponseNormalizationOptions.py  tflite/ResizeBilinearOptions.py
+tflite/BuiltinOperator.py          tflite/LSHProjectionOptions.py               tflite/RNNOptions.py
+tflite/BuiltinOptions.py           tflite/LSHProjectionType.py                  tflite/SkipGramOptions.py
+tflite/CallOptions.py              tflite/LSTMOptions.py                        tflite/SoftmaxOptions.py
+tflite/ConcatEmbeddingsOptions.py  tflite/Model.py                              tflite/SpaceToDepthOptions.py
+tflite/ConcatenationOptions.py     tflite/OperatorCode.py                       tflite/SubGraph.py
+tflite/Conv2DOptions.py            tflite/Operator.py                           tflite/SVDFOptions.py
+tflite/DepthwiseConv2DOptions.py   tflite/Padding.py                            tflite/Tensor.py
+tflite/FullyConnectedOptions.py    tflite/Pool2DOptions.py                      tflite/TensorType.py
+```
+
+Step.2 infer mnist with tflite  
+```
+ $ python fbapi.py
+...
+Creating Graph done.
+Allocatng Graph ..
+dist_tensor [9] <= operator RSHP 0(code 4) = src [16, 10] data_idx    [15] <= [10, 16]
+dist_tensor [6] <= operator DPTHW 1(code 1) = src [9, 11, 1] data_idx    [14] <= [15, 18, 12]
+dist_tensor [4] <= operator MXPLD 2(code 3) = src [6] data_idx    [17] <= [14]
+dist_tensor [7] <= operator CNVD 3(code 0) = src [4, 12, 0] data_idx    [7] <= [17, 5, 4]
+dist_tensor [5] <= operator MXPLD 4(code 3) = src [7] data_idx    [6] <= [7]
+dist_tensor [8] <= operator FLLYC 5(code 2) = src [5, 13, 3] data_idx    [11] <= [6, 3, 1]
+dist_tensor [15] <= operator FLLYC 6(code 2) = src [8, 14, 2] data_idx    [8] <= [11, 2, 9]
+dist_tensor [17] <= operator SFTMX 7(code 5) = src [15] data_idx    [13] <= [8]
+Allocatng Graph done.
+('incorrenct:', 6, 4)
+('incorrenct:', 4, 6)
+('incorrenct:', 1, 3)
+('incorrenct:', 9, 7)
+('incorrenct:', 2, 7)
+('incorrenct:', 7, 9)
+accurracy 0.940 94/100
+```
+
 ### Infer with json file by python using numpy only  
 ```
  $ flatc --strict-json -t ../schema_v3.fbs -- mnist.tflite
