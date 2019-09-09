@@ -27,8 +27,9 @@ import tflite.SoftmaxOptions
 
 import tflite.OperatorCode
 import tflite.BuiltinOperator
+import tflite.ActivationFunctionType
 
-from   nnop import DEPTHWISE_CONV_2D, MAX_POOL_2D, CONV_2D, RELUx
+from   fbnnop import DEPTHWISE_CONV_2D, MAX_POOL_2D, CONV_2D, RELUx
 
 def read_tflite_model(file):
     buf = open(file, "rb").read()
@@ -41,8 +42,8 @@ class operator():
         self.idx     = operator_idx
         self.Operator= operator_fb
         self.tensors = tensors
-        self.inputs  = operator_fb.InputsAsNumpy()
-        self.outputs = operator_fb.OutputsAsNumpy()
+        self.inputs  = list( operator_fb.InputsAsNumpy() )
+        self.outputs = list( operator_fb.OutputsAsNumpy() )
         self.opcode_index    = operator_fb.OpcodeIndex()
         self.builtin_options = operator_fb.BuiltinOptions()
         self.operator_codes_fb = operator_codes_fb
@@ -51,9 +52,8 @@ class operator():
         self.nick    = re.sub('[_AIUEO0-9]','',self.name)[:5]
         self.padding = 0
 
-    def Builtin_Options(self):
+    def Builtin_Options(self, verbose=False):
         def funcno2name(funcno):
-            import tflite.ActivationFunctionType
             if funcno == 0:return None
             if funcno == 1:return "RELU"
             if funcno == 2:return "RELU1"
@@ -72,7 +72,7 @@ class operator():
             stridew = opt.StrideW()
             _activation_ = opt.FusedActivationFunction()
             _activation_ = funcno2name(_activation_)
-            print("Conv2DOptions")
+            if verbose: print("Conv2DOptions")
             return (padding, stridew, strideh, _activation_)
 
         elif option_type == tflite.BuiltinOptions.BuiltinOptions.DepthwiseConv2DOptions:
@@ -84,7 +84,7 @@ class operator():
             _activation_ = opt.FusedActivationFunction()
             _activation_ = funcno2name(_activation_)
             depthmultiplier = opt.DepthMultiplier()
-            print("DepthwiseConv2DOptions")
+            if verbose: print("DepthwiseConv2DOptions")
             return (padding, stridew, strideh, _activation_,depthmultiplier)
 
         elif option_type == tflite.BuiltinOptions.BuiltinOptions.FullyConnectedOptions:
@@ -92,21 +92,21 @@ class operator():
             opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
             _activation_ = opt.FusedActivationFunction()
             _activation_ = funcno2name(_activation_)
-            print("FullyConnectedOptions")
+            if verbose: print("FullyConnectedOptions")
             return (_activation_)
 
         elif option_type == tflite.BuiltinOptions.BuiltinOptions.SoftmaxOptions:
             opt = tflite.SoftmaxOptions.SoftmaxOptions()
             opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
             beta = opt.Beta()
-            print("SoftmaxOptions")
+            if verbose: print("SoftmaxOptions")
             return (beta)
 
         elif option_type == tflite.BuiltinOptions.BuiltinOptions.ReshapeOptions:
             opt = tflite.ReshapeOptions.ReshapeOptions()
             opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
             newshape = list(opt.NewShapeAsNumpy())
-            print("ReshapeOptions")
+            if verbose: print("ReshapeOptions")
             return (newshape)
 
         elif option_type == tflite.BuiltinOptions.BuiltinOptions.Pool2DOptions:
@@ -119,7 +119,7 @@ class operator():
             filterheight = opt.FilterHeight()
             _activation_ = opt.FusedActivationFunction()
             _activation_ = funcno2name(_activation_)
-            print("Pool2DOptions")
+            if verbose: print("Pool2DOptions")
             return (padding, stridew, strideh, _activation_,filterwidth, filterheight)
         else:
             assert False,"Unknown:BuiltinOptions:"+str(op.BuiltinOptionsType())
@@ -274,28 +274,15 @@ class operator():
         for i in self.inputs:  self.tensors[i].view()
         assert cont,"Fatal Error occurrence at operator"
 
-def TensorType2String(TensorType):
-    if TensorType == tflite.TensorType.TensorType.FLOAT32:   return "FLOAT32"
-    elif TensorType == tflite.TensorType.TensorType.FLOAT16: return "FLOAT16"
-    elif TensorType == tflite.TensorType.TensorType.INT32:   return "INT32"
-    elif TensorType == tflite.TensorType.TensorType.INT8:    return "INT8"
-    elif TensorType == tflite.TensorType.TensorType.UINT8:   return "UINT8"
-    elif TensorType == tflite.TensorType.TensorType.INT64:   return "INT64"
-    elif TensorType == tflite.TensorType.TensorType.STRING:  return "STRING"
-    else: assert False,"Unknown:TensorType2String(TensorType)"+str(TensorType)
-
 class tensor():
     def __init__(self, tensor_idx, tensor_fb, buffers_fb):
         self.idx    = tensor_idx
         self.Tensor = tensor_fb
         self.shape  = list(tensor_fb.ShapeAsNumpy())
-        self.type   = TensorType2String(tensor_fb.Type())
+        self.type   = self.TensorType2String(tensor_fb.Type())
         self.name   = tensor_fb.Name()
         self.buffer = tensor_fb.Buffer()
 
-        #if self.buffer >= 0:
-            #if type(self.buff) != np.ndarray: self.buff = np.asarray(self.buff)
-            #if self.idx == 11:set_trace()
         assert self.buffer>=0,"Invalid tensor.Buffer() {}".format(self.buffer)
         self.buff = buffers_fb[self.buffer].DataAsNumpy()
         if buffers_fb[self.buffer].DataLength()>0:
@@ -303,13 +290,11 @@ class tensor():
             self.data = self.buff.copy()
         else:
             self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
-        #else:
-        #    self.buffer = -1
 
         self.quantization = tensor_fb.Quantization()
         assert type(self.quantization) == tflite.QuantizationParameters.QuantizationParameters
         self.scale = self.max = self.min = self.zero_point = None
-    #    if self.quantization != {}:
+
         self.scale      = self.quantization.ScaleAsNumpy()     if self.quantization.ScaleLength()    > 0 else None
         self.max        = self.quantization.MaxAsNumpy()       if self.quantization.MaxLength()      > 0 else None
         self.min        = self.quantization.MinAsNumpy()       if self.quantization.MinLength()      > 0 else None
@@ -336,6 +321,16 @@ class tensor():
             elif self.zero_point is not None:
                 self.min   =  self.scale * self.zero_point
                 self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
+
+    def TensorType2String(self, TensorType):
+        if TensorType == tflite.TensorType.TensorType.FLOAT32:   return "FLOAT32"
+        elif TensorType == tflite.TensorType.TensorType.FLOAT16: return "FLOAT16"
+        elif TensorType == tflite.TensorType.TensorType.INT32:   return "INT32"
+        elif TensorType == tflite.TensorType.TensorType.INT8:    return "INT8"
+        elif TensorType == tflite.TensorType.TensorType.UINT8:   return "UINT8"
+        elif TensorType == tflite.TensorType.TensorType.INT64:   return "INT64"
+        elif TensorType == tflite.TensorType.TensorType.STRING:  return "STRING"
+        else: assert False,"Unknown:TensorType2String(TensorType)"+str(TensorType)
 
     def list2int(self, bdy, idx, Nbyte):
         val = 0
@@ -387,13 +382,14 @@ class tensor():
         assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
-    def __init__(self,tflite='mnist.tflite'):
+    def __init__(self, tflite='mnist.tflite', verbose=False):
         self.model    = read_tflite_model(tflite)
         self.subgraph = self.model.Subgraphs(0)
         self.inputs   = list(self.subgraph.InputsAsNumpy())
         self.outputs  = list(self.subgraph.OutputsAsNumpy())
         buffers_fb    = [ self.model.Buffers(b) for b in range(self.model.BuffersLength()) ]
 
+        if verbose: print("Creating tensors structure ..")
         self.tensors  = []
         for idx in range(self.subgraph.TensorsLength()):
             tensor_fb = self.subgraph.Tensors(idx)
@@ -401,10 +397,114 @@ class graph:
             self.tensors.append(gtnsr)
 
         self.operators = []
+        if verbose: print("Creating operators structure ..")
         for idx in range(self.subgraph.OperatorsLength()):
             operator_fb = self.subgraph.Operators(idx)
             oprtr = operator(idx, operator_fb, self.model.OperatorCodes, self.tensors)
             self.operators.append(oprtr)
 
-g = graph()
+        self.reset_refs()
+        self.operate_order_list     = []
+        if verbose: print("Creating Graph done.")
+
+    def reset_refs(self): self.operator_refs = [0]*len(self.operators)
+
+    def refs(self, operator_idx):
+        refs = self.operator_refs[operator_idx]
+        self.operator_refs[operator_idx] += 1
+        return refs
+
+    def generators(self, tensors):
+        # find subgraph input operator index
+        output_operators_idxes = []
+        source_tensor_idxes    = []
+        assert type(tensors) == list,"tensors(index) must be list"
+        for ope_idx, ope in enumerate(self.operators):
+            ope_outs = ope.outputs
+            assert type(ope_outs) == list,"ope_outs(index) must be list"
+            if len(set(ope_outs+tensors)) != len(ope_outs+tensors):
+                output_operators_idxes.append(ope_idx)
+                source_tensor_idxes.append(ope.inputs)
+        return output_operators_idxes, source_tensor_idxes
+
+    def consumers(self, tensors):
+        # find subgraph output operator index
+        input_operators_idxes = []
+        distin_tensor_idxes   = []
+        for ope_idx, ope in enumerate(self.operators):
+            ope_ins = ope.inputs
+            if len(set(ope_ins+tensors)) != len(ope_ins+tensors):
+                input_operators_idxes.append(ope_idx)
+                distin_tensor_idxes.append(ope.outputs)
+        return input_operators_idxes, distin_tensor_idxes
+
+    def print_operator(self, operator_idx):
+        opcode = self.operators[operator_idx].opcode_index
+        o_obj  = self.operators[operator_idx]
+        o_nick = self.operators[operator_idx].nick
+        print("dist_tensor {} <= operator {} {}(code {}) = src {} data_idx    {} <= {}".format(
+                o_obj.outputs, o_nick, operator_idx, opcode, o_obj.inputs,
+                [self.tensors[i].buffer for i in o_obj.outputs],
+                [self.tensors[i].buffer for i in o_obj.inputs ]
+            )
+        )
+
+    #     Generators      Focus        Consumers
+    #Tensor ---- ope ---+ Tensor +---- ope --- Tensor
+    #List               | List   |             List
+    #                   |        |
+    #Tensor ____ ope ___|        |____ ope --- Tensor
+    #List                                      List
+    def walk_from(self, tensor_idx, verbose=True):
+        operators, tensors = self.generators(tensor_idx)
+        for o, t in zip(operators, tensors):
+            if self.refs(o)>0:continue
+            self.walk_from(t, verbose)
+            self.operate_order_list.append(o)
+            if verbose: self.print_operator(o)
+
+    def allocate_graph(self, verbose=False):
+        if verbose: print("Allocatng Graph ..")
+        self.walk_from(self.outputs, verbose)
+        for order, operator_idx in enumerate(self.operate_order_list):
+            pass
+        if verbose: print("Allocatng Graph done.")
+
+    def invoke(self, verbose=False):
+        if verbose: print("----- INVOKING      -----")
+        for order, operator_idx in enumerate(self.operate_order_list):
+            operator = self.operators[operator_idx]
+            #for i in self.inputs:   # Check only
+            #    input_ = self.tensors[i]
+            #    assert tuple(input_.shape)==input_.data.shape,"Input shape mismatch {} {}".format(
+            #            self.tensors[i].shape, self.tensors[i].data.shape)
+            ans = operator.eval()
+            if verbose: operator.view()
+        if verbose: print("----- DONE --------------")
+        return ans
+
+if __name__=='__main__':
+    import tensorflow.examples.tutorials.mnist.input_data as input_data
+    mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
+
+    g = graph(verbose=True)
+    g.allocate_graph(verbose=True)
+
+    questions=2
+    questions=10
+    questions=100
+    corrects =0
+    for i in range(questions):
+        number_img = mnist.test.images[i]
+        number_gt  = mnist.test.labels[i]
+        g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.float32))
+        y = g.invoke(verbose=False)
+        gt = np.argmax(number_gt)
+        pr = np.argmax(y)
+        if gt!=pr:
+            print("incorrenct:",gt,pr)
+        else:
+            corrects+=1
+
+    print("accurracy %.3f %d/%d"%(1.0*corrects/questions,corrects,questions))
 
