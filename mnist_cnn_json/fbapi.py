@@ -55,20 +55,55 @@ def TensorType2String(TensorType):
 class tensor():
     def __init__(self, tensor_idx, tensor_fb, buffers_fb):
         self.idx    = tensor_idx
+        self.Tensor = tensor_fb
         self.shape  = list(tensor_fb.ShapeAsNumpy())
         self.type   = TensorType2String(tensor_fb.Type())
         self.name   = tensor_fb.Name()
         self.buffer = tensor_fb.Buffer()
 
-        if buffers_fb[self.buffer].DataLength() > 0:
-            self.buff = buffers_fb[self.buffer].DataAsNumpy()
-            if self.buff is not None:
-                self.buff = self.dataWtype(self.buff, self.type, self.shape)
-                self.data = self.buff.copy()
-            else:
-                self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
+        #if self.buffer >= 0:
+            #if type(self.buff) != np.ndarray: self.buff = np.asarray(self.buff)
+            #if self.idx == 11:set_trace()
+        assert self.buffer>=0,"Invalid tensor.Buffer() {}".format(self.buffer)
+        self.buff = buffers_fb[self.buffer].DataAsNumpy()
+        if buffers_fb[self.buffer].DataLength()>0:
+            self.buff = self.dataWtype(self.buff, self.type, self.shape)
+            self.data = self.buff.copy()
         else:
-            self.buffer = -1
+            self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
+        #else:
+        #    self.buffer = -1
+
+        self.quantization = tensor_fb.Quantization()
+        assert type(self.quantization) == tflite.QuantizationParameters.QuantizationParameters
+        self.scale = self.max = self.min = self.zero_point = None
+    #    if self.quantization != {}:
+        self.scale      = self.quantization.ScaleAsNumpy()     if self.quantization.ScaleLength()    > 0 else None
+        self.max        = self.quantization.MaxAsNumpy()       if self.quantization.MaxLength()      > 0 else None
+        self.min        = self.quantization.MinAsNumpy()       if self.quantization.MinLength()      > 0 else None
+        self.zero_point = self.quantization.ZeroPointAsNumpy() if self.quantization.ZeroPointLength()> 0 else None
+
+        if self.scale is not None:
+            assert len(self.scale) == 1,"Json format error len(scale)="+str(len(self.scale))
+            self.scale = self.scale[0]
+        elif self.max is not None or self.min is not None or self.zero_point is not None:
+            self.scale = 1.0
+
+        if self.max is not None:
+            assert len(self.max) == 1,"Json format error len(max)="+str(len(self.max))
+            self.max = self.max[0]
+
+            if self.zero_point is not None:
+                assert len(self.zero_point) == 1,"Json format error len(zero_point)="+str(len(self.zero_point))
+                self.zero_point = self.zero_point[0]
+
+            if self.min is not None:
+                self.data  = (self.scale * self.data + self.min).astype(np.float32)
+                self.min   = self.min[0]
+
+            elif self.zero_point is not None:
+                self.min   =  self.scale * self.zero_point
+                self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
 
     def list2int(self, bdy, idx, Nbyte):
         val = 0
@@ -92,6 +127,7 @@ class tensor():
 
     def dataWtype(self, bdy, type_string, shp):
         np_type = self.type2np(type_string)
+        if type(bdy) != np.ndarray:set_trace()
         assert type(bdy) == np.ndarray,"tensor:{} {}".format(self.idx, type(bdy))
         if   type_string=='FLOAT32': data = np.asarray([self.list2float(bdy, i, 4) for i in range(0,len(bdy),4)], np_type)
         elif type_string=='FLOAT16': data = np.asarray([self.list2float(bdy, i, 2) for i in range(0,len(bdy),2)], np_type)
@@ -100,6 +136,23 @@ class tensor():
         elif type_string=='UINT8':   data = np.asarray(                 bdy,                                      np_type)
         else : assert True, "Unsupported type"+type_string
         return data.reshape(tuple(shp))
+
+    def set(self, img):
+        assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
+        assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
+        if (self.max < img.max() or self.min > img.min()):
+            print("Warnning: Suppoted float32 only so coverting input to float32")
+            img = ( self.scale * img + self.min ).astype(np.float32)
+        self.data = img
+        return self.data
+
+    def view(self, msg=None, cont=True):
+        if msg is not None: print("\n***\n*** "+msg+"\n***")
+        print("tensors[{}]({}) buffer:{}".format(self.idx, self.name, self.buffer))
+        print("  type@tflite :{} type@run :{}".format(self.type,self.data.dtype))
+        print("  shape@tflite:{} shape@run:{}".format(self.shape, self.data.shape))
+        print("  quantization:min/max/scale/zerop {} {} {} {}".format(self.min, self.max, self.scale,self.zero_point))
+        assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
     def __init__(self,tflite='mnist.tflite'):
@@ -116,7 +169,6 @@ class graph:
 
 g = graph()
 
-set_trace()
 model = read_tflite_model('mnist.tflite')
 sgl = model.SubgraphsLength()
 if sgl!=0:
@@ -132,6 +184,7 @@ print("buffers length",bfl)
 print("inputs",sg.InputsAsNumpy())
 print("outputs",sg.OutputsAsNumpy())
 
+set_trace()
 opl = sg.OperatorsLength()
 print("operators length",opl)
 
