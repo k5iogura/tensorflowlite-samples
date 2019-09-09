@@ -45,7 +45,7 @@ Need tflite_convert tool on tensorflow-v1.10.
 
 ### Infer with tflite by python(fbapi.py) using numpy only  
 
-Step.1 to make tflite flatbuffers api.  
+Step.1 to make tflite for flatbuffers api.  
 ```
  $ flatc --python ../schema_v3.fbs
    or
