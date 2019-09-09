@@ -115,8 +115,9 @@ Included operators in mnist.tflite.
     { "builtin_code": "SOFTMAX" }
   ]
 ```
-As of 30.Aug,2019, supported operators are **CONV_2D, DEPTHWISE_CONV_2D, MAX_POOL_2D, RESHAPE, FULLY_CONNECTED**.  
+As of 30.Aug,2019, supported operators are  
+**CONV_2D, DEPTHWISE_CONV_2D, MAX_POOL_2D, RESHAPE, FULLY_CONNECTED, CONCATENATE**  
 
 ### For debug of own implemented operator see [TensorFlow Lite Interpreter get_tensor() #23384](../README_get_tensor.md)  
 
-**Aug.30, 2019**  
+**Sep.09, 2019**  
