@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sys, argparse
+import os, sys, argparse,re
 import numpy as np
 from   pdb import set_trace
 from   inspect import getmembers
@@ -7,7 +7,7 @@ from   inspect import getmembers
 import struct
 
 import tflite
-from tflite.Model import Model
+from   tflite.Model import Model
 import tflite.BuiltinOptions
 import tflite.TensorType
 
@@ -28,29 +28,261 @@ import tflite.SoftmaxOptions
 import tflite.OperatorCode
 import tflite.BuiltinOperator
 
+from   nnop import DEPTHWISE_CONV_2D, MAX_POOL_2D, CONV_2D, RELUx
+
 def read_tflite_model(file):
     buf = open(file, "rb").read()
     buf = bytearray(buf)
     model = Model.GetRootAsModel(buf, 0)
     return model
 
+class operator():
+    def __init__(self, operator_idx, operator_fb, operator_codes_fb, tensors):
+        self.idx     = operator_idx
+        self.Operator= operator_fb
+        self.tensors = tensors
+        self.inputs  = operator_fb.InputsAsNumpy()
+        self.outputs = operator_fb.OutputsAsNumpy()
+        self.opcode_index    = operator_fb.OpcodeIndex()
+        self.builtin_options = operator_fb.BuiltinOptions()
+        self.operator_codes_fb = operator_codes_fb
+
+        self.name    = self.opcode_name = self.BuiltinCode2String(self.opcode_index)
+        self.nick    = re.sub('[_AIUEO0-9]','',self.name)[:5]
+        self.padding = 0
+
+    def Builtin_Options(self):
+        def funcno2name(funcno):
+            import tflite.ActivationFunctionType
+            if funcno == 0:return None
+            if funcno == 1:return "RELU"
+            if funcno == 2:return "RELU1"
+            if funcno == 3:return "RELU6"
+            if funcno == 4:return "TANH"
+            if funcno == 5:return "SIGN_BIT"
+            assert False,"Unknown Fused Function"
+
+        op = self.Operator
+        option_type = op.BuiltinOptionsType()
+        if option_type == tflite.BuiltinOptions.BuiltinOptions.Conv2DOptions:
+            opt = tflite.Conv2DOptions.Conv2DOptions()
+            opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
+            padding = opt.Padding()
+            strideh = opt.StrideH()
+            stridew = opt.StrideW()
+            _activation_ = opt.FusedActivationFunction()
+            _activation_ = funcno2name(_activation_)
+            print("Conv2DOptions")
+            return (padding, stridew, strideh, _activation_)
+
+        elif option_type == tflite.BuiltinOptions.BuiltinOptions.DepthwiseConv2DOptions:
+            opt = tflite.DepthwiseConv2DOptions.DepthwiseConv2DOptions()
+            opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
+            padding = opt.Padding()
+            strideh = opt.StrideH()
+            stridew = opt.StrideW()
+            _activation_ = opt.FusedActivationFunction()
+            _activation_ = funcno2name(_activation_)
+            depthmultiplier = opt.DepthMultiplier()
+            print("DepthwiseConv2DOptions")
+            return (padding, stridew, strideh, _activation_,depthmultiplier)
+
+        elif option_type == tflite.BuiltinOptions.BuiltinOptions.FullyConnectedOptions:
+            opt = tflite.FullyConnectedOptions.FullyConnectedOptions()
+            opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
+            _activation_ = opt.FusedActivationFunction()
+            _activation_ = funcno2name(_activation_)
+            print("FullyConnectedOptions")
+            return (_activation_)
+
+        elif option_type == tflite.BuiltinOptions.BuiltinOptions.SoftmaxOptions:
+            opt = tflite.SoftmaxOptions.SoftmaxOptions()
+            opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
+            beta = opt.Beta()
+            print("SoftmaxOptions")
+            return (beta)
+
+        elif option_type == tflite.BuiltinOptions.BuiltinOptions.ReshapeOptions:
+            opt = tflite.ReshapeOptions.ReshapeOptions()
+            opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
+            newshape = list(opt.NewShapeAsNumpy())
+            print("ReshapeOptions")
+            return (newshape)
+
+        elif option_type == tflite.BuiltinOptions.BuiltinOptions.Pool2DOptions:
+            opt = tflite.Pool2DOptions.Pool2DOptions()
+            opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
+            padding = opt.Padding()
+            strideh = opt.StrideH()
+            stridew = opt.StrideW()
+            filterwidth = opt.FilterWidth()
+            filterheight = opt.FilterHeight()
+            _activation_ = opt.FusedActivationFunction()
+            _activation_ = funcno2name(_activation_)
+            print("Pool2DOptions")
+            return (padding, stridew, strideh, _activation_,filterwidth, filterheight)
+        else:
+            assert False,"Unknown:BuiltinOptions:"+str(op.BuiltinOptionsType())
+
+    def BuiltinCode2String(self, opcode_index):
+        builtin_code = self.operator_codes_fb(opcode_index).BuiltinCode()
+        custom_code  = self.operator_codes_fb(opcode_index).CustomCode()
+        print("operator code {} builtin_code/custom_code = {}/{}".format(opcode_index,builtin_code,custom_code))
+        if builtin_code == tflite.BuiltinOperator.BuiltinOperator.CONCATENATION:
+            return "CONCATENATION"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.CONV_2D:
+            return "CONV_2D"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.DEPTHWISE_CONV_2D:
+            return "DEPTHWISE_CONV_2D"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.FULLY_CONNECTED:
+            return "FULLY_CONNECTED"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.LOGISTIC:
+            return "LOGISTIC"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.MAX_POOL_2D:
+            return "MAX_POOL_2D"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.RELU:
+            return "RELU"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.RELU6:
+            return "RELU6"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.RESHAPE:
+            return "RESHAPE"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.SOFTMAX:
+            return "SOFTMAX"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.CUSTOM:
+            return "CUSTOM"
+        else:
+            assert False,"Unknown "
+
+    def unsupported(self):
+        print(self.name+" IS NOT SUPPORTED",self.outputs,self.name,self.inputs)
+        #sys.exit(-1)
+
+    def fully_connected(self, x, W, b):
+        # x : width  x height
+        # W : height x width
+        # b : height
+        y = np.sum(x*W,axis=1)
+        z = y+b
+        return z
+
+    def clipping(self, tensor_idx):
+        tensor = self.tensors[tensor_idx[0]]
+        if tensor.min is not None and tensor.max is not None:
+            tensor.data = np.clip(tensor.data, tensor.min, tensor.max)
+        elif tensor.min is not None:
+            tensor.data = np.maximum(tensor.data, tensor.max)
+        elif tensor.max is not None:
+            tensor.data = np.minimum(tensor.data, tensor.min)
+
+    def eval(self):
+        name = self.name
+        if   name == 'ADD':     # Untested yet
+            r = self.tensors[0].data
+            for i in self.inputs[1:]:
+                assert self.tensors[0].shape == self.tensors[i].shape,"Unmatch {} {}".format(
+                                                    r.shape, self.tensors[i].shape)
+                r += self.tensors[i].data
+            self.clipping(self.outputs)
+            return r
+        elif name == 'AVERAGE_POOL_2D':   self.unsupported()
+        elif name == 'CONCATENATION':
+            _axis  = self.Builtin_Options()
+            #_axis_ = getordef(self.builtin_options,'axis',None)
+            if _axis_ is None:self.view('Invalid conatenation axis',cont=False)
+            temp_ = []
+            for t in self.inputs:
+                temp_.append(self.tensors[t].data.tolist())
+            assert len(temp_) > 0, "Invalid concatenation list"
+            r = self.tensors[self.outputs[0]].data = np.concatenate(temp_, axis = _axis_)
+            return r
+        elif name == 'CONV_2D':
+            CONV_2D(self, self.outputs, self.inputs)
+            self.clipping(self.outputs)
+        elif name == 'DEPTHWISE_CONV_2D':
+            DEPTHWISE_CONV_2D(self, self.outputs, self.inputs)
+            self.clipping(self.outputs)
+        elif name == 'EMBEDDING_LOOKUP':  self.unsupported()
+        elif name == 'FULLY_CONNECTED':
+            x = self.tensors[self.inputs[0]].data.reshape(-1)
+            w = self.tensors[self.inputs[1]].data
+            b = self.tensors[self.inputs[2]].data
+            r = self.fully_connected(x,w,b)
+            _activation_ = self.Builtin_Options()
+            #_activation_ = getordef(self.builtin_options, 'fused_activation_function', None)
+            if _activation_ is not None:
+                if   "RELU"  in _activation_: r = RELUx(r, 0)
+                elif "RELU1" in _activation_: r = RELUx(r, 1)
+                elif "RELU6" in _activation_: r = RELUx(r, 6)
+                else: print(_activation_+' not supported')
+            self.tensors[self.outputs[0]].data = r
+            self.clipping(self.outputs)
+            return r
+        elif name == 'HASHTABLE_LOOKUP':  self.unsupported()
+        elif name == 'L2_NORMALIZATION':  self.unsupported()
+        elif name == 'L2_POOL_2D':        self.unsupported()
+        elif name == 'LOCAL_RESPONSE_NORMALIZATION': self.unsupported()
+        elif name == 'LOGISTIC':
+            sigmoid = lambda x : 1 / (1 + np.exp(-x))
+            x = self.tensors[self.inputs[0]].data
+            r = self.tensors[self.outputs[0]].data = sigmoid(np.clip(x,-100,100))
+            return r
+        elif name == 'LSH_PROJECTION':    self.unsupported()
+        elif name == 'LSTM':              self.unsupported()
+        elif name == 'MAX_POOL_2D':
+            MAX_POOL_2D(self, self.outputs, self.inputs)
+            self.clipping(self.outputs)
+        elif name == 'RELU':
+            x = self.tensors[self.inputs[0]].data
+            r = self.tensors[self.outputs[0]].data = RELUx(x, 0)
+            return r
+        elif name == 'RELU6':
+            x = self.tensors[self.inputs[0]].data
+            r = self.tensors[self.outputs[0]].data = RELUx(x, 6)
+            return r
+        elif name == 'RESHAPE':
+            s = self.Builtin_Options()
+            #s = getordef(self.builtin_options, 'new_shape', None)
+            x = self.tensors[self.inputs[0]].data
+            if s is None: s = self.tensors[self.inputs[1]].data
+            r = self.tensors[self.outputs[0]].data = x.reshape(tuple(s))
+            return r
+        elif name == 'RESIZE_BILINEAR':   self.unsupported()
+        elif name == 'RNN':               self.unsupported()
+        elif name == 'SOFTMAX':
+            assert len(self.inputs) == 1, "SOFTMAX not support dim {}".format(self.inputs)
+            beta = self.Builtin_Options()
+            #beta = getordef(self.builtin_options, 'beta', 1.0)
+            assert beta != 0, "SOFTMAX not support beta {}".format(beta)
+            # x  = np.exp(self.tensors[self.inputs[0]].data - np.max(self.tensors[self.inputs[0]].data))
+            input_tensor = self.tensors[self.inputs[0]]
+            x  = np.exp(beta*(input_tensor.data - np.max(input_tensor.data)))
+            r  = self.tensors[self.outputs[0]].data = x/np.sum(x)
+            return r
+        elif name == 'SPACE_TO_DEPTH':    self.unsupported()
+        elif name == 'SVDF':              self.unsupported()
+        elif name == 'TANH':              self.unsupported()
+        elif name == 'CONCAT_EMBEDDINGS': self.unsupported()
+        elif name == 'SKIP_GRAM':         self.unsupported()
+        elif name == 'CALL':              self.unsupported()
+        elif name == 'CUSTOM':            self.unsupported()
+
+    def view(self, msg=None, cont=True):
+        if msg is not None: print("\n***\n*** "+msg+"\n***")
+        print("operator[{}]({}:{}) outputs {} inpus {}".format(self.idx, self.nick, self.opcode_index, self.outputs, self.inputs))
+        print("  builtin_options : {} padding@run {}".format(self.builtin_options, self.padding))
+        for o in self.outputs: self.tensors[o].view()
+        for i in self.inputs:  self.tensors[i].view()
+        assert cont,"Fatal Error occurrence at operator"
+
 def TensorType2String(TensorType):
-    if TensorType == tflite.TensorType.TensorType.FLOAT32:
-        return "FLOAT32"
-    elif TensorType == tflite.TensorType.TensorType.FLOAT16:
-        return "FLOAT16"
-    elif TensorType == tflite.TensorType.TensorType.INT32:
-        return "INT32"
-    elif TensorType == tflite.TensorType.TensorType.INT8:
-        return "INT8"
-    elif TensorType == tflite.TensorType.TensorType.UINT8:
-        return "UINT8"
-    elif TensorType == tflite.TensorType.TensorType.INT64:
-        return "INT64"
-    elif TensorType == tflite.TensorType.TensorType.STRING:
-        return "STRING"
-    else:
-        assert False,"Unknown:TensorType2String(TensorType)"+str(TensorType)
+    if TensorType == tflite.TensorType.TensorType.FLOAT32:   return "FLOAT32"
+    elif TensorType == tflite.TensorType.TensorType.FLOAT16: return "FLOAT16"
+    elif TensorType == tflite.TensorType.TensorType.INT32:   return "INT32"
+    elif TensorType == tflite.TensorType.TensorType.INT8:    return "INT8"
+    elif TensorType == tflite.TensorType.TensorType.UINT8:   return "UINT8"
+    elif TensorType == tflite.TensorType.TensorType.INT64:   return "INT64"
+    elif TensorType == tflite.TensorType.TensorType.STRING:  return "STRING"
+    else: assert False,"Unknown:TensorType2String(TensorType)"+str(TensorType)
 
 class tensor():
     def __init__(self, tensor_idx, tensor_fb, buffers_fb):
@@ -161,128 +393,18 @@ class graph:
         self.inputs   = list(self.subgraph.InputsAsNumpy())
         self.outputs  = list(self.subgraph.OutputsAsNumpy())
         buffers_fb    = [ self.model.Buffers(b) for b in range(self.model.BuffersLength()) ]
+
         self.tensors  = []
         for idx in range(self.subgraph.TensorsLength()):
             tensor_fb = self.subgraph.Tensors(idx)
             gtnsr = tensor(idx, tensor_fb, buffers_fb)
             self.tensors.append(gtnsr)
 
+        self.operators = []
+        for idx in range(self.subgraph.OperatorsLength()):
+            operator_fb = self.subgraph.Operators(idx)
+            oprtr = operator(idx, operator_fb, self.model.OperatorCodes, self.tensors)
+            self.operators.append(oprtr)
+
 g = graph()
-
-model = read_tflite_model('mnist.tflite')
-sgl = model.SubgraphsLength()
-if sgl!=0:
-    sg = model.Subgraphs(0)
-tsl = sg.TensorsLength()
-print("tensors_length",tsl)
-
-ts = sg.Tensors(0)
-
-bfl = model.BuffersLength()
-print("buffers length",bfl)
-
-print("inputs",sg.InputsAsNumpy())
-print("outputs",sg.OutputsAsNumpy())
-
-set_trace()
-opl = sg.OperatorsLength()
-print("operators length",opl)
-
-for idx in range(opl):
-    op = sg.Operators(idx)
-    inputs = op.InputsAsNumpy()
-    outputs = op.OutputsAsNumpy()
-    opcode_index = op.OpcodeIndex()
-    if op.BuiltinOptionsType() == tflite.BuiltinOptions.BuiltinOptions.Conv2DOptions:
-        opt = tflite.Conv2DOptions.Conv2DOptions()
-        opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
-        padding = opt.Padding()
-        strideh = opt.StrideH()
-        stridew = opt.StrideW()
-        _activation_ = opt.FusedActivationFunction()
-        print("Conv2DOptions",idx)
-        print(padding, stridew, strideh, _activation_)
-
-    elif op.BuiltinOptionsType() == tflite.BuiltinOptions.BuiltinOptions.DepthwiseConv2DOptions:
-        opt = tflite.DepthwiseConv2DOptions.DepthwiseConv2DOptions()
-        opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
-        padding = opt.Padding()
-        strideh = opt.StrideH()
-        stridew = opt.StrideW()
-        _activation_ = opt.FusedActivationFunction()
-        depthmultiplier = opt.DepthMultiplier()
-        print("DepthwiseConv2DOptions",idx)
-        print(padding, stridew, strideh, _activation_,depthmultiplier)
-
-    elif op.BuiltinOptionsType() == tflite.BuiltinOptions.BuiltinOptions.FullyConnectedOptions:
-        opt = tflite.FullyConnectedOptions.FullyConnectedOptions()
-        opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
-        _activation_ = opt.FusedActivationFunction()
-        print("FullyConnectedOptions",idx)
-        print(_activation_)
-
-    elif op.BuiltinOptionsType() == tflite.BuiltinOptions.BuiltinOptions.SoftmaxOptions:
-        opt = tflite.SoftmaxOptions.SoftmaxOptions()
-        opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
-        beta = opt.Beta()
-        print("SoftmaxOptions",idx)
-        print(beta)
-
-    elif op.BuiltinOptionsType() == tflite.BuiltinOptions.BuiltinOptions.ReshapeOptions:
-        opt = tflite.ReshapeOptions.ReshapeOptions()
-        opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
-        newshape = list(opt.NewShapeAsNumpy())
-        print("ReshapeOptions",idx)
-        print(newshape)
-
-    elif op.BuiltinOptionsType() == tflite.BuiltinOptions.BuiltinOptions.Pool2DOptions:
-        opt = tflite.Pool2DOptions.Pool2DOptions()
-        opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
-        padding = opt.Padding()
-        strideh = opt.StrideH()
-        stridew = opt.StrideW()
-        filterwidth = opt.FilterWidth()
-        filterheight = opt.FilterHeight()
-        _activation_ = opt.FusedActivationFunction()
-        print("Pool2DOptions",idx)
-        print(padding, stridew, strideh, _activation_,filterwidth, filterheight)
-    else:
-        assert False,"Unknown:BuiltinOptions:"+str(op.BuiltinOptionsType())
-
-s=TensorType2String(ts.Type())
-
-def BuiltinCode2String(opcode_index):
-    builtin_code = model.OperatorCodes(opcode_index).BuiltinCode()
-    custom_code  = model.OperatorCodes(opcode_index).CustomCode()
-    print("operator code {} builtin_code/custom_code = {}/{}".format(opcode_index,builtin_code,custom_code))
-    if builtin_code == tflite.BuiltinOperator.BuiltinOperator.CONCATENATION:
-        return "CONCATENATION"
-    elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.CONV_2D:
-        return "CONV_2D"
-    elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.DEPTHWISE_CONV_2D:
-        return "DEPTHWISE_CONV_2D"
-    elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.FULLY_CONNECTED:
-        return "FULLY_CONNECTED"
-    elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.LOGISTIC:
-        return "LOGISTIC"
-    elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.MAX_POOL_2D:
-        return "MAX_POOL_2D"
-    elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.RELU:
-        return "RELU"
-    elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.RELU6:
-        return "RELU6"
-    elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.RESHAPE:
-        return "RESHAPE"
-    elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.SOFTMAX:
-        return "SOFTMAX"
-    elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.CUSTOM:
-        return "CUSTOM"
-    else:
-        assert False,"Unknown "
-
-ocl = model.OperatorCodesLength()
-print("operator_code_length:",ocl)
-for idx in range(ocl):
-    name = BuiltinCode2String(idx)
-    print("operator_code {} name : {}".format(idx,name))
 
