@@ -127,7 +127,7 @@ class operator():
     def BuiltinCode2String(self, opcode_index):
         builtin_code = self.operator_codes_fb(opcode_index).BuiltinCode()
         custom_code  = self.operator_codes_fb(opcode_index).CustomCode()
-        print("operator code {} builtin_code/custom_code = {}/{}".format(opcode_index,builtin_code,custom_code))
+        #print("operator code {} builtin_code/custom_code = {}/{}".format(opcode_index,builtin_code,custom_code))
         if builtin_code == tflite.BuiltinOperator.BuiltinOperator.CONCATENATION:
             return "CONCATENATION"
         elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.CONV_2D:
@@ -310,17 +310,17 @@ class tensor():
             assert len(self.max) == 1,"Json format error len(max)="+str(len(self.max))
             self.max = self.max[0]
 
-            if self.zero_point is not None:
-                assert len(self.zero_point) == 1,"Json format error len(zero_point)="+str(len(self.zero_point))
-                self.zero_point = self.zero_point[0]
+        if self.zero_point is not None:
+            assert len(self.zero_point) == 1,"Json format error len(zero_point)="+str(len(self.zero_point))
+            self.zero_point = self.zero_point[0]
 
-            if self.min is not None:
-                self.data  = (self.scale * self.data + self.min).astype(np.float32)
-                self.min   = self.min[0]
+        if self.min is not None:
+            self.data  = (self.scale * self.data + self.min).astype(np.float32)
+            self.min   = self.min[0]
 
-            elif self.zero_point is not None:
-                self.min   =  self.scale * self.zero_point
-                self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
+        elif self.zero_point is not None:
+            self.min   =  self.scale * self.zero_point
+            self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
 
     def TensorType2String(self, TensorType):
         if TensorType == tflite.TensorType.TensorType.FLOAT32:   return "FLOAT32"

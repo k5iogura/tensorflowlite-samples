@@ -26,11 +26,6 @@ def RELUx(numpy_in, val=0, leaky=None):
     return numpy_out
 
 def CONV_2D(operator, outputs, inputs, verbose=True):
-    #getordef = lambda json,key,default:json.get(key) if json.get(key) is not None else default
-
-    #stride           = getordef(operator.builtin_options, 'stride_h', 2)
-    #padding          = getordef(operator.builtin_options, 'padding',  0)
-    #_activation_     = getordef(operator.builtin_options, 'fused_activation_function', None)
     (padding, stride, strideh, _activation_) = operator.Builtin_Options()
     (tensor_idx_input, tensor_idx_filter, tensor_idx_bias) = inputs
     tensor_input     = operator.tensors[tensor_idx_input]
@@ -123,12 +118,6 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     return output_
 
 def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
-    #getordef = lambda json,key,default:json.get(key) if json.get(key) is not None else default
-
-    #stride           = getordef(operator.builtin_options, 'stride_h', 2)
-    #padding          = getordef(operator.builtin_options, 'padding',  0)
-    #depth_multiplier = getordef(operator.builtin_options, 'depth_multiplier',  0)
-    #_activation_     = getordef(operator.builtin_options, 'fused_activation_function', None)
     (padding, stride, strideh, _activation_,depth_multiplier) = operator.Builtin_Options()
     (tensor_idx_input, tensor_idx_filter, tensor_idx_bias)    = inputs
     tensor_input     = operator.tensors[tensor_idx_input]
@@ -222,13 +211,6 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
     return output_
 
 def MAX_POOL_2D(operator, outputs, inputs, verbose=True):
-    #getordef = lambda json,key,default:json.get(key) if json.get(key) is not None else default
-
-    #stride           = getordef(operator.builtin_options, 'stride_h', 2)
-    #padding          = getordef(operator.builtin_options, 'padding',  0)
-    #filter_size      = getordef(operator.builtin_options, 'filter_width',  0)
-    #filter_size      = getordef(operator.builtin_options, 'filter_height',  filter_size )
-    #_activation_     = getordef(operator.builtin_options, 'fused_activation_function', None)
     (padding, stride, strideh, _activation_, filter_size, filterheight) = operator.Builtin_Options()
     tensor_idx_input = inputs[0]
     tensor_input     = operator.tensors[tensor_idx_input]
