@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sys, argparse,re
+import os, sys, re
 import numpy as np
 from   pdb import set_trace
 from   inspect import getmembers
@@ -484,15 +484,21 @@ class graph:
         return ans
 
 if __name__=='__main__':
+    import argparse
+    args = argparse.ArgumentParser()
+    def chF(f): return f if os.path.exists(f) else sys.exit(-1)
+    args.add_argument('-t',"--tflite",       type=chF, default='mnist.tflite')
+    args.add_argument('-q',"--questions",    type=int, default=1)
+    args.add_argument('-v',"--verbose",      action='store_true')
+    args = args.parse_args()
+
     import tensorflow.examples.tutorials.mnist.input_data as input_data
     mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
-    g = graph(verbose=True)
-    g.allocate_graph(verbose=True)
+    g = graph(tflite=args.tflite, verbose=args.verbose)
+    g.allocate_graph(verbose=args.verbose)
 
-    questions=2
-    questions=10
-    questions=100
+    questions=args.questions
     corrects =0
     for i in range(questions):
         number_img = mnist.test.images[i]
