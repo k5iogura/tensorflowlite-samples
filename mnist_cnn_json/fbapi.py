@@ -352,10 +352,9 @@ class tensor():
             self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
 
     def TensorType2String(self, TensorType):
-        if TensorType == tflite.TensorType.TensorType.FLOAT32:   return "FLOAT32"
+        if   TensorType == tflite.TensorType.TensorType.FLOAT32: return "FLOAT32"
         elif TensorType == tflite.TensorType.TensorType.FLOAT16: return "FLOAT16"
         elif TensorType == tflite.TensorType.TensorType.INT32:   return "INT32"
-        elif TensorType == tflite.TensorType.TensorType.INT8:    return "INT8"
         elif TensorType == tflite.TensorType.TensorType.UINT8:   return "UINT8"
         elif TensorType == tflite.TensorType.TensorType.INT64:   return "INT64"
         elif TensorType == tflite.TensorType.TensorType.STRING:  return "STRING"
@@ -447,10 +446,13 @@ class graph:
         opcode = self.operators[operator_idx].opcode_index
         o_obj  = self.operators[operator_idx]
         o_nick = self.operators[operator_idx].nick
-        print("dest_tensor {} <= operator {} {:3d}(code {:2d}) = src {} data_idx    {} <= {}".format(
-                o_obj.outputs, o_nick, operator_idx, opcode, o_obj.inputs,
-                [self.tensors[i].buffer for i in o_obj.outputs],
-                [self.tensors[i].buffer for i in o_obj.inputs ]
+        print("dest_tensor {} {} <= operator {} {:3d}(code {:2d}) = src {}".format(
+                o_obj.outputs,
+                [self.tensors[o].type for o in o_obj.outputs],
+                o_nick,
+                operator_idx,
+                opcode,
+                o_obj.inputs
             )
         )
 
@@ -508,7 +510,7 @@ if __name__=='__main__':
         
         number_img = mnist.test.images[i]
         number_gt  = mnist.test.labels[i]
-        g.tensors[g.inputs[0]].set(number_img[np.newaxis,:])
+        g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.uint8))
         y = g.invoke(verbose=False)
         gt = np.argmax(number_gt)
         pr = np.argmax(y)
