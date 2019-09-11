@@ -29,7 +29,10 @@ import tflite.OperatorCode
 import tflite.BuiltinOperator
 import tflite.ActivationFunctionType
 
+import cv2
+
 from   fbnnop import DEPTHWISE_CONV_2D, MAX_POOL_2D, CONV_2D, RELUx
+#from   fbnnpp import *
 
 def read_tflite_model(file):
     buf = open(file, "rb").read()
@@ -49,7 +52,7 @@ class operator():
         self.operator_codes_fb = operator_codes_fb
 
         self.name    = self.opcode_name = self.BuiltinCode2String(self.opcode_index)
-        self.nick    = re.sub('[_AIUEO0-9]','',self.name)[:5]
+        self.nick    = "{:5s}".format((self.name[:2]+re.sub('[_AIUEO0-9]','',self.name[2:]))[:5])
         self.padding = 0
 
     def Builtin_Options(self, verbose=False):
@@ -150,8 +153,13 @@ class operator():
             return "SOFTMAX"
         elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.CUSTOM:
             return "CUSTOM"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.MUL:
+            return "MUL"
+        elif builtin_code == tflite.BuiltinOperator.BuiltinOperator.MAXIMUM:
+            return "MAXIMUM"
         else:
-            assert False,"Unknown "
+            print("Unknown builtin {} custom {}".format(builtin_code, custom_code))
+            return "UNKNOWN{}{}".format(builtin_code, custom_code)
 
     def unsupported(self):
         print(self.name+" IS NOT SUPPORTED",self.outputs,self.name,self.inputs)
@@ -198,9 +206,11 @@ class operator():
         elif name == 'CONV_2D':
             CONV_2D(self, self.outputs, self.inputs)
             self.clipping(self.outputs)
+            return self.tensors[self.outputs[0]].data
         elif name == 'DEPTHWISE_CONV_2D':
             DEPTHWISE_CONV_2D(self, self.outputs, self.inputs)
             self.clipping(self.outputs)
+            return self.tensors[self.outputs[0]].data
         elif name == 'EMBEDDING_LOOKUP':  self.unsupported()
         elif name == 'FULLY_CONNECTED':
             x = self.tensors[self.inputs[0]].data.reshape(-1)
@@ -231,6 +241,7 @@ class operator():
         elif name == 'MAX_POOL_2D':
             MAX_POOL_2D(self, self.outputs, self.inputs)
             self.clipping(self.outputs)
+            return self.tensors[self.outputs[0]].data
         elif name == 'RELU':
             x = self.tensors[self.inputs[0]].data
             r = self.tensors[self.outputs[0]].data = RELUx(x, 0)
@@ -265,6 +276,17 @@ class operator():
         elif name == 'SKIP_GRAM':         self.unsupported()
         elif name == 'CALL':              self.unsupported()
         elif name == 'CUSTOM':            self.unsupported()
+        elif name == 'MUL':               # 18 additional support for schema_v3.fbs
+            a = self.tensors[self.inputs[0]].data
+            x = self.tensors[self.inputs[1]].data
+            r = self.tensors[self.outputs[0]].data = a * x
+            return r
+        elif name == 'MAXIMUM':           # 55 additional support for schema_v3.fbs
+            x0= self.tensors[self.inputs[0]].data
+            x1= self.tensors[self.inputs[1]].data
+            r = self.tensors[self.outputs[0]].data = np.maximum(x0, x1)
+            return r
+        else:                             self.unsupported()
 
     def view(self, msg=None, cont=True):
         if msg is not None: print("\n***\n*** "+msg+"\n***")
@@ -284,10 +306,17 @@ class tensor():
         self.buffer = tensor_fb.Buffer()
 
         assert self.buffer>=0,"Invalid tensor.Buffer() {}".format(self.buffer)
+        if self.type   == 'FLOAT32': dtype_string = 'f4'
+        elif self.type == 'FLOAT16': dtype_string = 'f2'
+        elif self.type == 'INT32'  : dtype_string = 'i4'
+        elif self.type == 'INT64'  : dtype_string = 'i8'
+        else                       : dtype_string = 'u1'    # unsigned integer 1Byte
         self.buff = buffers_fb[self.buffer].DataAsNumpy()
         if buffers_fb[self.buffer].DataLength()>0:
-            self.buff = self.dataWtype(self.buff, self.type, self.shape)
-            self.data = self.buff.copy()
+            self.data = self.buff.view(dtype=dtype_string).reshape(self.shape)     # Ultra fast!
+        #    self.buff = self.dataWtype(self.buff, self.type, self.shape)  # Too slow
+        #    self.data = self.buff.copy()
+            pass
         else:
             self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
 
@@ -332,18 +361,6 @@ class tensor():
         elif TensorType == tflite.TensorType.TensorType.STRING:  return "STRING"
         else: assert False,"Unknown:TensorType2String(TensorType)"+str(TensorType)
 
-    def list2int(self, bdy, idx, Nbyte):
-        val = 0
-        for s, i in enumerate(range(idx, idx+Nbyte)): val += bdy[i]<<(8*s)
-        return val
-
-    def list2float(self, bdy, idx, Nbyte):
-        val = self.list2int(bdy,idx,Nbyte)
-        frm = "%0"+str(2*Nbyte)+"x"
-        sp  = frm%val
-        flt = struct.unpack('!f',sp.decode('hex'))[0]
-        return flt
-
     def type2np(self,type_string):
         if type_string == 'FLOAT32': return np.float32
         if type_string == 'FLOAT16': return np.float16
@@ -351,18 +368,6 @@ class tensor():
         if type_string == 'INT64': return np.int64
         if type_string == 'UINT8': return np.uint8
         return np.float
-
-    def dataWtype(self, bdy, type_string, shp):
-        np_type = self.type2np(type_string)
-        if type(bdy) != np.ndarray:set_trace()
-        assert type(bdy) == np.ndarray,"tensor:{} {}".format(self.idx, type(bdy))
-        if   type_string=='FLOAT32': data = np.asarray([self.list2float(bdy, i, 4) for i in range(0,len(bdy),4)], np_type)
-        elif type_string=='FLOAT16': data = np.asarray([self.list2float(bdy, i, 2) for i in range(0,len(bdy),2)], np_type)
-        elif type_string=='INT32':   data = np.asarray([self.list2int(  bdy, i, 4) for i in range(0,len(bdy),4)], np_type)
-        elif type_string=='INT64':   data = np.asarray([self.list2int(  bdy, i, 8) for i in range(0,len(bdy),8)], np_type)
-        elif type_string=='UINT8':   data = np.asarray(                 bdy,                                      np_type)
-        else : assert True, "Unsupported type"+type_string
-        return data.reshape(tuple(shp))
 
     def set(self, img):
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
@@ -430,19 +435,19 @@ class graph:
     def consumers(self, tensors):
         # find subgraph output operator index
         input_operators_idxes = []
-        distin_tensor_idxes   = []
+        destin_tensor_idxes   = []
         for ope_idx, ope in enumerate(self.operators):
             ope_ins = ope.inputs
             if len(set(ope_ins+tensors)) != len(ope_ins+tensors):
                 input_operators_idxes.append(ope_idx)
-                distin_tensor_idxes.append(ope.outputs)
-        return input_operators_idxes, distin_tensor_idxes
+                destin_tensor_idxes.append(ope.outputs)
+        return input_operators_idxes, destin_tensor_idxes
 
     def print_operator(self, operator_idx):
         opcode = self.operators[operator_idx].opcode_index
         o_obj  = self.operators[operator_idx]
         o_nick = self.operators[operator_idx].nick
-        print("dist_tensor {} <= operator {} {}(code {}) = src {} data_idx    {} <= {}".format(
+        print("dest_tensor {} <= operator {} {:3d}(code {:2d}) = src {} data_idx    {} <= {}".format(
                 o_obj.outputs, o_nick, operator_idx, opcode, o_obj.inputs,
                 [self.tensors[i].buffer for i in o_obj.outputs],
                 [self.tensors[i].buffer for i in o_obj.inputs ]
@@ -488,7 +493,7 @@ if __name__=='__main__':
     args = argparse.ArgumentParser()
     def chF(f): return f if os.path.exists(f) else sys.exit(-1)
     args.add_argument('-t',"--tflite",       type=chF, default='mnist.tflite')
-    args.add_argument('-q',"--questions",    type=int, default=1)
+    args.add_argument('-i',"--images",       type=int, default=1)
     args.add_argument('-v',"--verbose",      action='store_true')
     args = args.parse_args()
 
@@ -496,14 +501,14 @@ if __name__=='__main__':
     mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
     g = graph(tflite=args.tflite, verbose=args.verbose)
-    g.allocate_graph(verbose=args.verbose)
+    g.allocate_graph(verbose=True)
 
-    questions=args.questions
-    corrects =0
-    for i in range(questions):
+    corrects = 0
+    for i in range(args.images):
+        
         number_img = mnist.test.images[i]
         number_gt  = mnist.test.labels[i]
-        g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.float32))
+        g.tensors[g.inputs[0]].set(number_img[np.newaxis,:])
         y = g.invoke(verbose=False)
         gt = np.argmax(number_gt)
         pr = np.argmax(y)
@@ -512,5 +517,5 @@ if __name__=='__main__':
         else:
             corrects+=1
 
-    print("accurracy %.3f %d/%d"%(1.0*corrects/questions,corrects,questions))
+    print("accurracy %.3f %d/%d"%(1.0*corrects/args.images,corrects,args.images))
 
