@@ -361,6 +361,9 @@ class tensor():
         elif TensorType == tflite.TensorType.TensorType.STRING:  return "STRING"
         else: assert False,"Unknown:TensorType2String(TensorType)"+str(TensorType)
 
+    def Quantization_Options(self, verbose=False):
+        return ( self.scale, self.max, self.min, self.zero_point )
+
     def type2np(self,type_string):
         if type_string == 'FLOAT32': return np.float32
         if type_string == 'FLOAT16': return np.float16
@@ -414,6 +417,13 @@ class graph:
         self.reset_refs()
         self.operate_order_list     = []
         if verbose: print("Creating Graph done.")
+
+    def ialpha(self, y, a, b, c):
+        ( scale_y, max_y, min_y, zero_point_y ) = self.tensors[y].Quantization_Options()
+        ( scale_a, max_a, min_a, zero_point_a ) = self.tensors[a].Quantization_Options()
+        ( scale_b, max_b, min_b, zero_point_b ) = self.tensors[b].Quantization_Options()
+        ( scale_c, max_c, min_c, zero_point_c ) = self.tensors[c].Quantization_Options()
+        return scale_a*scale_b/scale_y, scale_c/scale_y, scale_y, scale_a, scale_b, scale_c
 
     def reset_refs(self): self.operator_refs = [0]*len(self.operators)
 
@@ -500,8 +510,13 @@ if __name__=='__main__':
     def chF(f): return f if os.path.exists(f) else sys.exit(-1)
     args.add_argument('-t',"--tflite",       type=chF, default='mnist.tflite')
     args.add_argument('-i',"--images",       type=int, default=1)
+    args.add_argument('-q',"--quantization", action='store_true')
     args.add_argument('-v',"--verbose",      action='store_true')
     args = args.parse_args()
+    if args.quantization:
+        print("Inference with UINT8 Quantization")
+    else:
+        print("Inference with Default type")
 
     import tensorflow.examples.tutorials.mnist.input_data as input_data
     mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
@@ -512,9 +527,12 @@ if __name__=='__main__':
     corrects = 0
     for i in range(args.images):
         
-        number_img = mnist.test.images[i]*255   # For Quantization inference with uint8
+        number_img = mnist.test.images[i]
         number_gt  = mnist.test.labels[i]
-        g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.uint8))
+        if args.quantization:
+            g.tensors[g.inputs[0]].set((255*number_img[np.newaxis,:]).astype(np.uint8))
+        else:
+            g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.float32))
         y = g.invoke(verbose=False)
         gt = np.argmax(number_gt)
         pr = np.argmax(y)
