@@ -304,6 +304,7 @@ class tensor():
         self.type   = self.TensorType2String(tensor_fb.Type())
         self.name   = tensor_fb.Name()
         self.buffer = tensor_fb.Buffer()
+        self.warn_convert = 1
 
         assert self.buffer>=0,"Invalid tensor.Buffer() {}".format(self.buffer)
         if self.type   == 'FLOAT32': dtype_string = 'f4'
@@ -371,8 +372,11 @@ class tensor():
     def set(self, img):
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
         assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
+        self.buff = img
         if (self.max < img.max() or self.min > img.min()):
-            print("Warnning: Suppoted float32 only so coverting input to float32")
+            if self.warn_convert>0:
+                print("Warning: Suppots float32 only so converting input {} to float32".format(img.dtype))
+                self.warn_convert = 0
             img = ( self.scale * img + self.min ).astype(np.float32)
         self.data = img
         return self.data
@@ -472,7 +476,7 @@ class graph:
 
     def allocate_graph(self, verbose=False):
         if verbose: print("Allocatng Graph ..")
-        self.walk_from(self.outputs, verbose)
+        self.walk_from(self.outputs, verbose=verbose)
         for order, operator_idx in enumerate(self.operate_order_list):
             pass
         if verbose: print("Allocatng Graph done.")
@@ -508,14 +512,14 @@ if __name__=='__main__':
     corrects = 0
     for i in range(args.images):
         
-        number_img = mnist.test.images[i]
+        number_img = mnist.test.images[i]*255   # For Quantization inference with uint8
         number_gt  = mnist.test.labels[i]
         g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.uint8))
         y = g.invoke(verbose=False)
         gt = np.argmax(number_gt)
         pr = np.argmax(y)
         if gt!=pr:
-            print("incorrenct:",gt,pr)
+            print("{:5d} incorrenct:gt-{} pr-{}".format(i,gt,pr))
         else:
             corrects+=1
 
