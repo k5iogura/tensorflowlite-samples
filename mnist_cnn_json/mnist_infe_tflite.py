@@ -13,6 +13,7 @@ args = argparse.ArgumentParser()
 def chF(f): return f if os.path.exists(f) else sys.exit(-1)
 args.add_argument('-t',"--tflite",       type=chF, default='mnist.tflite')
 args.add_argument('-i',"--images",       type=int, default=1)
+args.add_argument('-q',"--quantization", action='store_true')
 args.add_argument('-v',"--verbose",      action='store_true')
 args = args.parse_args()
 
@@ -31,10 +32,13 @@ start=time()
 questions= args.images
 corrects = 0
 for inferNo in range(questions):
-    #number_img, number_out = mnist.test.next_batch(1)
-    number_img = mnist.test.images[inferNo].reshape(1,-1)
+    if args.quantization:
+        number_img = (mnist.test.images[inferNo]*255).reshape(1,-1)
+        ip.set_tensor(indexi, number_img.astype(np.uint8))
+    else:
+        number_img, number_out = mnist.test.next_batch(1)
+        ip.set_tensor(indexi, number_img.astype(np.float32))
     number_out = mnist.test.labels[inferNo].reshape(1,-1)
-    ip.set_tensor(indexi, number_img)
     ip.invoke()
     gt = np.argmax(number_out)
     pd = np.argmax(ip.get_tensor(indexo))
