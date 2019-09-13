@@ -345,10 +345,12 @@ class tensor():
             self.zero_point = self.zero_point[0]
 
         if self.min is not None:
+            print("convert tensor-{:<3d} {} to float by self.min {}".format(self.idx,self.type,self.min))
             self.data  = (self.scale * self.data + self.min).astype(np.float32)
             self.min   = self.min[0]
 
         elif self.zero_point is not None:
+            print("convert tensor-{:<3d} {} to float by self.zero_point {}".format(self.idx,self.type,self.zero_point))
             self.min   =  self.scale * self.zero_point
             self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
 
@@ -484,8 +486,10 @@ class graph:
             self.operate_order_list.append(o)
             if verbose: self.print_operator(o)
 
-    def allocate_graph(self, verbose=False):
+    def allocate_graph(self, verbose=True):
         if verbose: print("Allocatng Graph ..")
+        self.reset_refs()
+        self.operate_order_list     = []
         self.walk_from(self.outputs, verbose=verbose)
         for order, operator_idx in enumerate(self.operate_order_list):
             pass
