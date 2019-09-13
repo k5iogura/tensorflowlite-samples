@@ -374,7 +374,7 @@ class tensor():
 
     def set(self, img):
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
-        assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
+        #assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
         self.buff = img
         if (self.max < img.max() or self.min > img.min()):
             if self.warn_convert>0:
