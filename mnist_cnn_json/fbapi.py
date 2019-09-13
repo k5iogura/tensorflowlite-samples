@@ -55,6 +55,16 @@ class operator():
         self.nick    = "{:5s}".format((self.name[:2]+re.sub('[_AIUEO0-9]','',self.name[2:]))[:5])
         self.padding = 0
 
+        self.denomi  = None
+        if len(self.inputs)==3:
+            ( scale_a, max_a, min_a, zero_point_a ) = self.tensors[self.inputs[0]].Quantization_Options()
+            ( scale_b, max_b, min_b, zero_point_b ) = self.tensors[self.inputs[1]].Quantization_Options()
+            ( scale_c, max_c, min_c, zero_point_c ) = self.tensors[self.inputs[2]].Quantization_Options()
+            self.denomi = np.int32((scale_a*scale_b)**-1)
+            denomiC     = np.int32((scale_c)**-1)
+            assert self.denomi > 0,"Invalid Denominator {}".format(self.denomi)
+            assert self.denomi == denomiC,"Unsupports Denominator {} != {}".format(self.denomi,denomiC)
+
     def Builtin_Options(self, verbose=False):
         def funcno2name(funcno):
             if funcno == 0:return None
@@ -352,6 +362,9 @@ class tensor():
             print("convert tensor-{:<3d} {} to float by self.zero_point {}".format(self.idx,self.type,self.zero_point))
             self.min   =  self.scale * self.zero_point
             self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
+
+        if self.zero_point is not None:
+            self.dati  = self.dati - np.int32(self.zero_point)
 
     def TensorType2String(self, TensorType):
         if   TensorType == tflite.TensorType.TensorType.FLOAT32: return "FLOAT32"
