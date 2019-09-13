@@ -313,14 +313,6 @@ class tensor():
         elif self.type == 'INT64'  : dtype_string = 'i8'
         else                       : dtype_string = 'u1'    # unsigned integer 1Byte
         self.buff = buffers_fb[self.buffer].DataAsNumpy()
-        if buffers_fb[self.buffer].DataLength()>0:
-            self.data = self.buff.view(dtype=dtype_string).reshape(self.shape)     # Ultra fast!
-        #    self.buff = self.dataWtype(self.buff, self.type, self.shape)  # Too slow
-        #    self.data = self.buff.copy()
-            pass
-        else:
-            self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
-
         self.quantization = tensor_fb.Quantization()
         assert type(self.quantization) == tflite.QuantizationParameters.QuantizationParameters
         self.scale = self.max = self.min = self.zero_point = None
@@ -329,6 +321,13 @@ class tensor():
         self.max        = self.quantization.MaxAsNumpy()       if self.quantization.MaxLength()      > 0 else None
         self.min        = self.quantization.MinAsNumpy()       if self.quantization.MinLength()      > 0 else None
         self.zero_point = self.quantization.ZeroPointAsNumpy() if self.quantization.ZeroPointLength()> 0 else None
+
+        if buffers_fb[self.buffer].DataLength()>0:
+            self.data = self.buff.view(dtype=dtype_string).reshape(self.shape)     # Ultra fast!
+            if self.zero_point is not None: self.dati = self.data.astype(np.int32) - np.int32(self.zero_point)
+        else:
+            self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
+            self.dati = np.zeros(tuple(self.shape),dtype=np.int32)
 
         if self.scale is not None:
             assert len(self.scale) == 1,"Json format error len(scale)="+str(len(self.scale))
@@ -378,6 +377,11 @@ class tensor():
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
         #assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
         self.buff = img
+        if self.type == 'UINT8':
+            # 0 - 255 : range of dati
+            self.dati = img.astype(np.int32).copy() # Don't care zero_point of a input tensor!
+        else:
+            self.dati = img.copy()
         if (self.max < img.max() or self.min > img.min()):
             if self.warn_convert>0:
                 print("Warning: Suppots float32 only so converting input {} to float32".format(img.dtype))
@@ -533,7 +537,7 @@ if __name__=='__main__':
         
         number_img = mnist.test.images[i]
         number_gt  = mnist.test.labels[i]
-        if args.quantization:
+        if g.tensors[g.inputs[0]].type=='UINT8':
             g.tensors[g.inputs[0]].set((255*number_img[np.newaxis,:]).astype(np.uint8))
         else:
             g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.float32))
