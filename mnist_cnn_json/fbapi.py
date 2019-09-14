@@ -188,6 +188,7 @@ class operator():
         return z
 
     def clipping(self, tensor_idx):
+        return
         tensor = self.tensors[tensor_idx[0]]
         if tensor.min is not None and tensor.max is not None:
             tensor.data = np.clip(tensor.data, tensor.min, tensor.max)
@@ -374,11 +375,11 @@ class tensor():
         # Offseting dati
         if self.zero_point is not None:
             sys.stdout.write(" dati offset by self.zero_point {:4d}".format(self.zero_point))
-            self.dati  = self.dati - np.int32(self.zero_point)
+            self.dati  = self.dati.astype(np.int32) - np.int32(self.zero_point)
         if self.min is not None or self.zero_point is not None :sys.stdout.write('\n')
  
         # Targetting
-        if floating_infer:
+        if not floating_infer:
             self.data=self.dati.copy()
 
     def TensorType2String(self, TensorType):
@@ -547,6 +548,10 @@ class graph:
             #    assert tuple(input_.shape)==input_.data.shape,"Input shape mismatch {} {}".format(
             #            self.tensors[i].shape, self.tensors[i].data.shape)
             ans = operator.eval()
+            tensor_output = self.tensors[operator.outputs[0]]
+            if not floating_infer and operator.denomi is not None:
+                print(tensor_output.data.max(), operator.denomi)
+                tensor_output.data = np.int32( tensor_output.data / operator.denomi )   # To avoid int16 overflow
             if verbose: operator.view()
         if verbose: print("----- DONE --------------")
         return ans
