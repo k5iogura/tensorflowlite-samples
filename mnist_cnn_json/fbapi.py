@@ -34,6 +34,8 @@ import cv2
 from   fbnnop import DEPTHWISE_CONV_2D, MAX_POOL_2D, CONV_2D, RELUx
 #from   fbnnpp import *
 
+floating_infer = False
+
 def read_tflite_model(file):
     buf = open(file, "rb").read()
     buf = bytearray(buf)
@@ -334,13 +336,16 @@ class tensor():
         self.min        = self.quantization.MinAsNumpy()       if self.quantization.MinLength()      > 0 else None
         self.zero_point = self.quantization.ZeroPointAsNumpy() if self.quantization.ZeroPointLength()> 0 else None
 
+        # Initialize data, dati
         if buffers_fb[self.buffer].DataLength()>0:
             self.data = self.buff.view(dtype=dtype_string).reshape(self.shape)     # Ultra fast!
-            if self.zero_point is not None: self.dati = self.data.astype(np.int32) - np.int32(self.zero_point)
+            self.dati = self.data.copy()
+        #    if self.zero_point is not None: self.dati = self.data.astype(np.int32) - np.int32(self.zero_point)
         else:
             self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
             self.dati = np.zeros(tuple(self.shape),dtype=np.int32)
 
+        # Initialize scale, max, min, zero_point
         if self.scale is not None:
             assert len(self.scale) == 1,"Json format error len(scale)="+str(len(self.scale))
             self.scale = self.scale[0]
@@ -355,6 +360,7 @@ class tensor():
             assert len(self.zero_point) == 1,"Json format error len(zero_point)="+str(len(self.zero_point))
             self.zero_point = self.zero_point[0]
 
+        # Convert to float
         if self.min is not None:
             self.data  = (self.scale * self.data + self.min).astype(np.float32)
             self.min   = self.min[0]
@@ -365,10 +371,15 @@ class tensor():
             self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
             sys.stdout.write("convert tensor-{:<3d} {} to float by self.zero_point {}".format(self.idx,self.type,self.zero_point))
 
+        # Offseting dati
         if self.zero_point is not None:
             sys.stdout.write(" dati offset by self.zero_point {:4d}".format(self.zero_point))
             self.dati  = self.dati - np.int32(self.zero_point)
         if self.min is not None or self.zero_point is not None :sys.stdout.write('\n')
+ 
+        # Targetting
+        if floating_infer:
+            self.data=self.dati.copy()
 
     def TensorType2String(self, TensorType):
         if   TensorType == tflite.TensorType.TensorType.FLOAT32: return "FLOAT32"
@@ -411,7 +422,10 @@ class tensor():
     #            print("Warning: Suppots float32 only so converting input {} to float32".format(img.dtype))
     #            self.warn_convert = 0
     #        img = ( self.scale * img + self.min ).astype(np.float32)
-        self.data = img.copy()
+        if floating_infer:
+            self.data = img.copy()
+        else:
+            self.data = self.dati
         print("set data tensor range max/min/mean ={:.3f}/{:.3f}/{:.3f} type {}".format(self.data.max(),self.data.min(),self.data.mean(),self.data.dtype))
         return self.data
 
@@ -572,6 +586,7 @@ if __name__=='__main__':
             g.tensors[g.inputs[0]].set((255*number_img[np.newaxis,:]).astype(np.uint8))
         else:
             g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.float32))
+            floating_infer = True
         y = g.invoke(verbose=False)
         gt = np.argmax(number_gt)
         pr = np.argmax(y)
