@@ -314,6 +314,7 @@ class operator():
 
 class tensor():
     def __init__(self, tensor_idx, tensor_fb, buffers_fb):
+        global floating_infer
         self.idx    = tensor_idx
         self.Tensor = tensor_fb
         self.shape  = list(tensor_fb.ShapeAsNumpy())
@@ -407,18 +408,19 @@ class tensor():
     #   input_data = (np.float32(input_data) - args.input_mean) / args.input_std
     #   reference : https://github.com/raymond-li/tflite_tensor_outputter/blob/master/tflite_tensor_outputter.py
     #
-    def set(self, img):
+    def set(self, img, verbose=False):
+        global floating_infer
         # If input-type QUINT8 and inference-typ FLOAT then converter generates DEQUANT operator
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
         #assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
         self.buff = img
-        print("set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(img.max(), img.min(), img.mean(), img.dtype))
+        if verbose: print("set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(img.max(), img.min(), img.mean(), img.dtype))
         if self.type == 'UINT8':
             # 0 - 255 : range of dati
             self.dati = img.astype(dati_dtype).copy() # Don't care zero_point of a input tensor!
         else:
             self.dati = img.copy()
-        print("set dati tensor range max/min/mean ={}/{}/{:.3f} type {}".format(self.dati.max(),self.dati.min(),self.dati.mean(),self.dati.dtype))
+        if verbose: print("set dati tensor range max/min/mean ={}/{}/{:.3f} type {}".format(self.dati.max(),self.dati.min(),self.dati.mean(),self.dati.dtype))
     #    if (self.max < img.max() or self.min > img.min()):
     #        if self.warn_convert>0:
     #            print("Warning: Suppots float32 only so converting input {} to float32".format(img.dtype))
@@ -428,7 +430,7 @@ class tensor():
             self.data = img.copy()
         else:
             self.data = self.dati
-        print("set data tensor range max/min/mean ={:.3f}/{:.3f}/{:.3f} type {}".format(self.data.max(),self.data.min(),self.data.mean(),self.data.dtype))
+        if verbose: print("set data tensor range max/min/mean ={:.3f}/{:.3f}/{:.3f} type {}".format(self.data.max(),self.data.min(),self.data.mean(),self.data.dtype))
         return self.data
 
     def view(self, msg=None, cont=True):
@@ -541,6 +543,7 @@ class graph:
         if verbose: print("Allocatng Graph done.")
 
     def invoke(self, verbose=False):
+        global floating_infer
         if verbose: print("----- INVOKING      -----")
         for order, operator_idx in enumerate(self.operate_order_list):
             operator = self.operators[operator_idx]
@@ -571,6 +574,7 @@ if __name__=='__main__':
         print("Inference with UINT8 Quantization")
     else:
         print("Inference with Default type")
+        floating_infer = True
     if args.int16:
         dati_dtype = np.int16
 
@@ -595,7 +599,6 @@ if __name__=='__main__':
             g.tensors[g.inputs[0]].set((255*number_img[np.newaxis,:]).astype(np.uint8))
         else:
             g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.float32))
-            floating_infer = True
         y = g.invoke(verbose=False)
         gt = np.argmax(number_gt)
         pr = np.argmax(y)
