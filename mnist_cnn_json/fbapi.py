@@ -35,6 +35,7 @@ from   fbnnop import DEPTHWISE_CONV_2D, MAX_POOL_2D, CONV_2D, RELUx
 #from   fbnnpp import *
 
 floating_infer = False
+dati_dtype     = np.int32
 
 def read_tflite_model(file):
     buf = open(file, "rb").read()
@@ -63,10 +64,10 @@ class operator():
             ( scale_b, max_b, min_b, zero_point_b ) = self.tensors[self.inputs[1]].Quantization_Options()
             ( scale_c, max_c, min_c, zero_point_c ) = self.tensors[self.inputs[2]].Quantization_Options()
             if scale_a is not None and scale_b is not None:
-                self.denomi = np.int32((scale_a*scale_b)**-1)
+                self.denomi = dati_dtype((scale_a*scale_b)**-1)
                 assert self.denomi > 0,"Invalid Denominator {}".format(self.denomi)
             if scale_c is not None:
-                denomiC     = np.int32((scale_c)**-1)
+                denomiC     = dati_dtype((scale_c)**-1)
                 assert self.denomi == denomiC,"Unsupports Denominator {} != {}".format(self.denomi,denomiC)
 
     def Builtin_Options(self, verbose=False):
@@ -340,11 +341,11 @@ class tensor():
         # Initialize data, dati
         if buffers_fb[self.buffer].DataLength()>0:
             self.data = self.buff.view(dtype=dtype_string).reshape(self.shape)     # Ultra fast!
-            self.dati = self.data.copy()
+            self.dati = self.data.astype(dati_dtype).copy()
         #    if self.zero_point is not None: self.dati = self.data.astype(np.int32) - np.int32(self.zero_point)
         else:
             self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
-            self.dati = np.zeros(tuple(self.shape),dtype=np.int32)
+            self.dati = np.zeros(tuple(self.shape),dtype=dati_dtype)
 
         # Initialize scale, max, min, zero_point
         if self.scale is not None:
@@ -375,7 +376,7 @@ class tensor():
         # Offseting dati
         if self.zero_point is not None:
             sys.stdout.write(" dati offset by self.zero_point {:4d}".format(self.zero_point))
-            self.dati  = self.dati.astype(np.int32) - np.int32(self.zero_point)
+            self.dati  = self.dati.astype(dati_dtype) - dati_dtype(self.zero_point)
         if self.min is not None or self.zero_point is not None :sys.stdout.write('\n')
  
         # Targetting
@@ -414,7 +415,7 @@ class tensor():
         print("set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(img.max(), img.min(), img.mean(), img.dtype))
         if self.type == 'UINT8':
             # 0 - 255 : range of dati
-            self.dati = img.astype(np.int32).copy() # Don't care zero_point of a input tensor!
+            self.dati = img.astype(dati_dtype).copy() # Don't care zero_point of a input tensor!
         else:
             self.dati = img.copy()
         print("set dati tensor range max/min/mean ={}/{}/{:.3f} type {}".format(self.dati.max(),self.dati.min(),self.dati.mean(),self.dati.dtype))
@@ -550,8 +551,8 @@ class graph:
             ans = operator.eval()
             tensor_output = self.tensors[operator.outputs[0]]
             if not floating_infer and operator.denomi is not None:
-                print(tensor_output.data.max(), operator.denomi)
-                tensor_output.data = np.int32( tensor_output.data / operator.denomi )   # To avoid int16 overflow
+                if verbose: print(tensor_output.data.max(), operator.denomi)
+                tensor_output.data = dati_dtype( tensor_output.data / operator.denomi )   # To avoid dati_dtype overflow
             if verbose: operator.view()
         if verbose: print("----- DONE --------------")
         return ans
@@ -563,12 +564,15 @@ if __name__=='__main__':
     args.add_argument('-t',"--tflite",       type=chF, default='mnist.tflite')
     args.add_argument('-i',"--images",       type=int, default=1)
     args.add_argument('-q',"--quantization", action='store_true')
+    args.add_argument('-i16',"--int16",      action='store_true')
     args.add_argument('-v',"--verbose",      action='store_true')
     args = args.parse_args()
     if args.quantization:
         print("Inference with UINT8 Quantization")
     else:
         print("Inference with Default type")
+    if args.int16:
+        dati_dtype = np.int16
 
     import tensorflow.examples.tutorials.mnist.input_data as input_data
     mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
