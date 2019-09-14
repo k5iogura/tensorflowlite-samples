@@ -55,15 +55,17 @@ class operator():
         self.nick    = "{:5s}".format((self.name[:2]+re.sub('[_AIUEO0-9]','',self.name[2:]))[:5])
         self.padding = 0
 
-        self.denomi  = None
+        self.denomi  = denomiC = None
         if len(self.inputs)==3:
             ( scale_a, max_a, min_a, zero_point_a ) = self.tensors[self.inputs[0]].Quantization_Options()
             ( scale_b, max_b, min_b, zero_point_b ) = self.tensors[self.inputs[1]].Quantization_Options()
             ( scale_c, max_c, min_c, zero_point_c ) = self.tensors[self.inputs[2]].Quantization_Options()
-            self.denomi = np.int32((scale_a*scale_b)**-1)
-            denomiC     = np.int32((scale_c)**-1)
-            assert self.denomi > 0,"Invalid Denominator {}".format(self.denomi)
-            assert self.denomi == denomiC,"Unsupports Denominator {} != {}".format(self.denomi,denomiC)
+            if scale_a is not None and scale_b is not None:
+                self.denomi = np.int32((scale_a*scale_b)**-1)
+                assert self.denomi > 0,"Invalid Denominator {}".format(self.denomi)
+            if scale_c is not None:
+                denomiC     = np.int32((scale_c)**-1)
+                assert self.denomi == denomiC,"Unsupports Denominator {} != {}".format(self.denomi,denomiC)
 
     def Builtin_Options(self, verbose=False):
         def funcno2name(funcno):
@@ -364,6 +366,7 @@ class tensor():
             self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
 
         if self.zero_point is not None:
+            print("        tensor-{:<3d} {} offset   by self.zero_point {}".format(self.idx,self.type,self.zero_point))
             self.dati  = self.dati - np.int32(self.zero_point)
 
     def TensorType2String(self, TensorType):
@@ -386,21 +389,29 @@ class tensor():
         if type_string == 'UINT8': return np.uint8
         return np.float
 
+    # Notice! when inference-type FLOAT,
+    #   input_data = (np.float32(input_data) - args.input_mean) / args.input_std
+    #   reference : https://github.com/raymond-li/tflite_tensor_outputter/blob/master/tflite_tensor_outputter.py
+    #
     def set(self, img):
+        # If input-type QUINT8 and inference-typ FLOAT then converter generates DEQUANT operator
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
         #assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
         self.buff = img
+        print("set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(img.max(), img.min(), img.mean(), img.dtype))
         if self.type == 'UINT8':
             # 0 - 255 : range of dati
             self.dati = img.astype(np.int32).copy() # Don't care zero_point of a input tensor!
         else:
             self.dati = img.copy()
-        if (self.max < img.max() or self.min > img.min()):
-            if self.warn_convert>0:
-                print("Warning: Suppots float32 only so converting input {} to float32".format(img.dtype))
-                self.warn_convert = 0
-            img = ( self.scale * img + self.min ).astype(np.float32)
-        self.data = img
+        print("set dati tensor range max/min/mean ={}/{}/{:.3f} type {}".format(self.dati.max(),self.dati.min(),self.dati.mean(),self.dati.dtype))
+    #    if (self.max < img.max() or self.min > img.min()):
+    #        if self.warn_convert>0:
+    #            print("Warning: Suppots float32 only so converting input {} to float32".format(img.dtype))
+    #            self.warn_convert = 0
+    #        img = ( self.scale * img + self.min ).astype(np.float32)
+        self.data = img.copy()
+        print("set data tensor range max/min/mean ={:.3f}/{:.3f}/{:.3f} type {}".format(self.data.max(),self.data.min(),self.data.mean(),self.data.dtype))
         return self.data
 
     def view(self, msg=None, cont=True):
@@ -550,7 +561,13 @@ if __name__=='__main__':
         
         number_img = mnist.test.images[i]
         number_gt  = mnist.test.labels[i]
-        if g.tensors[g.inputs[0]].type=='UINT8':
+        # input-type inference-type
+        # uint8      uint8           no-convert
+        # uint8      float           convert
+        # float      uint8           NG
+        # float      float           no-convert
+        if args.quantization:
+            assert g.tensors[g.inputs[0]].type == 'UINT8',"-q {} but input {}".format(args.quantization, g.tensors[g.inputs[0]].type)
             g.tensors[g.inputs[0]].set((255*number_img[np.newaxis,:]).astype(np.uint8))
         else:
             g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.float32))
