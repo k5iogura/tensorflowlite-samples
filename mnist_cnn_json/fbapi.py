@@ -356,18 +356,19 @@ class tensor():
             self.zero_point = self.zero_point[0]
 
         if self.min is not None:
-            print("convert tensor-{:<3d} {} to float by self.min {}".format(self.idx,self.type,self.min))
             self.data  = (self.scale * self.data + self.min).astype(np.float32)
             self.min   = self.min[0]
+            sys.stdout.write("convert tensor-{:<3d} {} to float by self.min {:8.3f}".format(self.idx,self.type,self.min))
 
         elif self.zero_point is not None:
-            print("convert tensor-{:<3d} {} to float by self.zero_point {}".format(self.idx,self.type,self.zero_point))
             self.min   =  self.scale * self.zero_point
             self.data  = (self.scale * (self.data.astype(np.int32) - self.zero_point)).astype(np.float32)
+            sys.stdout.write("convert tensor-{:<3d} {} to float by self.zero_point {}".format(self.idx,self.type,self.zero_point))
 
         if self.zero_point is not None:
-            print("        tensor-{:<3d} {} offset   by self.zero_point {}".format(self.idx,self.type,self.zero_point))
+            sys.stdout.write(" dati offset by self.zero_point {:4d}".format(self.zero_point))
             self.dati  = self.dati - np.int32(self.zero_point)
+        if self.min is not None or self.zero_point is not None :sys.stdout.write('\n')
 
     def TensorType2String(self, TensorType):
         if   TensorType == tflite.TensorType.TensorType.FLOAT32: return "FLOAT32"
