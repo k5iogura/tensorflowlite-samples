@@ -35,17 +35,12 @@ from   fbnnop import DEPTHWISE_CONV_2D, MAX_POOL_2D, CONV_2D, RELUx
 #from   fbnnpp import *
 
 _floating_infer = False
-_dati_dtype     = np.int32
+dati_dtype      = np.int32
 
 def floating_on(verbose=False):
     global _floating_infer
     _floating_infer = True
     if verbose: print("floating inference On {}".format(_floating_infer))
-
-def i16_on(verbose=True):
-    global _dati_dtype
-    _dati_dtype = np.int16
-    if verbose: print("integer INTEGER16 mode On {}".format(_dati_dtype))
 
 def read_tflite_model(file):
     buf = open(file, "rb").read()
@@ -55,7 +50,6 @@ def read_tflite_model(file):
 
 class operator():
     def __init__(self, operator_idx, operator_fb, operator_codes_fb, tensors):
-        global _dati_dtype
         self.idx     = operator_idx
         self.Operator= operator_fb
         self.tensors = tensors
@@ -75,16 +69,16 @@ class operator():
             ( scale_b, max_b, min_b, zero_point_b ) = self.tensors[self.inputs[1]].Quantization_Options()
             ( scale_c, max_c, min_c, zero_point_c ) = self.tensors[self.inputs[2]].Quantization_Options()
             if scale_a is not None and scale_b is not None:
-                self.denomi = _dati_dtype((scale_a*scale_b)**-1)
+                self.denomi = dati_dtype((scale_a*scale_b)**-1)
                 assert self.denomi > 0,"Invalid Denominator {}".format(self.denomi)
             if scale_c is not None:
-                denomiC     = _dati_dtype((scale_c)**-1)
-                assert self.denomi == denomiC,"Unsupports Denominator {} != {}".format(self.denomi,denomiC)
+                denomiC     = dati_dtype((scale_c)**-1)
+                if self.denomi != denomiC: print("operator-{} Unsupports Denominator {} != {}".format(self.nick,self.denomi,denomiC))
         elif len(self.inputs)==2 and self.name=='MUL':
             ( scale_a, max_a, min_a, zero_point_a ) = self.tensors[self.inputs[0]].Quantization_Options()
             ( scale_b, max_b, min_b, zero_point_b ) = self.tensors[self.inputs[1]].Quantization_Options()
             if scale_a is not None and scale_b is not None:
-                self.denomi = _dati_dtype((scale_a*scale_b)**-1)
+                self.denomi = dati_dtype((scale_a*scale_b)**-1)
                 assert self.denomi > 0,"operator-{} Invalid Denominator {}(1/({}*{}))".format(self.nick,self.denomi,scale_a,scale_b)
 
     def Builtin_Options(self, verbose=False):
@@ -156,6 +150,15 @@ class operator():
             _activation_ = funcno2name(_activation_)
             if verbose: print("Pool2DOptions")
             return (padding, stridew, strideh, _activation_,filterwidth, filterheight)
+
+        elif option_type == tflite.BuiltinOptions.BuiltinOptions.ConcatenationOptions:
+            opt = tflite.ConcatenationOptions.ConcatenationOptions()
+            opt.Init(op.BuiltinOptions().Bytes, op.BuiltinOptions().Pos)
+            axis = opt.Axis()
+            _activation_ = opt.FusedActivationFunction()
+            _activation_ = funcno2name(_activation_)
+            return (axis, _activation_)
+
         else:
             assert False,"Unknown:BuiltinOptions:"+str(op.BuiltinOptionsType())
 
@@ -217,6 +220,7 @@ class operator():
 
     def eval(self):
         name = self.name
+        #if self.idx == 57:set_trace()
         if   name == 'ADD':     # Untested yet
             r = self.tensors[0].data
             for i in self.inputs[1:]:
@@ -227,7 +231,7 @@ class operator():
             return r
         elif name == 'AVERAGE_POOL_2D':   self.unsupported()
         elif name == 'CONCATENATION':
-            _axis  = self.Builtin_Options()
+            _axis_, _activation_ = self.Builtin_Options()
             #_axis_ = getordef(self.builtin_options,'axis',None)
             if _axis_ is None:self.view('Invalid conatenation axis',cont=False)
             temp_ = []
@@ -235,6 +239,7 @@ class operator():
                 temp_.append(self.tensors[t].data.tolist())
             assert len(temp_) > 0, "Invalid concatenation list"
             r = self.tensors[self.outputs[0]].data = np.concatenate(temp_, axis = _axis_)
+            assert _activation_ is None, "Unsupports activation of CONCATENATE {}".format(_activation_)
             return r
         elif name == 'CONV_2D':
             CONV_2D(self, self.outputs, self.inputs)
@@ -333,7 +338,6 @@ class operator():
 class tensor():
     def __init__(self, tensor_idx, tensor_fb, buffers_fb):
         global _floating_infer
-        global _dati_dtype
         self.idx    = tensor_idx
         self.Tensor = tensor_fb
         self.shape  = list(tensor_fb.ShapeAsNumpy())
@@ -361,11 +365,11 @@ class tensor():
         # Initialize data, dati
         if buffers_fb[self.buffer].DataLength()>0:
             self.data = self.buff.view(dtype=dtype_string).reshape(self.shape)     # Ultra fast!
-            self.dati = self.data.astype(_dati_dtype).copy()
+            self.dati = self.data.astype(dati_dtype).copy()
         #    if self.zero_point is not None: self.dati = self.data.astype(np.int32) - np.int32(self.zero_point)
         else:
             self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
-            self.dati = np.zeros(tuple(self.shape),dtype=_dati_dtype)
+            self.dati = np.zeros(tuple(self.shape),dtype=dati_dtype)
 
         # Initialize scale, max, min, zero_point
         if self.scale is not None:
@@ -396,7 +400,7 @@ class tensor():
         # Offseting dati
         if self.zero_point is not None:
             sys.stdout.write(" dati offset by self.zero_point {:4d}".format(self.zero_point))
-            self.dati  = self.dati.astype(_dati_dtype) - _dati_dtype(self.zero_point)
+            self.dati  = self.dati.astype(dati_dtype) - dati_dtype(self.zero_point)
         if self.min is not None or self.zero_point is not None :sys.stdout.write('\n')
  
         # Targetting
@@ -429,7 +433,6 @@ class tensor():
     #
     def set(self, img, verbose=False):
         global _floating_infer
-        global _dati_dtype
         # If input-type QUINT8 and inference-typ FLOAT then converter generates DEQUANT operator
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
         #assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
@@ -437,7 +440,7 @@ class tensor():
         if verbose: print("set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(img.max(), img.min(), img.mean(), img.dtype))
         if self.type == 'UINT8':
             # 0 - 255 : range of dati
-            self.dati = img.astype(_dati_dtype).copy() # Don't care zero_point of a input tensor!
+            self.dati = img.astype(dati_dtype).copy() # Don't care zero_point of a input tensor!
         else:
             self.dati = img.copy()
         if verbose: print("set dati tensor range max/min/mean ={}/{}/{:.3f} type {}".format(self.dati.max(),self.dati.min(),self.dati.mean(),self.dati.dtype))
@@ -458,12 +461,17 @@ class tensor():
         print("tensors[{}]({}) buffer:{}".format(self.idx, self.name, self.buffer))
         print("  type@tflite :{} type@run :{}".format(self.type,self.data.dtype))
         print("  shape@tflite:{} shape@run:{}".format(self.shape, self.data.shape))
-        print("  quantization:min/max/scale/zerop {} {} {} {}".format(self.min, self.max, self.scale,self.zero_point))
+        print("  quantization:min/max/scale/zerop {:.4f} {:.4f} {:.6f} {}".format(self.min, self.max, self.scale,self.zero_point))
+        print("  data         min/max/mean        {:.4f} {:.4f} {:.4f}".format(self.data.min(), self.data.max(), self.data.mean()))
+        print("  dati         min/max/mean        {} {} {:.4f}".format(self.dati.min(), self.dati.max(), self.dati.mean()))
         assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
     def __init__(self, tflite='mnist.tflite', floating=False, verbose=False):
-        if floating: floating_on(verbose=verbose)
+        if floating:
+            floating_on(verbose=verbose)
+        else:
+            print("Quantization Model on {}".format(_floating_infer))
         self.model    = read_tflite_model(tflite)
         self.subgraph = self.model.Subgraphs(0)
         self.inputs   = list(self.subgraph.InputsAsNumpy())
@@ -565,7 +573,6 @@ class graph:
 
     def invoke(self, verbose=False):
         global _floating_infer
-        global _dati_dtype
         if verbose: print("----- INVOKING      -----")
         for order, operator_idx in enumerate(self.operate_order_list):
             operator = self.operators[operator_idx]
@@ -577,7 +584,7 @@ class graph:
             tensor_output = self.tensors[operator.outputs[0]]
             if not _floating_infer and operator.denomi is not None:
                 if verbose: print(tensor_output.data.max(), operator.denomi)
-                tensor_output.data = _dati_dtype( tensor_output.data / operator.denomi )   # To avoid dati_dtype overflow
+                tensor_output.data = dati_dtype( tensor_output.data / operator.denomi )   # To avoid dati_dtype overflow
             if verbose: operator.view()
         if verbose: print("----- DONE --------------")
         return ans
@@ -595,10 +602,10 @@ if __name__=='__main__':
     if args.quantization:
         print("Inference with UINT8 Quantization")
     else:
-        print("Inference with Default type")
-        _floating_infer = True
+        print("Inference with FLOAT type")
+        floating_on(verbose=True)
     if args.int16:
-        _dati_dtype = np.int16
+        dati_dtype = np.int16
 
     import tensorflow.examples.tutorials.mnist.input_data as input_data
     mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
