@@ -27,6 +27,11 @@ Need tflite_convert tool on tensorflow-v1.10.
    精度
    0.9002
 ```
+### Check names of input and output of network via tensorboard for tflite_convert  
+```
+ $ tboard.sh
+```
+![](./tensorboard.jpg)  
 
 ### Infer with tflite by tensorflow-lite.  
 ```
