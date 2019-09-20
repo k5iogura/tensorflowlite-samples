@@ -36,7 +36,7 @@ for inferNo in range(questions):
         number_img = (mnist.test.images[inferNo]*255).reshape(1,-1)
         ip.set_tensor(indexi, number_img.astype(np.uint8))
     else:
-        number_img, number_out = mnist.test.next_batch(1)
+        number_img = mnist.test.images[inferNo].reshape(1,-1)
         ip.set_tensor(indexi, number_img.astype(np.float32))
     number_out = mnist.test.labels[inferNo].reshape(1,-1)
     ip.invoke()
@@ -47,3 +47,10 @@ for inferNo in range(questions):
     else:
         corrects+=1
 print("total %.3f(%d/%d)"%(1.0*corrects/questions,corrects,questions))
+
+def view(idx):
+    mx=ip.get_tensor(idx).max()
+    mn=ip.get_tensor(idx).min()
+    me=ip.get_tensor(idx).mean()
+    sd=ip.get_tensor(idx).std()
+    print("min/max/mean = {:.3f}/{:3f}/{:3f}:{:.6f}".format(mn,mx,me,sd))
