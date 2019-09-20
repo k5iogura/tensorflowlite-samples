@@ -594,7 +594,11 @@ class graph:
             tensor_output = self.tensors[operator.outputs[0]]
             if not _floating_infer and operator.denomi is not None:
                 if verbose: print(tensor_output.data.max(), operator.denomi)
-                tensor_output.data = dati_dtype( tensor_output.data / operator.denomi )   # To avoid dati_dtype overflow
+                # tensor_output.data = dati_dtype( tensor_output.data / operator.denomi )                # floor default of numpy divide
+                # Use round not floor
+                tensor_output.data = dati_dtype((10*tensor_output.data) / operator.denomi)               # round without Float32
+                tensor_output.data = dati_dtype(np.round(tensor_output.data,-1)/10)                      # round without Float32
+                #tensor_output.data = dati_dtype( np.round(1.0*tensor_output.data / operator.denomi) )   # Using Float32
             if verbose: operator.view()
         if verbose: print("----- DONE --------------")
         return ans
