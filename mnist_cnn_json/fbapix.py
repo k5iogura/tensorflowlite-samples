@@ -65,12 +65,13 @@ class operator():
 
         self.denomi  = denomiC = None
         if len(self.inputs)==3:
+            ( scale_y, max_y, min_y, zero_point_y ) = self.tensors[self.outputs[0]].Quantization_Options()
             ( scale_a, max_a, min_a, zero_point_a ) = self.tensors[self.inputs[0]].Quantization_Options()
             ( scale_b, max_b, min_b, zero_point_b ) = self.tensors[self.inputs[1]].Quantization_Options()
             ( scale_c, max_c, min_c, zero_point_c ) = self.tensors[self.inputs[2]].Quantization_Options()
-            if scale_a is not None and scale_b is not None:
-                self.denomi = dati_dtype((scale_a*scale_b)**-1)
-                assert self.denomi > 0,"Invalid Denominator {}".format(self.denomi)
+            if scale_y is not None and scale_a is not None and scale_b is not None:
+                self.denomi = dati_dtype(((scale_a*scale_b)/scale_y)**-1)
+                #assert self.denomi > 0,"Invalid Denominator {}".format(self.denomi)
             if scale_c is not None:
                 denomiC     = dati_dtype((scale_c)**-1)
                 if self.denomi != denomiC: print("operator-{} Unsupports Denominator {} != {}".format(self.nick,self.denomi,denomiC))
@@ -461,9 +462,13 @@ class tensor():
         print("tensors[{}]({}) buffer:{}".format(self.idx, self.name, self.buffer))
         print("  type@tflite :{} type@run :{}".format(self.type,self.data.dtype))
         print("  shape@tflite:{} shape@run:{}".format(self.shape, self.data.shape))
-        print("  quantization:min/max/scale/zerop {:.4f} {:.4f} {:.6f} {}".format(self.min, self.max, self.scale,self.zero_point))
-        print("  data         min/max/mean        {:.4f} {:.4f} {:.4f}".format(self.data.min(), self.data.max(), self.data.mean()))
-        print("  dati         min/max/mean        {} {} {:.4f}".format(self.dati.min(), self.dati.max(), self.dati.mean()))
+        if self.min is not None:
+            print("  quantization:min/max/scale/zerop {:.4f} {:.4f} {:.6f} {}".format(
+                                    self.min, self.max, self.scale,self.zero_point))
+        print("  data         min/max/mean        {:.4f} {:.4f} {:.4f} ({:.4f})".format(
+                                    self.data.min(), self.data.max(), self.data.mean(),self.data.std()))
+        print("  dati         min/max/mean        {} {} {:.4f} ({:.4f})".format(
+                                    self.dati.min(), self.dati.max(), self.dati.mean(),self.dati.std()))
         assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
@@ -494,6 +499,10 @@ class graph:
 
         self.reset_refs()
         self.operate_order_list     = []
+
+        with open("name_outputs.txt",'w') as f:
+            for o in self.operators:
+                f.write("{}\n".format(self.tensors[o.outputs[0]].name))
         if verbose: print("Creating Graph done.")
 
     def ialpha(self, y, a, b, c):
@@ -538,9 +547,10 @@ class graph:
         opcode = self.operators[operator_idx].opcode_index
         o_obj  = self.operators[operator_idx]
         o_nick = self.operators[operator_idx].nick
-        print("dest_tensor {} {} <= operator {} {:3d}(code {:2d}) = src {}".format(
+        print("dest_tensor {} {:5s} {:16s} <= operator {} {:3d}(code {:2d}) = src {}".format(
                 o_obj.outputs,
-                [self.tensors[o].type for o in o_obj.outputs],
+                self.tensors[o_obj.outputs[0]].type,
+                self.tensors[o_obj.outputs[0]].name,
                 o_nick,
                 operator_idx,
                 opcode,
