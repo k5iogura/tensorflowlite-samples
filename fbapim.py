@@ -28,6 +28,7 @@ import tflite.SoftmaxOptions
 import tflite.OperatorCode
 import tflite.BuiltinOperator
 import tflite.ActivationFunctionType
+from   flags import flags
 
 import cv2
 
@@ -46,14 +47,13 @@ if __name__=='__main__':
 
     #import tensorflow.examples.tutorials.mnist.input_data as input_data
     #mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
-    floating_model = True
     img = preprocessing('dog.jpg', 300, 300)
     if args.quantization:
         img *= 255
-        #img  = img.astype(np.uint8)
-        floating_model = False
+        img  = img.astype(np.uint8)
+        flags.floating_infer = False
 
-    g = graph(tflite=args.tflite, floating=not args.quantization, verbose=args.verbose)
+    g = graph(tflite=args.tflite, verbose=args.verbose)
     g.allocate_graph(verbose=args.verbose)
     g.tensors[g.inputs[0]].set(img)
     predictions = g.invoke(verbose=False)
