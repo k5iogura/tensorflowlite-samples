@@ -367,6 +367,7 @@ class tensor():
         self.name   = tensor_fb.Name()
         self.buffer = tensor_fb.Buffer()
         self.show_info = True
+        self.run_max = self.run_min = None
 
         assert self.buffer>=0,"Invalid tensor.Buffer() {}".format(self.buffer)
         if self.type   == 'FLOAT32': dtype_string = 'f4'
@@ -457,7 +458,7 @@ class tensor():
         _floating_infer = flags.floating_infer
         # If input-type QUINT8 and inference-typ FLOAT then converter generates DEQUANT operator
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
-        assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
+        #assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
         self.buff = img
         if self.show_info:print("set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(img.max(), img.min(), img.mean(), img.dtype))
         self.show_info = False
@@ -488,6 +489,8 @@ class tensor():
         print("  quantization:min/max/scale/zerop {} {} {} {}".format(self.min, self.max, self.scale,self.zero_point))
         print("  dati         min/max/mean        {} {} {:.3f}".format(self.dati.min(),self.dati.max(),self.dati.mean()))
         print("  data         min/max/mean        {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),self.data.std()))
+        if self.run_max is not None:
+            print("  @run         min/max/mean        {:.3f} {:.3f} {:.3f}".format(self.run_min,self.run_max,self.run_mean))
         assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
@@ -599,20 +602,23 @@ class graph:
         elapsed = 0.
         if verbose: print("----- INVOKING      -----")
         for order, operator_idx in enumerate(self.operate_order_list):
-            start = time()
             operator = self.operators[operator_idx]
+            if self.show_timer:
+                sys.stdout.write("{:8s} ".format(operator.nick))
+            start = time()
             #for i in self.inputs:   # Check only
             #    input_ = self.tensors[i]
             #    assert tuple(input_.shape)==input_.data.shape,"Input shape mismatch {} {}".format(
             #            self.tensors[i].shape, self.tensors[i].data.shape)
             ans = operator.eval()
+            output_shape = self.tensors[operator.outputs[0]].data.shape
+            output_idx   = self.tensors[operator.outputs[0]].idx
             if verbose: operator.view()
             operator.elapsed = (time()-start)
             elapsed += operator.elapsed
-            output_shape = self.tensors[operator.outputs[0]].data.shape
             if self.show_timer:
-                sys.stdout.write("{:18s} {:.6f}/{:6f} {} <= ".format(operator.name, operator.elapsed, elapsed, output_shape))
-                for input_idx in operator.inputs: sys.stdout.write("{} ".format(self.tensors[input_idx].data.shape))
+                sys.stdout.write("{:.4f}/{:.4f} {:3d} {} <= ".format(operator.elapsed, elapsed, output_idx, output_shape))
+                for input_idx in operator.inputs: sys.stdout.write("{:3d} {} ".format(input_idx, self.tensors[input_idx].data.shape))
                 sys.stdout.write("\n")
         if not _floating_infer:
             for output_idx in self.outputs:
