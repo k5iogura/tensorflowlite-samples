@@ -3,6 +3,7 @@ import sys,os
 import math
 from decimal import Decimal, ROUND_HALF_UP, ROUND_HALF_EVEN
 from pdb import *
+from flags import flags
 
 # NHWC : input  tensor shape   = ( batch,  h, w, in_ch )
 # NHWC : output tensor shape   = ( batch,  h, w, in_ch )
@@ -25,7 +26,25 @@ def RELUx(numpy_in, val=0, leaky=None):
         numpy_out[numpy_out < 0]   = 0
     return numpy_out
 
+# MultiplyByQuantizedMultiplier instead of tensorflow-lite reference code
+def MBQM(acc, multiplier_fx, shift):
+    set_trace()
+    f1 = (multiplier_fx * acc)
+    lsb= 1 if f1 & (1<<(shift - 1)) else 0
+    f1 = f1 >> shift
+    f1+=lsb
+    return f1
+
+def mbqm(acc, multiplier_fx, shift):
+    f1 = (multiplier_fx * acc)
+    # 1 or 0 to get round with ndarray
+    lsb= (f1 & (1<<(shift - 1)))>>(shift - 1)
+    f1 = f1 >> shift
+    f1+=lsb
+    return f1
+
 def CONV_2D(operator, outputs, inputs, verbose=True):
+    _floating_infer = flags.floating_infer
     (padding, stride, strideh, _activation_) = operator.Builtin_Options()
     (tensor_idx_input, tensor_idx_filter, tensor_idx_bias) = inputs
     tensor_input     = operator.tensors[tensor_idx_input]
@@ -39,8 +58,10 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     output_ = []
     input_shape = tensor_input.data.shape
     output_height, output_width = tensor_output.data.shape[1:3]
+    output_ch   = tensor_filter.shape[0]
     
     D = tensor_input.data.copy()
+    if not _floating_infer: D -= tensor_input.zero_point
     # stride 1
     # output 1,14,14,64
     # input  1,14,14,32
@@ -85,19 +106,89 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
             patches.append(apatch)
     # patches 14*14,5,5,32
     patches = np.concatenate(patches, axis=0)
-    # temp_ = []  # for DepthWiseConv
-    for filter_, bias in zip(F, B):
-        temp_ = []  # for CONV
-        # filter_ 5,5,32
-        for patch_idx, patch_ in enumerate(patches):
-            # patch_ 5,5,32
-            conv = (np.sum(patch_ * filter_) + bias)              # for CONV as scaler
-            #conv = (np.sum(patch_ * filter_, axis=(0,1)) + bias)   # for DepthWiseConv
-            temp_.append(conv)
-        #temp_ 14*14
-        output_.append(np.array(temp_).reshape(output_height, output_width)) # for CONV
-    # output_ 14,14,64
-    output_ = np.transpose(np.array(output_), (1,2,0)) # for CONV
+
+    # FF 64,14*14,5,5,32
+    # Q  64,14*14,5,5,32
+    if False:
+  #  if output_ch<512:
+        if False:
+            FF = []
+            for i in range(output_ch):
+                temp_ = []
+                for j in range(output_height*output_width):
+                    temp_.append(F[i][np.newaxis,:])
+                FF.append(np.concatenate(temp_, axis=0)[np.newaxis,:])
+            FF= np.concatenate(FF,axis=0)
+
+            Q = FF.copy()
+            for i in range(output_ch):
+                Q[i] *= patches
+            Q = np.sum(Q, axis=(2,3,4)).reshape(-1, output_height, output_width)
+            for i in range(output_ch):
+                Q[i] += B[i]
+            output_ = mbqm(Q, operator.factor_fx, 16) if not _floating_infer else Q
+        else:
+            # FX = np.tile(F.reshape(st),(1,output_height*output_width,1,1,1))
+            #
+            # patches  1, 14*14, 5, 5, 32
+            # FX      64,     1, 5, 5, 32
+            # tt      64, 14*14, 5, 5, 32   by broadcast
+            sl= list(F.shape)
+            sl.insert(1,1)
+            st = tuple(sl)
+            FX = F.reshape(st)
+            tt = patches[np.newaxis,:] * FX
+            tt = np.sum(tt, axis=(2,3,4)).reshape(-1, output_height, output_width)
+            tt+= B[:,np.newaxis,np.newaxis]
+            output_ = mbqm(tt, operator.factor_fx, 16) if not _floating_infer else tt
+    else:
+        # temp_ = []  # for DepthWiseConv
+        outputX = []
+        if True:
+            if not _floating_infer:
+                F       = F.astype(np.int16)
+                patches = patches.astype(np.int16)
+            if output_ch < 256:
+                for filter_, bias in zip(F, B):
+                    # Fx          1,5,5,32
+                    # patches 14*14,5,5,32
+                    # tt      14*14,5,5,32
+                    # tsum(f) 14*14
+                    Fx    = filter_[np.newaxis,:]
+                    tt    = patches * Fx
+                    tsum  = np.sum(tt, axis=(1,2,3))
+                    tsum += bias
+                    tsum = mbqm(tsum, operator.factor_fx, 16) if not _floating_infer else tsum
+                    output_.append(tsum.reshape(output_height, output_width))
+                output_ = np.array(output_)
+            else:
+                for patche_ in patches:
+                    # patche_  1,5,5,32
+                    # F       64,5,5,32
+                    # tsum    64
+                    tt = F * patche_[np.newaxis,:]
+                    tsum  = np.sum(tt, axis=(1,2,3))
+                    tsum += B
+                    tsum = mbqm(tsum, operator.factor_fx, 16) if not _floating_infer else tsum
+                    output_.append(tsum)
+                output_ = np.array(output_).reshape(output_height, output_width, -1)
+                output_ = np.transpose(output_,(2,0,1))
+        else:
+            for filter_, bias in zip(F, B):
+                temp_ = []  # for CONV
+                for patch_idx, patch_ in enumerate(patches):
+                    # patch_ 5,5,32
+                    conv = (np.sum(patch_ * filter_) + bias)              # for CONV as scaler
+                    #conv = (np.sum(patch_ * filter_, axis=(0,1)) + bias)   # for DepthWiseConv
+                    if not _floating_infer: conv = MBQM(conv, operator.factor_fx, 16)
+                    temp_.append(conv)
+                #temp_ 14*14
+                output_.append(np.array(temp_).reshape(output_height, output_width)) # for CONV
+            output_ = np.array(output_)
+    # output_ 64,14,14
+    output_ = np.transpose(output_, (1,2,0)) # for CONV
+    if not _floating_infer: output_+= tensor_output.zero_point
+    if not _floating_infer: output_ = np.clip(output_, 0, np.int32(tensor_output.max))
     # output_ 1,14,14,64
     output_ = output_[np.newaxis, :]
     #output_ = np.asarray(temp_).reshape((1, output_height, output_width, -1)) # for DepthWiseConv
@@ -112,6 +203,7 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     return output_
 
 def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
+    _floating_infer = flags.floating_infer
     (padding, stride, strideh, _activation_,depth_multiplier) = operator.Builtin_Options()
     (tensor_idx_input, tensor_idx_filter, tensor_idx_bias)    = inputs
     tensor_input     = operator.tensors[tensor_idx_input]
@@ -127,6 +219,7 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
     output_height, output_width = tensor_output.data.shape[1:3]
     
     D = tensor_input.data.copy()
+    if not _floating_infer: D -= tensor_input.zero_point
     # <by depth_multiplier>
     # output 1,28,28,32
     # input  1,28,28,1  (depth_multiplier==32)
@@ -177,18 +270,37 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
             patches.append(apatch)
     # patches N,5,5,32
     patches = np.concatenate(patches, axis=0)
-    temp_ = []  # for DepthWiseConv
-    for filter_, bias in zip(F, B):
-        # temp_ = []  # for CONV
-        # filter_ 5,5,32
-        for patch_idx, patch_ in enumerate(patches):
-            # patch_ 5,5,32
-            #conv = (np.sum(patch_ * filter_) + bias)              # for CONV
-            conv = (np.sum(patch_ * filter_, axis=(0,1)) + bias)   # for DepthWiseConv
-            temp_.append(conv)
-        # output_.append(np.array(temp_).reshape(int(output_height), int(output_width))) # for CONV
-    #output_ = np.transpose(np.array(output_), (1,2,0)) # for CONV
-    output_ = np.asarray(temp_).reshape((1, output_height, output_width, -1))
+    if not _floating_infer:
+        F       = F.astype(np.int16)
+        patches = patches.astype(np.int16)
+
+    if True:
+        for filter_, bias in zip(F, B):
+            # Fx          1,5,5,32
+            # patches 28*28,5,5,32
+            # tt      28*28,5,5,32
+            # tsum(f) 28*28,32
+            Fx    = filter_[np.newaxis,:]
+            tt    = patches * Fx
+            tsum  = np.sum(tt, axis=(1,2))
+            tsum += bias
+            tsum = mbqm(tsum, operator.factor_fx, 16) if not _floating_infer else tsum
+            output_.append(tsum.reshape(output_height, output_width,-1))
+        output_ = np.array(output_)
+    else:
+        temp_ = []  # for DepthWiseConv
+        for filter_, bias in zip(F, B):
+            # temp_ = []  # for CONV
+            # filter_ 5,5,32
+            for patch_idx, patch_ in enumerate(patches):
+                # patch_ 5,5,32
+                #conv = (np.sum(patch_ * filter_) + bias)              # for CONV
+                conv = (np.sum(patch_ * filter_, axis=(0,1)) + bias)   # for DepthWiseConv
+                if not _floating_infer: conv = mbqm(conv, operator.factor_fx, 16)
+                temp_.append(conv)
+            # output_.append(np.array(temp_).reshape(int(output_height), int(output_width))) # for CONV
+        #output_ = np.transpose(np.array(output_), (1,2,0)) # for CONV
+        output_ = np.asarray(temp_).reshape((1, output_height, output_width, -1))
     if _activation_ is not None:
         if   "RELU"  in _activation_: output_ = RELUx(output_, 0)
         elif "RELU1" in _activation_: output_ = RELUx(output_, 1)

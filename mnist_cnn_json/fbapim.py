@@ -28,6 +28,7 @@ import tflite.SoftmaxOptions
 import tflite.OperatorCode
 import tflite.BuiltinOperator
 import tflite.ActivationFunctionType
+from   flags import flags
 
 import cv2
 
@@ -42,20 +43,18 @@ if __name__=='__main__':
     args.add_argument('-t',"--tflite",       type=chF, default='mnist.tflite')
     args.add_argument('-i',"--images",       type=int, default=1)
     args.add_argument('-q',"--quantization", action='store_true')
-    args.add_argument('-i16',"--int16",      action='store_true')
     args.add_argument('-v',"--verbose",      action='store_true')
     args = args.parse_args()
     if args.quantization:
         print("Inference with UINT8 Quantization")
+        flags.floating_infer = False
     else:
         print("Inference with Default type")
-    if args.int16:
-        i16_on()
 
     import tensorflow.examples.tutorials.mnist.input_data as input_data
     mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
-    g = graph(tflite=args.tflite, floating=not args.quantization, verbose=args.verbose)
+    g = graph(tflite=args.tflite, verbose=args.verbose)
     g.allocate_graph(verbose=True)
 
     corrects = 0
@@ -70,7 +69,8 @@ if __name__=='__main__':
         # float      float           no-convert
         if args.quantization:
             assert g.tensors[g.inputs[0]].type == 'UINT8',"-q {} but input {}".format(args.quantization, g.tensors[g.inputs[0]].type)
-            g.tensors[g.inputs[0]].set((255*number_img[np.newaxis,:]).astype(np.uint8))
+            #g.tensors[g.inputs[0]].set((255*number_img[np.newaxis,:]).astype(np.uint8))
+            g.tensors[g.inputs[0]].set((number_img[np.newaxis,:]).astype(np.uint8))
         else:
             g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.float32))
         y = g.invoke(verbose=False)
