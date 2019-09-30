@@ -366,7 +366,7 @@ class tensor():
         self.type   = self.TensorType2String(tensor_fb.Type())
         self.name   = tensor_fb.Name()
         self.buffer = tensor_fb.Buffer()
-        self.warn_convert = 1
+        self.show_info = True
 
         assert self.buffer>=0,"Invalid tensor.Buffer() {}".format(self.buffer)
         if self.type   == 'FLOAT32': dtype_string = 'f4'
@@ -459,7 +459,8 @@ class tensor():
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
         assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
         self.buff = img
-        print("set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(img.max(), img.min(), img.mean(), img.dtype))
+        if self.show_info:print("set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(img.max(), img.min(), img.mean(), img.dtype))
+        self.show_info = False
         if self.type == 'UINT8':
             # 0 - 255 : range of dati
             # self.dati = (img.astype(np.int32)-self.zero_point).astype(dati_dtype).copy() # Don't care zero_point of a input tensor!
@@ -496,6 +497,7 @@ class graph:
         self.inputs   = list(self.subgraph.InputsAsNumpy())
         self.outputs  = list(self.subgraph.OutputsAsNumpy())
         buffers_fb    = [ self.model.Buffers(b) for b in range(self.model.BuffersLength()) ]
+        self.show_timer = True
 
         if verbose: print("Creating tensors structure ..")
         self.tensors  = []
@@ -608,15 +610,17 @@ class graph:
             operator.elapsed = (time()-start)
             elapsed += operator.elapsed
             output_shape = self.tensors[operator.outputs[0]].data.shape
-            sys.stdout.write("{:18s} {:.6f}/{:6f} {} <= ".format(operator.name, operator.elapsed, elapsed, output_shape))
-            for input_idx in operator.inputs: sys.stdout.write("{} ".format(self.tensors[input_idx].data.shape))
-            sys.stdout.write("\n")
+            if self.show_timer:
+                sys.stdout.write("{:18s} {:.6f}/{:6f} {} <= ".format(operator.name, operator.elapsed, elapsed, output_shape))
+                for input_idx in operator.inputs: sys.stdout.write("{} ".format(self.tensors[input_idx].data.shape))
+                sys.stdout.write("\n")
         if not _floating_infer:
             for output_idx in self.outputs:
                 graph_output = self.tensors[output_idx]
                 graph_output.data-= graph_output.zero_point
                 graph_output.data = graph_output.data.astype(graph_output.scale.dtype) * graph_output.scale
                 graph_output.data = graph_output.data.astype(dati_dtype)
+        self.show_timer=False
         if verbose: print("----- DONE --------------")
         return ans
 
