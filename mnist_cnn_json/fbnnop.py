@@ -188,7 +188,7 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     # output_ 64,14,14
     output_ = np.transpose(output_, (1,2,0)) # for CONV
     if not _floating_infer: output_+= tensor_output.zero_point
-    if not _floating_infer: output_ = np.clip(output_, tensor_output.zero_point, np.iinfo(np.uint8).max)
+    if not _floating_infer: output_ = np.clip(output_, 0, np.iinfo(np.uint8).max)
     # output_ 1,14,14,64
     output_ = output_[np.newaxis, :]
     #output_ = np.asarray(temp_).reshape((1, output_height, output_width, -1)) # for DepthWiseConv
@@ -302,8 +302,8 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
         #output_ = np.transpose(np.array(output_), (1,2,0)) # for CONV
         output_ = np.asarray(temp_).reshape((1, output_height, output_width, -1))
     if not _floating_infer: output_+= tensor_output.zero_point
-    if not _floating_infer: output_ = np.clip(output_, tensor_output.zero_point, np.iinfo(np.uint8).max)
-    if _activation_ is not None:
+    if not _floating_infer: output_ = np.clip(output_, 0, np.iinfo(np.uint8).max)
+    elif _activation_ is not None:
         if   "RELU"  in _activation_: output_ = RELUx(output_, 0)
         elif "RELU1" in _activation_: output_ = RELUx(output_, 1)
         elif "RELU6" in _activation_: output_ = RELUx(output_, 6)
