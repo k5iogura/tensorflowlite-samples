@@ -301,6 +301,8 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
             # output_.append(np.array(temp_).reshape(int(output_height), int(output_width))) # for CONV
         #output_ = np.transpose(np.array(output_), (1,2,0)) # for CONV
         output_ = np.asarray(temp_).reshape((1, output_height, output_width, -1))
+    if not _floating_infer: output_+= tensor_output.zero_point
+    if not _floating_infer: output_ = np.clip(output_, 0, np.int32(tensor_output.max))
     if _activation_ is not None:
         if   "RELU"  in _activation_: output_ = RELUx(output_, 0)
         elif "RELU1" in _activation_: output_ = RELUx(output_, 1)
