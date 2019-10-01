@@ -61,7 +61,7 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     output_ch   = tensor_filter.shape[0]
     
     D = tensor_input.data.copy()
-    if not _floating_infer: D -= tensor_input.zero_point
+    if not _floating_infer: D -= tensor_input.zero_point    # Care zero_point about feature-map only
     # stride 1
     # output 1,14,14,64
     # input  1,14,14,32
@@ -223,7 +223,7 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
     output_height, output_width = tensor_output.data.shape[1:3]
     
     D = tensor_input.data.copy()
-    if not _floating_infer: D -= tensor_input.zero_point
+    if not _floating_infer: D -= tensor_input.zero_point    # Care zero_point about feature-map only
     # <by depth_multiplier>
     # output 1,28,28,32
     # input  1,28,28,1  (depth_multiplier==32)
