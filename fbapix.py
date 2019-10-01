@@ -61,7 +61,7 @@ class operator():
         self.nick    = "{:5s}".format((self.name[:2]+re.sub('[_AIUEO0-9]','',self.name[2:]))[:5])
         self.padding = 0
 
-        self.denomi  = denomiC = None
+        self.factor_fx = self.denomi  = denomiC = None
         if len(self.inputs)==3:
             ( scale_y, max_y, min_y, zero_point_y ) = self.tensors[self.outputs[0]].Quantization_Options()
             ( scale_a, max_a, min_a, zero_point_a ) = self.tensors[self.inputs[0]].Quantization_Options()
@@ -353,6 +353,9 @@ class operator():
         print("operator[{}]({}:{}) outputs {} inpus {}".format(self.idx, self.nick, self.opcode_index, self.outputs, self.inputs))
         #print("  builtin_options : {} padding@run {}".format(self.builtin_options, self.padding))
         print("  builtin_options : {} padding@run {}".format(self.Builtin_Options(), self.padding))
+        if self.factor_fx is not None:
+            print(
+              "  factor_fx : {}".format(self.factor_fx))
         for o in self.outputs: self.tensors[o].view()
         for i in self.inputs:  self.tensors[i].view()
         assert cont,"Fatal Error occurrence at operator"
@@ -488,9 +491,10 @@ class tensor():
         print("  shape@tflite:{} shape@run:{}".format(self.shape, self.data.shape))
         print("  quantization:min/max/scale/zerop {} {} {} {}".format(self.min, self.max, self.scale,self.zero_point))
         print("  dati         min/max/mean        {} {} {:.3f}".format(self.dati.min(),self.dati.max(),self.dati.mean()))
-        print("  data         min/max/mean        {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),self.data.std()))
         if self.run_max is not None:
-            print("  @run         min/max/mean        {:.3f} {:.3f} {:.3f}".format(self.run_min,self.run_max,self.run_mean))
+            print(
+              "  @Bef.Act     min/max/mean        {:.3f} {:.3f} {:.3f}".format(self.run_min,self.run_max,self.run_mean))
+        print("  data         min/max/mean        {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),self.data.std()))
         assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
