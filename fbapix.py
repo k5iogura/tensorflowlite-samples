@@ -369,8 +369,9 @@ class tensor():
         self.type   = self.TensorType2String(tensor_fb.Type())
         self.name   = tensor_fb.Name()
         self.buffer = tensor_fb.Buffer()
+        self.run_max= self.run_min = None
         self.show_info = True
-        self.run_max = self.run_min = None
+        self.dati_valid= False
 
         assert self.buffer>=0,"Invalid tensor.Buffer() {}".format(self.buffer)
         if self.type   == 'FLOAT32': dtype_string = 'f4'
@@ -392,6 +393,7 @@ class tensor():
         if buffers_fb[self.buffer].DataLength()>0:
             self.data = self.buff.view(dtype=dtype_string).reshape(self.shape)     # Ultra fast!
             self.dati = self.data.astype(dati_dtype).copy()
+            self.dati_valid = True
         #    if self.zero_point is not None: self.dati = self.data.astype(np.int32) - np.int32(self.zero_point)
         else:
             self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
@@ -514,12 +516,14 @@ class tensor():
         return self.data
 
     def view(self, msg=None, cont=True):
+        _floating_infer = flags.floating_infer
         if msg is not None: print("\n***\n*** "+msg+"\n***")
         print("tensors[{}]({}) buffer:{}".format(self.idx, self.name, self.buffer))
         print("  type@tflite :{} type@run :{}".format(self.type,self.data.dtype))
         print("  shape@tflite:{} shape@run:{}".format(self.shape, self.data.shape))
         print("  quantization:min/max/scale/zerop {} {} {} {}".format(self.min, self.max, self.scale,self.zero_point))
-        print("  dati         min/max/mean        {} {} {:.3f}".format(self.dati.min(),self.dati.max(),self.dati.mean()))
+        if self.dati_valid: print(
+              "  dati         min/max/mean        {} {} {:.3f}".format(self.dati.min(),self.dati.max(),self.dati.mean()))
         if self.run_max is not None:
             print(
               "  @Bef.Act     min/max/mean        {:.3f} {:.3f} {:.3f}".format(self.run_min,self.run_max,self.run_mean))
