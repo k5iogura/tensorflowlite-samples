@@ -289,7 +289,16 @@ class operator():
         elif name == 'LOGISTIC':
             sigmoid = lambda x : 1 / (1 + np.exp(-x))
             x = self.tensors[self.inputs[0]].data
-            r = self.tensors[self.outputs[0]].data = sigmoid(np.clip(x,-100,100))
+            if _floating_infer:
+                r = self.tensors[self.outputs[0]].data = sigmoid(np.clip(x,-2**8,2**8)) # clip by IEEE754(binary32)
+            else:
+                in_scale      = self.tensors[self.inputs[0]].scale
+                in_zero_point = self.tensors[self.inputs[0]].zero_point
+                temp_ = sigmoid(in_scale*(x-in_zero_point))
+                go_scale      = self.tensors[self.outputs[0]].scale
+                go_zero_point = self.tensors[self.outputs[0]].zero_point
+                temp_ = np.int32(np.round(temp_/np.float32(go_scale))) + go_zero_point
+                r = self.tensors[self.outputs[0]].data = temp_
             return r
         elif name == 'LSH_PROJECTION':    self.unsupported()
         elif name == 'LSTM':              self.unsupported()
@@ -523,7 +532,7 @@ class tensor():
         print("  shape@tflite:{} shape@run:{}".format(self.shape, self.data.shape))
         print("  quantization:min/max/scale/zerop {} {} {} {}".format(self.min, self.max, self.scale,self.zero_point))
         if self.dati_valid: print(
-              "  dati         min/max/mean        {} {} {:.3f}".format(self.dati.min(),self.dati.max(),self.dati.mean()))
+              "  dati         min/max/mean/std    {} {} {:.3f}".format(self.dati.min(),self.dati.max(),self.dati.mean()))
         if self.run_max is not None:
             print(
               "  @Bef.Act     min/max/mean        {:.3f} {:.3f} {:.3f}".format(self.run_min,self.run_max,self.run_mean))
@@ -531,7 +540,7 @@ class tensor():
             d_std = self.data.std()
         else:
             d_std = self.scale*(self.data-self.zero_point).std()
-        print("  data         min/max/mean        {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),d_std))
+        print("  data         min/max/mean/std    {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),d_std))
         assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
