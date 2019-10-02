@@ -61,7 +61,7 @@ class operator():
         self.nick    = "{:5s}".format((self.name[:2]+re.sub('[_AIUEO0-9]','',self.name[2:]))[:5])
         self.padding = 0
 
-        self.denomi  = denomiC = None
+        self.factor_fx = self.denomi  = denomiC = None
         if len(self.inputs)==3:
             ( scale_y, max_y, min_y, zero_point_y ) = self.tensors[self.outputs[0]].Quantization_Options()
             ( scale_a, max_a, min_a, zero_point_a ) = self.tensors[self.inputs[0]].Quantization_Options()
@@ -273,11 +273,12 @@ class operator():
             w = self.tensors[self.inputs[1]].data
             b = self.tensors[self.inputs[2]].data
             r = self.fully_connected(x,w,b)
+            tensor_output = self.tensors[self.outputs[0]]
             _activation_ = self.Builtin_Options()
             if _activation_ is not None:
-                if   "RELU"  in _activation_: r = RELUx(r, 0)
-                elif "RELU1" in _activation_: r = RELUx(r, 1)
-                elif "RELU6" in _activation_: r = RELUx(r, 6)
+                if   "RELU6" in _activation_: r = RELUx(r, 6, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
+                elif "RELU1" in _activation_: r = RELUx(r, 1, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
+                elif "RELU"  in _activation_: r = RELUx(r, 0, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
                 else: print(_activation_+' not supported')
             self.tensors[self.outputs[0]].data = r
             self.clipping(self.outputs)
@@ -289,7 +290,16 @@ class operator():
         elif name == 'LOGISTIC':
             sigmoid = lambda x : 1 / (1 + np.exp(-x))
             x = self.tensors[self.inputs[0]].data
-            r = self.tensors[self.outputs[0]].data = sigmoid(np.clip(x,-100,100))
+            if _floating_infer:
+                r = self.tensors[self.outputs[0]].data = sigmoid(np.clip(x,-2**8,2**8)) # clip by IEEE754(binary32)
+            else:
+                in_scale      = self.tensors[self.inputs[0]].scale
+                in_zero_point = self.tensors[self.inputs[0]].zero_point
+                temp_ = sigmoid(in_scale*(x-in_zero_point))
+                go_scale      = self.tensors[self.outputs[0]].scale
+                go_zero_point = self.tensors[self.outputs[0]].zero_point
+                temp_ = np.int32(np.round(temp_/np.float32(go_scale))) + go_zero_point
+                r = self.tensors[self.outputs[0]].data = temp_
             return r
         elif name == 'LSH_PROJECTION':    self.unsupported()
         elif name == 'LSTM':              self.unsupported()
@@ -353,6 +363,9 @@ class operator():
         print("operator[{}]({}:{}) outputs {} inpus {}".format(self.idx, self.nick, self.opcode_index, self.outputs, self.inputs))
         #print("  builtin_options : {} padding@run {}".format(self.builtin_options, self.padding))
         print("  builtin_options : {} padding@run {}".format(self.Builtin_Options(), self.padding))
+        if self.factor_fx is not None:
+            print(
+              "  factor_fx : {}".format(self.factor_fx))
         for o in self.outputs: self.tensors[o].view()
         for i in self.inputs:  self.tensors[i].view()
         assert cont,"Fatal Error occurrence at operator"
@@ -366,7 +379,9 @@ class tensor():
         self.type   = self.TensorType2String(tensor_fb.Type())
         self.name   = tensor_fb.Name()
         self.buffer = tensor_fb.Buffer()
+        self.run_max= self.run_min = None
         self.show_info = True
+        self.dati_valid= False
 
         assert self.buffer>=0,"Invalid tensor.Buffer() {}".format(self.buffer)
         if self.type   == 'FLOAT32': dtype_string = 'f4'
@@ -388,6 +403,7 @@ class tensor():
         if buffers_fb[self.buffer].DataLength()>0:
             self.data = self.buff.view(dtype=dtype_string).reshape(self.shape)     # Ultra fast!
             self.dati = self.data.astype(dati_dtype).copy()
+            self.dati_valid = True
         #    if self.zero_point is not None: self.dati = self.data.astype(np.int32) - np.int32(self.zero_point)
         else:
             self.data = np.zeros(tuple(self.shape),dtype=self.type2np(self.type))
@@ -457,37 +473,76 @@ class tensor():
         _floating_infer = flags.floating_infer
         # If input-type QUINT8 and inference-typ FLOAT then converter generates DEQUANT operator
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
-        assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
+        #assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
         self.buff = img
-        if self.show_info:print("set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(img.max(), img.min(), img.mean(), img.dtype))
-        self.show_info = False
-        if self.type == 'UINT8':
-            # 0 - 255 : range of dati
-            # self.dati = (img.astype(np.int32)-self.zero_point).astype(dati_dtype).copy() # Don't care zero_point of a input tensor!
-            self.dati = img.astype(np.int32).astype(dati_dtype).copy() # Care zero_point of a input tensor!
-        else:
-            self.dati = img.copy()
-        if verbose: print("set dati tensor range max/min/mean ={}/{}/{:.3f} type {}".format(self.dati.max(),self.dati.min(),self.dati.mean(),self.dati.dtype))
-    #    if (self.max < img.max() or self.min > img.min()):
-    #        if self.warn_convert>0:
-    #            print("Warning: Suppots float32 only so converting input {} to float32".format(img.dtype))
-    #            self.warn_convert = 0
-    #        img = ( self.scale * img + self.min ).astype(np.float32)
-        if _floating_infer:
+        if self.show_info:print(
+            "set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(
+            img.max(), img.min(), img.mean(), img.dtype))
+
+        # infer input conversion
+        #+----------------------------------------------------+
+        # float float -              OK
+        # float uint8 uint8 to float OK
+        # uint8 float float to uint8 but ng if tflite is float
+        # uint8 uint8 -              but ng if tflite is float
+        #+----------------------------------------------------+
+        # Don't Care zero_point offset here
+        if       _floating_infer and img.dtype == np.float32:
+            if self.show_info: print("Not convert {} input at floating inference".format(img.dtype))
+            assert self.max is not None and self.min is not None
+            self.data = abs(self.max - self.min) * img + self.min
             self.data = img.copy()
+
+        elif     _floating_infer and img.dtype == np.uint8  :
+            if self.show_info: print("# convert uint8 {} to float".format(img.dtype))
+            assert self.scale is not None and self.zero_point is not None
+            self.data = self.scale * ( img.astype(np.float32) - np.float32(self.zero_point) )
+
+        elif not _floating_infer and img.dtype == np.float32 and self.type == 'UINT8':
+            if self.show_info: print("# convert float {} to uint8 {}".format(img.dtype, self.type))
+            assert self.scale is not None and self.zero_point is not None
+            self.dati = ((img/self.scale).astype(dati_dtype) + self.zero_point).astype(dati_dtype)
+
+        elif not _floating_infer and img.dtype == np.uint8   and self.type == 'UINT8':
+            if self.show_info: print("Not convert {} input at quantized inference".format(img.dtype))
+            self.dati = img.astype(dati_dtype).copy()
+
+        else:
+            assert False,"not support {} {} {}".format(_floating_infer, img.dtype, self.type)
+
+        if verbose: print(
+            "set dati tensor range max/min/mean ={}/{}/{:.3f} type {}".format(
+            self.dati.max(),self.dati.min(),self.dati.mean(),self.dati.dtype))
+
+        if _floating_infer:
+            pass
         else:
             self.data = self.dati
-        if verbose: print("set data tensor range max/min/mean ={:.3f}/{:.3f}/{:.3f} type {}".format(self.data.max(),self.data.min(),self.data.mean(),self.data.dtype))
+
+        if verbose: print(
+            "set data tensor range max/min/mean ={:.3f}/{:.3f}/{:.3f} type {}".format(
+            self.data.max(),self.data.min(),self.data.mean(),self.data.dtype))
+        if self.show_info:self.view("tensor.set")
+        self.show_info = False
         return self.data
 
     def view(self, msg=None, cont=True):
+        _floating_infer = flags.floating_infer
         if msg is not None: print("\n***\n*** "+msg+"\n***")
         print("tensors[{}]({}) buffer:{}".format(self.idx, self.name, self.buffer))
         print("  type@tflite :{} type@run :{}".format(self.type,self.data.dtype))
         print("  shape@tflite:{} shape@run:{}".format(self.shape, self.data.shape))
         print("  quantization:min/max/scale/zerop {} {} {} {}".format(self.min, self.max, self.scale,self.zero_point))
-        print("  dati         min/max/mean        {} {} {:.3f}".format(self.dati.min(),self.dati.max(),self.dati.mean()))
-        print("  data         min/max/mean        {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),self.data.std()))
+        if self.dati_valid: print(
+              "  dati         min/max/mean/std    {} {} {:.3f}".format(self.dati.min(),self.dati.max(),self.dati.mean()))
+        if self.run_max is not None:
+            print(
+              "  @Bef.Act     min/max/mean        {:.3f} {:.3f} {:.3f}".format(self.run_min,self.run_max,self.run_mean))
+        if not _floating_infer and self.scale is not None and self.zero_point is not None:
+            d_std = self.scale*(self.data-self.zero_point).std()
+        else:
+            d_std = self.data.std()
+        print("  data         min/max/mean/std    {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),d_std))
         assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
@@ -596,23 +651,27 @@ class graph:
     def f2x(self, f, shift): return np.int32(round(f*(1<<shift)))
     def invoke(self, verbose=False):
         _floating_infer = flags.floating_infer
+        flags.relux_info= self.show_timer
         elapsed = 0.
         if verbose: print("----- INVOKING      -----")
         for order, operator_idx in enumerate(self.operate_order_list):
-            start = time()
             operator = self.operators[operator_idx]
+            if self.show_timer:
+                sys.stdout.write("{:3d}-{:8s} ".format(operator_idx, operator.nick))
+            start = time()
             #for i in self.inputs:   # Check only
             #    input_ = self.tensors[i]
             #    assert tuple(input_.shape)==input_.data.shape,"Input shape mismatch {} {}".format(
             #            self.tensors[i].shape, self.tensors[i].data.shape)
             ans = operator.eval()
+            output_shape = self.tensors[operator.outputs[0]].data.shape
+            output_idx   = self.tensors[operator.outputs[0]].idx
             if verbose: operator.view()
             operator.elapsed = (time()-start)
             elapsed += operator.elapsed
-            output_shape = self.tensors[operator.outputs[0]].data.shape
             if self.show_timer:
-                sys.stdout.write("{:18s} {:.6f}/{:6f} {} <= ".format(operator.name, operator.elapsed, elapsed, output_shape))
-                for input_idx in operator.inputs: sys.stdout.write("{} ".format(self.tensors[input_idx].data.shape))
+                sys.stdout.write("{:.4f}/{:.4f} {:3d} {} <= ".format(operator.elapsed, elapsed, output_idx, output_shape))
+                for input_idx in operator.inputs: sys.stdout.write("{:3d} {} ".format(input_idx, self.tensors[input_idx].data.shape))
                 sys.stdout.write("\n")
         if not _floating_infer:
             for output_idx in self.outputs:
@@ -621,6 +680,7 @@ class graph:
                 graph_output.data = graph_output.data.astype(graph_output.scale.dtype) * graph_output.scale
                 graph_output.data = graph_output.data.astype(dati_dtype)
         self.show_timer=False
+        flags.relux_info= self.show_timer
         if verbose: print("----- DONE --------------")
         return ans
 

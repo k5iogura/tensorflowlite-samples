@@ -70,7 +70,7 @@ if __name__=='__main__':
         if args.quantization:
             assert g.tensors[g.inputs[0]].type == 'UINT8',"-q {} but input {}".format(args.quantization, g.tensors[g.inputs[0]].type)
             #g.tensors[g.inputs[0]].set((255*number_img[np.newaxis,:]).astype(np.uint8))
-            g.tensors[g.inputs[0]].set((number_img[np.newaxis,:]).astype(np.uint8))
+            g.tensors[g.inputs[0]].set((255*number_img[np.newaxis,:]).astype(np.uint8))
         else:
             g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.float32))
         y = g.invoke(verbose=False)

@@ -5,7 +5,7 @@ class FLAGs:
         global __floating_infer
         global __relux_info
         __floating_infer = True
-        __relux_info     = False
+        __relux_info     = True
 
 #
 # Floating inference mode cntorl
