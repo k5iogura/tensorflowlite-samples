@@ -11,20 +11,26 @@ from flags import flags
 # CHWC : filter tensor shape   = ( out_ch, k, k, in_ch ) at CONV_2D
 # C    : bias   tensor shape   = ( in_ch               )
 
-def RELUx(numpy_in, val=0, leaky=None):
+def RELUx(numpy_in, val=0, leaky=None, scale=None, zero_point=None):
     assert numpy_in.dtype != np.uint8,"RELU not supports {}".format(np.uint8)
     numpy_out = numpy_in.copy()
     sys.stdout.write("\b\b\b\b-R{} ".format(val))
+    zpt = 0
+    if scale is not None and zero_point is not None:
+        val = np.int32(round(val / scale)) + np.int32(zero_point)
+        zpt = np.int32(zero_point)
+
     if val > 1:                    # RELUx
-        numpy_out[numpy_out < 0]   = 0
+        numpy_out[numpy_out < zpt] = zpt
         numpy_out[numpy_out > val] = val
     elif val == 1:                 # RELU1
+        assert False,"not support {} {}".format(val,zpt)
         numpy_out[numpy_out < -1]  = -1
         numpy_out[numpy_out > val] =  1
     elif leaky is not None:        # LEAKY RELU
-        numpy_out[numpy_out < 0]  *= leaky
+        numpy_out[numpy_out < zpt]  *= leaky
     else:                          # RELU
-        numpy_out[numpy_out < 0]   = 0
+        numpy_out[numpy_out < zpt] = zpt
     return numpy_out
 
 # MultiplyByQuantizedMultiplier instead of tensorflow-lite reference code
@@ -197,9 +203,9 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     output_ = output_[np.newaxis, :]
     #output_ = np.asarray(temp_).reshape((1, output_height, output_width, -1)) # for DepthWiseConv
     if _activation_ is not None:
-        if   "RELU6" in _activation_: output_ = RELUx(output_, 6)
-        elif "RELU1" in _activation_: output_ = RELUx(output_, 1)
-        elif "RELU"  in _activation_: output_ = RELUx(output_, 0)
+        if   "RELU6" in _activation_: output_ = RELUx(output_, 6, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
+        elif "RELU1" in _activation_: output_ = RELUx(output_, 1, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
+        elif "RELU"  in _activation_: output_ = RELUx(output_, 0, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
         else: print(_activation_+' not supported')
     assert output_.shape == tensor_output.data.shape,"Mismatch {} {}".format(
                             output_.shape,tensor_output.data.shape)
@@ -314,9 +320,9 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
     if     _floating_infer:
         output_ = np.clip(output_, tensor_output.min, tensor_output.max)
     elif _activation_ is not None:
-        if   "RELU6" in _activation_: output_ = RELUx(output_, 6)
-        elif "RELU1" in _activation_: output_ = RELUx(output_, 1)
-        elif "RELU"  in _activation_: output_ = RELUx(output_, 0)
+        if   "RELU6" in _activation_: output_ = RELUx(output_, 6, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
+        elif "RELU1" in _activation_: output_ = RELUx(output_, 1, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
+        elif "RELU"  in _activation_: output_ = RELUx(output_, 0, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
         else: print(_activation_+' not supported')
     assert output_.shape == tensor_output.data.shape,"Mismatch {} {}".format(
                             output_.shape,tensor_output.data.shape)
