@@ -463,25 +463,54 @@ class tensor():
         assert type(img) == np.ndarray,"Input image type must be numpy.ndarray but got "+str(type(img))
         #assert img.dtype == self.type2np(self.type),"Cannot set tensor: expect {} but {}".format(self.type,img.dtype)
         self.buff = img
-        if self.show_info:print("set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(img.max(), img.min(), img.mean(), img.dtype))
-        self.show_info = False
-        if self.type == 'UINT8':
-            # 0 - 255 : range of dati
-            # self.dati = (img.astype(np.int32)-self.zero_point).astype(dati_dtype).copy() # Don't care zero_point of a input tensor!
-            self.dati = img.astype(np.int32).astype(dati_dtype).copy() # Care zero_point of a input tensor!
+        if self.show_info:print(
+            "set buff tensor range max/min/mean ={}/{}/{:.3f} type {}".format(
+            img.max(), img.min(), img.mean(), img.dtype))
+
+        # infer input conversion
+        #+----------------------------------------------------+
+        # float float -              OK
+        # float uint8 uint8 to float OK
+        # uint8 float float to uint8 but ng if tflite is float
+        # uint8 uint8 -              but ng if tflite is float
+        #+----------------------------------------------------+
+        # Don't Care zero_point offset here
+        if       _floating_infer and img.dtype == np.float32:
+            print("Not convert {} input at floating inference".format(img.dtype))
+            assert self.max is not None and self.min is not None
+            self.data = abs(self.max - self.min) * img + self.min
+
+        elif     _floating_infer and img.dtype == np.uint8  :
+            print("# convert uint8 {} to float".format(img.dtype))
+            assert self.scale is not None and self.zero_point is not None
+            self.data = self.scale * ( img.astype(np.float32) - np.float32(self.zero_point) )
+
+        elif not _floating_infer and img.dtype == np.float32 and self.type == 'UINT8':
+            print("# convert float {} to uint8 {}".format(img.dtype, self.type))
+            assert self.scale is not None and self.zero_point is not None
+            self.dati = ((img/self.scale).astype(dati_dtype) + self.zero_point).astype(dati_dtype)
+
+        elif not _floating_infer and img.dtype == np.uint8   and self.type == 'UINT8':
+            print("Not convert {} input at quantized inference".format(img.dtype))
+            self.dati = img.astype(dati_dtype).copy()
+
         else:
-            self.dati = img.copy()
-        if verbose: print("set dati tensor range max/min/mean ={}/{}/{:.3f} type {}".format(self.dati.max(),self.dati.min(),self.dati.mean(),self.dati.dtype))
-    #    if (self.max < img.max() or self.min > img.min()):
-    #        if self.warn_convert>0:
-    #            print("Warning: Suppots float32 only so converting input {} to float32".format(img.dtype))
-    #            self.warn_convert = 0
-    #        img = ( self.scale * img + self.min ).astype(np.float32)
+            assert False,"not support {} {} {}".format(_floating_infer, img.dtype, self.type)
+
+        if verbose: print(
+            "set dati tensor range max/min/mean ={}/{}/{:.3f} type {}".format(
+            self.dati.max(),self.dati.min(),self.dati.mean(),self.dati.dtype))
+
         if _floating_infer:
-            self.data = img.copy()
+            pass
         else:
             self.data = self.dati
-        if verbose: print("set data tensor range max/min/mean ={:.3f}/{:.3f}/{:.3f} type {}".format(self.data.max(),self.data.min(),self.data.mean(),self.data.dtype))
+
+        if verbose: print(
+            "set data tensor range max/min/mean ={:.3f}/{:.3f}/{:.3f} type {}".format(
+            self.data.max(),self.data.min(),self.data.mean(),self.data.dtype))
+        if self.show_info:self.view("tensor.set")
+        self.show_info = False
         return self.data
 
     def view(self, msg=None, cont=True):
