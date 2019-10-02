@@ -12,11 +12,13 @@ from flags import flags
 # C    : bias   tensor shape   = ( in_ch               )
 
 def RELUx(numpy_in, val=0, leaky=None, scale=None, zero_point=None):
+    _floating_infer = flags.floating_infer
     assert numpy_in.dtype != np.uint8,"RELU not supports {}".format(np.uint8)
     numpy_out = numpy_in.copy()
     sys.stdout.write("\b\b\b\b-R{} ".format(val))
     zpt = 0
-    if scale is not None and zero_point is not None:
+    if not _floating_infer:
+        assert scale is not None and zero_point is not None
         val = np.int32(round(val / scale)) + np.int32(zero_point)
         zpt = np.int32(zero_point)
 
