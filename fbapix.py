@@ -637,7 +637,7 @@ class graph:
         for order, operator_idx in enumerate(self.operate_order_list):
             operator = self.operators[operator_idx]
             if self.show_timer:
-                sys.stdout.write("{:8s} ".format(operator.nick))
+                sys.stdout.write("{:3d}-{:8s} ".format(operator_idx, operator.nick))
             start = time()
             #for i in self.inputs:   # Check only
             #    input_ = self.tensors[i]
