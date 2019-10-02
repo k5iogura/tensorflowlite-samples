@@ -527,7 +527,11 @@ class tensor():
         if self.run_max is not None:
             print(
               "  @Bef.Act     min/max/mean        {:.3f} {:.3f} {:.3f}".format(self.run_min,self.run_max,self.run_mean))
-        print("  data         min/max/mean        {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),self.data.std()))
+        if _floating_infer:
+            d_std = self.data.std()
+        else:
+            d_std = self.scale*(self.data-self.zero_point).std()
+        print("  data         min/max/mean        {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),d_std))
         assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
