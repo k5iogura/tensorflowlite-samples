@@ -13,22 +13,24 @@ from flags import flags
 
 def RELUx(numpy_in, val=0, leaky=None, scale=None, zero_point=None):
     _floating_infer = flags.floating_infer
+    _relux_info     = flags.relux_info
     assert numpy_in.dtype != np.uint8,"RELU not supports {}".format(np.uint8)
     numpy_out = numpy_in.copy()
-    sys.stdout.write("\b\b\b\b-R{} ".format(val))
+    if _relux_info: sys.stdout.write("\b\b\b\b-R{} ".format(val))
     zpt = 0
+    zvl = val
     if not _floating_infer:
         assert scale is not None and zero_point is not None
-        val = np.int32(round(val / scale)) + np.int32(zero_point)
+        zvl = np.int32(round(val / scale)) + np.int32(zero_point)
         zpt = np.int32(zero_point)
 
     if val > 1:                    # RELUx
         numpy_out[numpy_out < zpt] = zpt
-        numpy_out[numpy_out > val] = val
+        numpy_out[numpy_out > zvl] = zvl
     elif val == 1:                 # RELU1
         assert False,"not support {} {}".format(val,zpt)
         numpy_out[numpy_out < -1]  = -1
-        numpy_out[numpy_out > val] =  1
+        numpy_out[numpy_out > zvl] =  1
     elif leaky is not None:        # LEAKY RELU
         numpy_out[numpy_out < zpt]  *= leaky
     else:                          # RELU
@@ -51,7 +53,7 @@ def mbqm(acc, multiplier_fx, shift):
     f1+=lsb
     return f1
 
-def CONV_2D(operator, outputs, inputs, verbose=True):
+def CONV_2D(operator, outputs, inputs, verbose=False):
     _floating_infer = flags.floating_infer
     (padding, stride, strideh, _activation_) = operator.Builtin_Options()
     (tensor_idx_input, tensor_idx_filter, tensor_idx_bias) = inputs
@@ -200,7 +202,8 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     tensor_output.run_min = output_.min()
     tensor_output.run_mean= output_.mean()
     if not _floating_infer: output_ = np.clip(output_, 0, np.iinfo(np.uint8).max)
-    if     _floating_infer: output_ = np.clip(output_, tensor_output.min, tensor_output.max) 
+    if _floating_infer and tensor_output.min is not None and tensor_output.min is not None:
+        output_ = np.clip(output_, tensor_output.min, tensor_output.max) 
     # output_ 1,14,14,64
     output_ = output_[np.newaxis, :]
     #output_ = np.asarray(temp_).reshape((1, output_height, output_width, -1)) # for DepthWiseConv
@@ -214,7 +217,7 @@ def CONV_2D(operator, outputs, inputs, verbose=True):
     tensor_output.data = output_
     return output_
 
-def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
+def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=False):
     _floating_infer = flags.floating_infer
     (padding, stride, strideh, _activation_,depth_multiplier) = operator.Builtin_Options()
     (tensor_idx_input, tensor_idx_filter, tensor_idx_bias)    = inputs
@@ -319,9 +322,9 @@ def DEPTHWISE_CONV_2D(operator, outputs, inputs, verbose=True):
     tensor_output.run_mean= output_.mean()
     if not _floating_infer:
         output_ = np.clip(output_, np.iinfo(np.uint8).min, np.iinfo(np.uint8).max)
-    if     _floating_infer:
+    if     _floating_infer and tensor_output.max is not None and tensor_output.min is not None:
         output_ = np.clip(output_, tensor_output.min, tensor_output.max)
-    elif _activation_ is not None:
+    if _activation_ is not None:
         if   "RELU6" in _activation_: output_ = RELUx(output_, 6, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
         elif "RELU1" in _activation_: output_ = RELUx(output_, 1, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
         elif "RELU"  in _activation_: output_ = RELUx(output_, 0, scale=tensor_output.scale, zero_point=tensor_output.zero_point)

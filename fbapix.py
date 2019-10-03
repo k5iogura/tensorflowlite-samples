@@ -273,11 +273,12 @@ class operator():
             w = self.tensors[self.inputs[1]].data
             b = self.tensors[self.inputs[2]].data
             r = self.fully_connected(x,w,b)
+            tensor_output = self.tensors[self.outputs[0]]
             _activation_ = self.Builtin_Options()
             if _activation_ is not None:
-                if   "RELU"  in _activation_: r = RELUx(r, 0)
-                elif "RELU1" in _activation_: r = RELUx(r, 1)
-                elif "RELU6" in _activation_: r = RELUx(r, 6)
+                if   "RELU6" in _activation_: r = RELUx(r, 6, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
+                elif "RELU1" in _activation_: r = RELUx(r, 1, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
+                elif "RELU"  in _activation_: r = RELUx(r, 0, scale=tensor_output.scale, zero_point=tensor_output.zero_point)
                 else: print(_activation_+' not supported')
             self.tensors[self.outputs[0]].data = r
             self.clipping(self.outputs)
@@ -487,22 +488,23 @@ class tensor():
         #+----------------------------------------------------+
         # Don't Care zero_point offset here
         if       _floating_infer and img.dtype == np.float32:
-            print("Not convert {} input at floating inference".format(img.dtype))
+            if self.show_info: print("Not convert {} input at floating inference".format(img.dtype))
             assert self.max is not None and self.min is not None
             self.data = abs(self.max - self.min) * img + self.min
+            self.data = img.copy()
 
         elif     _floating_infer and img.dtype == np.uint8  :
-            print("# convert uint8 {} to float".format(img.dtype))
+            if self.show_info: print("# convert uint8 {} to float".format(img.dtype))
             assert self.scale is not None and self.zero_point is not None
             self.data = self.scale * ( img.astype(np.float32) - np.float32(self.zero_point) )
 
         elif not _floating_infer and img.dtype == np.float32 and self.type == 'UINT8':
-            print("# convert float {} to uint8 {}".format(img.dtype, self.type))
+            if self.show_info: print("# convert float {} to uint8 {}".format(img.dtype, self.type))
             assert self.scale is not None and self.zero_point is not None
             self.dati = ((img/self.scale).astype(dati_dtype) + self.zero_point).astype(dati_dtype)
 
         elif not _floating_infer and img.dtype == np.uint8   and self.type == 'UINT8':
-            print("Not convert {} input at quantized inference".format(img.dtype))
+            if self.show_info: print("Not convert {} input at quantized inference".format(img.dtype))
             self.dati = img.astype(dati_dtype).copy()
 
         else:
@@ -536,11 +538,13 @@ class tensor():
         if self.run_max is not None:
             print(
               "  @Bef.Act     min/max/mean        {:.3f} {:.3f} {:.3f}".format(self.run_min,self.run_max,self.run_mean))
-        if _floating_infer:
-            d_std = self.data.std()
-        else:
+        f_std = self.data.std()
+        d_std = -1
+        if not _floating_infer and self.scale is not None and self.zero_point is not None:
             d_std = self.scale*(self.data-self.zero_point).std()
-        print("  data         min/max/mean/std    {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),d_std))
+        print(
+               "  data         min/max/mean/std    {:.3f} {:.3f} {:.3f} {:.3f}(f={:.3f})".format(
+                self.data.min(),self.data.max(),self.data.mean(),f_std,d_std))
         assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
@@ -649,6 +653,7 @@ class graph:
     def f2x(self, f, shift): return np.int32(round(f*(1<<shift)))
     def invoke(self, verbose=False):
         _floating_infer = flags.floating_infer
+        flags.relux_info= self.show_timer
         elapsed = 0.
         if verbose: print("----- INVOKING      -----")
         for order, operator_idx in enumerate(self.operate_order_list):
@@ -673,10 +678,14 @@ class graph:
         if not _floating_infer:
             for output_idx in self.outputs:
                 graph_output = self.tensors[output_idx]
-                graph_output.data-= graph_output.zero_point
-                graph_output.data = graph_output.data.astype(graph_output.scale.dtype) * graph_output.scale
+                output_scale = graph_output.scale
+                output_zero_point = graph_output.zero_point
+                if output_zero_point is not None and output_scale is not None:
+                    graph_output.data-= output_zero_point
+                    graph_output.data = graph_output.data.astype(output_scale) * output_scale
                 graph_output.data = graph_output.data.astype(dati_dtype)
         self.show_timer=False
+        flags.relux_info= self.show_timer
         if verbose: print("----- DONE --------------")
         return ans
 

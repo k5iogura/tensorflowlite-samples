@@ -51,3 +51,9 @@ for i in range(int(Ndets[0])):
     cv2.putText(org,label_txt,tl,cv2.FONT_HERSHEY_SIMPLEX,1.0,(255,255,255),2)
 assert cv2.imwrite("result.jpg",org)
 
+def view(idx):
+    mx=ip.get_tensor(idx).max()
+    mn=ip.get_tensor(idx).min()
+    me=ip.get_tensor(idx).mean()
+    sd=ip.get_tensor(idx).std()
+    print("min/max/mean = {:.3f}/{:3f}/{:3f}:{:.6f}".format(mn,mx,me,sd))
