@@ -538,11 +538,13 @@ class tensor():
         if self.run_max is not None:
             print(
               "  @Bef.Act     min/max/mean        {:.3f} {:.3f} {:.3f}".format(self.run_min,self.run_max,self.run_mean))
+        f_std = self.data.std()
+        d_std = -1
         if not _floating_infer and self.scale is not None and self.zero_point is not None:
             d_std = self.scale*(self.data-self.zero_point).std()
-        else:
-            d_std = self.data.std()
-        print("  data         min/max/mean/std    {:.3f} {:.3f} {:.3f} {:.3f}".format(self.data.min(),self.data.max(),self.data.mean(),d_std))
+        print(
+               "  data         min/max/mean/std    {:.3f} {:.3f} {:.3f} {:.3f}(f={:.3f})".format(
+                self.data.min(),self.data.max(),self.data.mean(),f_std,d_std))
         assert cont,"Fatal Error occurrence at tensor"
 
 class graph:
@@ -676,8 +678,11 @@ class graph:
         if not _floating_infer:
             for output_idx in self.outputs:
                 graph_output = self.tensors[output_idx]
-                graph_output.data-= graph_output.zero_point
-                graph_output.data = graph_output.data.astype(graph_output.scale.dtype) * graph_output.scale
+                output_scale = graph_output.scale
+                output_zero_point = graph_output.zero_point
+                if output_zero_point is not None and output_scale is not None:
+                    graph_output.data-= output_zero_point
+                    graph_output.data = graph_output.data.astype(output_scale) * output_scale
                 graph_output.data = graph_output.data.astype(dati_dtype)
         self.show_timer=False
         flags.relux_info= self.show_timer
