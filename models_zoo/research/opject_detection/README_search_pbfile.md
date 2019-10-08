@@ -1,4 +1,4 @@
-# Use node_pb.pyt to check contencts of pbfile  
+# Use node_pb.py to check contencts of pbfile  
 
 ```
  $ python node_pb.py tensorflowlite-samples/mnist_cnn_json/mnist_frozen.pb
