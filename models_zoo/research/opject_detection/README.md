@@ -27,5 +27,8 @@
  $ python object_detection_tutorial.py
 ```
 
+## Appendex  
+[Use node_pb.py to check contents of graph file](./README_search_pbfile.md)  
+
 **Oct.07, 2019**  
 
