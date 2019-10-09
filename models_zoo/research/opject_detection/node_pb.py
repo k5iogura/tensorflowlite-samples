@@ -9,6 +9,7 @@ args = argparse.ArgumentParser()
 def chF(f): return f if os.path.exists(f) else sys.exit(-1)
 args.add_argument("pbfile",           type=chF, default='frozen_inference_graph.pb')
 args.add_argument('-v',"--verbose",   action='store_true')
+args.add_argument('-f',"--folding",   type=str, default=None)
 args = args.parse_args()
 
 PATH_TO_FROZEN_GRAPH = args.pbfile
@@ -35,32 +36,30 @@ class graph():
             self.all_input_tensors  = {tensor for op in ops for tensor in op.inputs}
             self.all_output_names   = {tensor.name for op in ops for tensor in op.outputs}
             self.all_input_names    = {tensor.name for op in ops for tensor in op.inputs}
-            self.tensors       = list(self.all_input_tensors | self.all_output_tensors)
-            self.tensor_names  = [ t.name for t in self.tensors]
-            for o in ops:
-                    o.outputs_idx = [ self.tensor_names.index(t.name) for t in o.outputs ]
-            for o in ops:
-                    o.inputs_idx  = [ self.tensor_names.index(t.name) for t in o.inputs ]
+            self.tensors            = list(self.all_input_tensors | self.all_output_tensors)
+            self.tensor_names       = [ t.name for t in self.tensors]
+            for o in ops: o.outputs_idx = [ self.tensor_names.index(t.name) for t in o.outputs ]
+            for o in ops: o.inputs_idx  = [ self.tensor_names.index(t.name) for t in o.inputs ]
 
-            self.output_tensors   = list({ i for i in ( self.all_output_tensors - self.all_input_tensors ) if ':0' in i.name and '/' not in i.name })
-            self.outputs_idx      = [ self.tensors.index(i) for i in self.output_tensors ]
-            self.outputs_name     = [ self.tensors[o].name  for o in self.outputs_idx    ]
+            self.output_tensors     = list({ i for i in ( self.all_output_tensors - self.all_input_tensors ) if ':0' in i.name and '/' not in i.name })
+            self.outputs_idx        = [ self.tensors.index(i) for i in self.output_tensors ]
+            self.outputs_name       = [ self.tensors[o].name  for o in self.outputs_idx    ]
 
-            self.input_tensors    = []
-            self.inputs_idx       = []
-            self.inputs_name      = []
+            self.input_tensors      = []
+            self.inputs_idx         = []
+            self.inputs_name        = []
 
-            self.all_op_names     = list({op.name for op in ops})
-            self.only_l0_outputs  = list({ i for i in (self.all_output_names - self.all_input_names) if ':0' in i and '/' not in i })
-            self.only_inputs      = list({ i for i in (self.all_input_names - self.all_output_names) })
+            self.all_op_names       = list({op.name for op in ops})
+            self.only_l0_outputs    = list({ i for i in (self.all_output_names - self.all_input_names) if ':0' in i and '/' not in i })
+            self.only_inputs        = list({ i for i in (self.all_input_names - self.all_output_names) })
 
-            self.feedables        = {i.name for i in self.all_input_tensors if tf.get_default_graph().is_feedable(i) and '/' not in i.name}
+            self.feedables          = {i.name for i in self.all_input_tensors if tf.get_default_graph().is_feedable(i) and '/' not in i.name}
 
-            self.all_output_names = list(self.all_output_names)
-            self.all_input_names  = list(self.all_input_names)
+            self.all_output_names   = list(self.all_output_names)
+            self.all_input_names    = list(self.all_input_names)
 
             self.reset_refs()
-            self.operate_order_list     = []
+            self.operate_order_list = []
 
     def setup_inputs(self):
         def op_inputs(operator_idx):return [i for i in self.operators[operator_idx].inputs]
