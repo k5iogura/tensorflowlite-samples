@@ -43,8 +43,8 @@ class graph():
                     o.inputs_idx  = [ self.tensor_names.index(t.name) for t in o.inputs ]
 
             self.output_tensors   = list({ i for i in ( self.all_output_tensors - self.all_input_tensors ) if ':0' in i.name and '/' not in i.name })
-            self.outputs_idx      = [ self.tensors.index(i) for i in self.output_tensors]
-            self.outputs_name     = [ self.tensors[o].name for o in self.outputs_idx ]
+            self.outputs_idx      = [ self.tensors.index(i) for i in self.output_tensors ]
+            self.outputs_name     = [ self.tensors[o].name  for o in self.outputs_idx    ]
 
             self.input_tensors    = []
             self.inputs_idx       = []
@@ -61,6 +61,19 @@ class graph():
 
             self.reset_refs()
             self.operate_order_list     = []
+
+    def setup_inputs(self):
+        def op_inputs(operator_idx):return [i for i in self.operators[operator_idx].inputs]
+        for i in self.operate_order_list:
+            inputs = op_inputs(i)
+            if len(inputs) > 0:
+                #for j in inputs:
+                #    print("input tensors[{}]: {} => {}".format(i,j.name,self.operators_name[i]))
+                self.input_tensors = inputs
+                self.inputs_idx    = [ self.tensors.index(i) for i in self.input_tensors ]
+                self.inputs_name   = [ self.tensors[o].name  for o in self.inputs_idx    ]
+                return
+        print("found no inputs of this graph")
 
     def reset_refs(self): self.operator_refs = [0]*len(self.operators)
 
@@ -117,20 +130,16 @@ class graph():
         self.operate_order_list     = []
         self.walk_from(self.outputs_idx, verbose=verbose)
         if verbose: print("Allocatng Graph done.")
-        def op_inputs(idx):return [i for i in self.operators[idx].inputs]
-        for i in self.operate_order_list:
-            inputs = op_inputs(i)
-            if len(inputs) > 0:
-                for j in inputs:
-                    print("input tensors[{}]: {} => {}".format(i,j.name,self.operators_name[i]))
-                self.input_tensors = inputs
-                break
+        self.setup_inputs()
 
 g = graph(detection_graph)
 g.allocate_graph(verbose=False)
-#for i in g.operate_order_list:
-    #print(g.operators[i].name)
-#print('only_l0_outputs  :{}'.format(only_l0_outputs))
-#print('only_inputs      :{}'.format(only_inputs))
-#print('feedable tensors :{}'.format(feedables))
-
+print("<< operate order >>")
+for i in g.operate_order_list:
+    print(g.operators[i].name)
+print("<< graph inputs  >>")
+for i in g.inputs_name:
+    print(i)
+print("<< graph outputs >>")
+for i in g.outputs_name:
+    print(i)
