@@ -707,34 +707,11 @@ if __name__=='__main__':
     if args.int16:
         dati_dtype = np.int16
 
-    import tensorflow.examples.tutorials.mnist.input_data as input_data
-    mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
-
     g = graph(tflite=args.tflite, verbose=args.verbose)
     g.allocate_graph(verbose=True)
 
-    corrects = 0
-    for i in range(args.images):
-        
-        number_img = mnist.test.images[i]
-        number_gt  = mnist.test.labels[i]
-        # input-type inference-type
-        # uint8      uint8           no-convert
-        # uint8      float           convert
-        # float      uint8           NG
-        # float      float           no-convert
-        if args.quantization:
-            assert g.tensors[g.inputs[0]].type == 'UINT8',"-q {} but input {}".format(args.quantization, g.tensors[g.inputs[0]].type)
-            g.tensors[g.inputs[0]].set((255*number_img[np.newaxis,:]).astype(np.uint8))
-        else:
-            g.tensors[g.inputs[0]].set(number_img[np.newaxis,:].astype(np.float32))
-        y = g.invoke(verbose=False)
-        gt = np.argmax(number_gt)
-        pr = np.argmax(y)
-        if gt!=pr:
-            print("{:5d} incorrenct:gt-{} pr-{}".format(i,gt,pr))
-        else:
-            corrects+=1
-
-    print("accurracy %.3f %d/%d"%(1.0*corrects/args.images,corrects,args.images))
-
+    for i in g.inputs:
+        g.tensors[i].view(msg='<< graph inputs >>')
+    for no, i in enumerate(g.outputs):
+        if no==0: g.tensors[i].view(msg='<< graph outputs >>')
+        if no!=0: g.tensors[i].view()
