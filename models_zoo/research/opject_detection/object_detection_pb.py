@@ -83,7 +83,7 @@ def run_inference_for_single_image(image, graph):
       all_tensor_names = {output.name for op in ops for output in op.outputs}
       tensor_dict = {}
       for key in [
-          'MultipleGridAnchorGenerator/Identity',
+          'Postprocessor/ExpandDims',
           'concat','concat_1',
           'num_detections', 'detection_boxes', 'detection_scores',
           'detection_classes', 'detection_masks'
@@ -121,7 +121,7 @@ def run_inference_for_single_image(image, graph):
       output_dict['detection_scores'] = output_dict['detection_scores'][0]
       output_dict['pred'] = output_dict['concat']
       output_dict['conf'] = output_dict['concat_1']
-      output_dict['anch'] = output_dict['MultipleGridAnchorGenerator/Identity']
+      output_dict['anch'] = output_dict['Postprocessor/ExpandDims']
       if 'detection_masks' in output_dict:
         output_dict['detection_masks'] = output_dict['detection_masks'][0]
   return output_dict
@@ -143,12 +143,13 @@ for image_path in TEST_IMAGE_PATHS:
   output_dict = run_inference_for_single_image(image_np_expanded, detection_graph)
   c0=output_dict['pred']
   c1=output_dict['conf']
-  c2=output_dict['anch']
+  c2=output_dict['anch'][0]
   s1=softmax(c1[...,1:])
   idxs = np.where(s1>0.95)
+  set_trace()
   high_conf_regions = c0[0, idxs[1],]
   high_conf_classes = c1[0, idxs[1],]
-  high_conf_anchors = c2[   idxs[1],]
+  high_conf_anchors = np.clip(c2[idxs[1],],0., 1.)
   #                defaultBox_wh             * p_xy                      + defaultBox_xy
   gxy_pred = 0.1 * high_conf_anchors[...,2:] * high_conf_regions[...,:2] + high_conf_anchors[...,:2]
   #                defaultBox_wh             * np.exp( p_wh )
@@ -157,7 +158,7 @@ for image_path in TEST_IMAGE_PATHS:
   for j in idxs[1]:
       #xy = c0[0, j, :2]
       #wh = c0[0, j, 2:]
-      gx,gy,gw,gh = decode(j, c0, c2)
+      gx,gy,gw,gh = np.clip(decode(j, c0, c2),0.,1.)
       classid = np.argmax(s1[0,j])
       cx,cy,w,h = c2[j,]
       lx, ly, rx, ry = int(org_w*(cx-w/2.)), int(org_h*(cy-h/2.)), int(org_w*(cx+w/2.)), int(org_h*(cy+h/2.))
