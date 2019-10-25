@@ -4,6 +4,7 @@
 ## Download Model Zoo  
 
 Example is ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03.  
+Check [model zoo site](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md)  
 ```
  $ wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03.tar.gz
    http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03.tar.gz
