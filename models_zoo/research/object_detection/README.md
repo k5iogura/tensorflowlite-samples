@@ -29,6 +29,7 @@
 
 ## Appendex  
 [Use node_pb.py to check contents of graph file](./README_search_pbfile.md)  
+[Conversion Model Zoo to tflite file](./README_zoo_to_tflite.md)  
 
 **Oct.07, 2019**  
 
