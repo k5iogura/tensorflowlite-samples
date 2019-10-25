@@ -23,7 +23,49 @@ Example is ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03.
    model.ckpt.data-00000-of-00001  model.ckpt.index  model.ckpt.meta  pipeline.config  tflite_graph.pb  tflite_graph.pbtxt
 ```
 
-## Prepare tflite python directory to run node_tflite.py 
+## Run searching pb file via node_pb.py  
+
+```
+ $ ./node_pb.py ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03/tflite_graph.pb
+   PATH_TO_FROZEN_GRAPH:ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03/tflite_graph.pb
+   Traceback (most recent call last):
+     File "./node_pb.py", line 25, in <module>
+       tf.import_graph_def(od_graph_def, name='')
+     File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/util/deprecation.py", line 507, in new_func
+       return func(*args, **kwargs)
+     File "/usr/local/lib/python2.7/dist-packages/tensorflow/python/framework/importer.py", line 426, in import_graph_def
+       graph._c_graph, serialized, options)  # pylint: disable=protected-access
+   tensorflow.python.framework.errors_impl.NotFoundError:
+   Op type not registered 'TFLite_Detection_PostProcess' in binary running on ub1604lts-shima.
+   Make sure the Op and Kernel are registered in the binary running in this process.
+   Note that if you are loading a saved graph which used ops from tf.contrib,
+   accessing (e.g.) `tf.contrib.resampler` should be done before importing the graph, as contrib ops are lazily
+   registered when the module is first accessed.
+```
+Failed but don't mind, go to next step.  
+
+## Convert pb to tflite  
+
+Convert pb to tflite with --inference_type=QUANTIZED_UINT8.  
+To get correct tensor value via interpreter get_tensor() avoid to reuse local tensor memory area by specifying tensor name with --output_array option such as Squeeze, convert_socres that is input of TFLite_Detection_PostProcess tensor No. are 250, 259.  
+```
+ $ tflite_convert \
+--graph_def_file=ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03/tflite_graph.pb \
+--output_file=./foo.tflite \
+--output_format=TFLITE \
+--input_arrays=normalized_input_image_tensor \
+--input_shapes=1,300,300,3 \
+--inference_type=QUANTIZED_UINT8 \
+--mean_values=128 \
+--std_dev_values=128 \
+--output_arrays="TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3,Squeeze,convert_scores" \
+--allow_custom_ops
+
+ $ ls -lh foo.tflite
+   -rw-rw-r-- 1 hst20076433 hst20076433 5.9M 10月 25 12:29 foo.tflite
+```
+
+## Prepare tflite python directory and run searching tflite file via node_tfl.py 
 
 You can see contents of tflite file by node_tfl.py.  
 ```
@@ -133,25 +175,5 @@ You can see contents of tflite file by node_tfl.py.
    dest_tensor [259] UINT8 convert_scores   <= operator LOGST  97(code  4) = src [258]
    dest_tensor [252, 253, 254, 255] FLOAT32 TFLite_Detection_PostProcess <= operator CUSTM  98(code  6) = src [250, 259, 256]
    Allocatng Graph done.
-```
-
-## Convert pb to tflite  
-
-To get correct tensor value via interpreter get_tensor() avoid to reuse local tensor memory area by specifying tensor name with --output_array option such as Squeeze, convert_socres that is input of TFLite_Detection_PostProcess tensor No. are 250, 259.  
-```
- $ tflite_convert \
---graph_def_file=ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03/tflite_graph.pb \
---output_file=./foo.tflite \
---output_format=TFLITE \
---input_arrays=normalized_input_image_tensor \
---input_shapes=1,300,300,3 \
---inference_type=QUANTIZED_UINT8 \
---mean_values=128 \
---std_dev_values=128 \
---output_arrays="TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3,Squeeze,convert_scores" \
---allow_custom_ops
-
- $ ls -lh foo.tflite
-   -rw-rw-r-- 1 hst20076433 hst20076433 5.9M 10月 25 12:29 foo.tflite
 ```
 
