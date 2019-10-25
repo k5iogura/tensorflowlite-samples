@@ -23,7 +23,7 @@ Example is ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03.
    model.ckpt.data-00000-of-00001  model.ckpt.index  model.ckpt.meta  pipeline.config  tflite_graph.pb  tflite_graph.pbtxt
 ```
 
-## Run searching pb file via node_pb.py  
+## Check contents of pb file via node_pb.py  
 
 ```
  $ ./node_pb.py ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03/tflite_graph.pb
@@ -65,7 +65,7 @@ To get correct tensor value via interpreter get_tensor() avoid to reuse local te
    -rw-rw-r-- 1 hst20076433 hst20076433 5.9M 10月 25 12:29 foo.tflite
 ```
 
-## Prepare tflite python directory and run searching tflite file via node_tfl.py 
+## Prepare tflite python directory and check contents of tflite file via node_tfl.py 
 
 You can see contents of tflite file by node_tfl.py.  
 ```
