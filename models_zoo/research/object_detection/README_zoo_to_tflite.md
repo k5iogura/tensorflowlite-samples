@@ -52,7 +52,7 @@ To get correct tensor value via interpreter get_tensor() avoid to reuse local te
 ```
  $ tflite_convert \
 --graph_def_file=ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03/tflite_graph.pb \
---output_file=./foo.tflite \
+--output_file=./detect.tflite \
 --output_format=TFLITE \
 --input_arrays=normalized_input_image_tensor \
 --input_shapes=1,300,300,3 \
@@ -62,8 +62,8 @@ To get correct tensor value via interpreter get_tensor() avoid to reuse local te
 --output_arrays="TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3,Squeeze,convert_scores" \
 --allow_custom_ops
 
- $ ls -lh foo.tflite
-   -rw-rw-r-- 1 hst20076433 hst20076433 5.9M 10月 25 12:29 foo.tflite
+ $ ls -lh detect.tflite
+   -rw-rw-r-- 1 hst20076433 hst20076433 5.9M 10月 25 12:29 detect.tflite
 ```
 
 ## Prepare tflite python directory and check contents of tflite file via node_tfl.py 
@@ -73,7 +73,7 @@ You can see contents of tflite file by node_tfl.py.
  $ flatc --python schema_v3+MUL+MAXIMUM.fbs
  $ ls -d tflite/
    tflite
- $ ./node_tfl.py foo.tflite
+ $ ./node_tfl.py detect.tflite
    ...
    Allocatng Graph ..
    dest_tensor [61] UINT8 FeatureExtractor/MobilenetV2/Conv/Relu6 <= operator CONVD   0(code  2) = src [260, 62, 60]
@@ -178,3 +178,4 @@ You can see contents of tflite file by node_tfl.py.
    Allocatng Graph done.
 ```
 
+**Oct.25,2019**  
