@@ -14,8 +14,8 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 The [SSD Notebook](notebooks/ssd_notebook.ipynb) contains a minimal example of the SSD TensorFlow pipeline. Shortly, the detection is made of two main steps: running the SSD network on the image and post-processing the output using common algorithms (top-k filtering and Non-Maximum Suppression algorithm).
 
 Here are two examples of successful detection outputs:
-![](pictures/ex1.png "SSD anchors")
-![](pictures/ex2.png "SSD anchors")
+![](SSD-Tensorflow_files/ex1.png "SSD anchors")
+![](SSD-Tensorflow_files/ex2.png "SSD anchors")
 
 To run the notebook you first have to unzip the checkpoint files in ./checkpoint
 ```bash
