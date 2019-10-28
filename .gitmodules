@@ -1,3 +1,6 @@
 [submodule "tensorflow"]
 	path = tensorflow
 	url = https://github.com/tensorflow/tensorflow
+[submodule "SSD-Tensorflow"]
+	path = SSD-Tensorflow
+	url = https://github.com/balancap/SSD-Tensorflow
