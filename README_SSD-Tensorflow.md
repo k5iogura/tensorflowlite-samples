@@ -19,18 +19,24 @@ Here are two examples of successful detection outputs:
 
 To run the notebook you first have to unzip the checkpoint files in ./checkpoint
 ```bash
-unzip ssd_300_vgg.ckpt.zip
+ $ git submodule update init
+ $ cd SSD-Tensorflow/checkpoints
+ $ unzip ssd_300_vgg.ckpt.zip
+ $ cd ..
 ```
-and then start a jupyter notebook with
-```bash
-jupyter notebook notebooks/ssd_notebook.ipynb
+
+and then start a python via nbconvert notebook with  
 ```
-or  
-```
+  $ cd notenbooks
   $ jupyter nbconvert --to python ssd_notebook.ipynb 
     [NbConvertApp] Converting notebook ssd_notebook.ipynb to python
     [NbConvertApp] Writing 4183 bytes to ssd_notebook.py
-  $ python ssd_notebook.py
+
+  $ vi ssd_notebook.py
+  // comment out a get_ipython line 
+  // #get_ipython().run_line_magic('matplotlib', 'inline')
+  $ touch __init__.py
+  $ PYTHONPATH=../ python ssd_notebook.py
 ```
 ![](SSD-Tensorflow_files/dog_result.jpg)  
 
