@@ -9,6 +9,12 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 * networks: definition of SSD networks, and common encoding and decoding methods (we refer to the paper on this precise topic);
 * pre-processing: pre-processing and data augmentation routines, inspired by original VGG and Inception implementations.
 
+## Requirement to reproduce  
+- tensorflow(1.13.1)  
+- matplotlib(2.1.1)  
+- opencv2(4.1.1)  
+- jupyter(1.0.0 with python3)  
+
 ## SSD minimal example
 
 The [SSD Notebook](notebooks/ssd_notebook.ipynb) contains a minimal example of the SSD TensorFlow pipeline. Shortly, the detection is made of two main steps: running the SSD network on the image and post-processing the output using common algorithms (top-k filtering and Non-Maximum Suppression algorithm).
@@ -19,7 +25,7 @@ Here are two examples of successful detection outputs:
 
 To run the notebook you first have to unzip the checkpoint files in ./checkpoint
 ```bash
- $ git submodule update init
+ $ git submodule update --init
  $ cd SSD-Tensorflow/checkpoints
  $ unzip ssd_300_vgg.ckpt.zip
  $ cd ..
