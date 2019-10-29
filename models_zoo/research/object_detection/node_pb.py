@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pdb import set_trace
+#from pdb import set_trace
 import numpy as np
 import sys,os
 import tensorflow as tf
@@ -43,6 +43,8 @@ class graph():
             for o in ops: o.inputs_idx  = [ self.tensor_names.index(t.name) for t in o.inputs ]
 
             self.output_tensors     = list({ i for i in ( self.all_output_tensors - self.all_input_tensors ) if ':0' in i.name and '/' not in i.name })
+            if len(self.output_tensors)==0:
+                self.output_tensors     = list({ i for i in ( self.all_output_tensors - self.all_input_tensors ) if ':0' in i.name})
             self.outputs_idx        = [ self.tensors.index(i) for i in self.output_tensors ]
             self.outputs_name       = [ self.tensors[o].name  for o in self.outputs_idx    ]
 
