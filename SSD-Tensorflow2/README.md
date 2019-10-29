@@ -44,7 +44,7 @@ and then start a python via nbconvert notebook with
   $ touch __init__.py
   $ PYTHONPATH=../ python ssd_notebook.py
 ```
-![](SSD-Tensorflow_files/dog_result.jpg)  
+![](../SSD-Tensorflow_files/dog_result.jpg)  
 
 ## Datasets
 
