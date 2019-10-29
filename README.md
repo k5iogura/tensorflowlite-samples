@@ -7,7 +7,7 @@
 ## [mnist train and saving model example](https://github.com/k5iogura/tensorflowlite-samples/tree/master/mnist_train_saving)  
 ## [chainer2tflite](chainer2tflite/example/mnist/README.md)  
 ## [## [TensorFlow Lite Interpreter get_tensor() #23384](./README_get_tensor.md)
-## [SSD-Tensorflow](README_SSD-Tensorflow.md)  
+## [SSD-Tensorflow](SSD-Tensorflow2/README.md)  
 
 ## On rock64 requesties
 python-pip python3pip  
