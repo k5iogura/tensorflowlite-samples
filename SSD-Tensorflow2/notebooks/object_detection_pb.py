@@ -47,14 +47,6 @@ PATH_TO_FROZEN_GRAPH = MODEL_NAME + '/ssd_net_frozen.pb'
 # List of the strings that is used to add correct label for each box.
 PATH_TO_LABELS = os.path.join('object_detection/data', 'mscoco_label_map.pbtxt')
 
-#opener = urllib.request.URLopener()
-#opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, MODEL_FILE)
-#tar_file = tarfile.open(MODEL_FILE)
-#for file in tar_file.getmembers():
-#  file_name = os.path.basename(file.name)
-#  if 'frozen_inference_graph.pb' in file_name:
-#    tar_file.extract(file, os.getcwd())
-
 detection_graph = tf.Graph()
 with detection_graph.as_default():
   od_graph_def = tf.GraphDef()
@@ -71,17 +63,17 @@ def load_image_into_numpy_array(image):
   return np.array(image.getdata()).reshape(
       (im_height, im_width, 3)).astype(np.uint8)
 
-# For the sake of simplicity we will use only 2 images:
-# image1.jpg
-# image2.jpg
-# If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
 PATH_TO_TEST_IMAGES_DIR = '../demo/*.jpg'
 TEST_IMAGE_PATHS = glob(PATH_TO_TEST_IMAGES_DIR)
 
 # Size, in inches, of the output images.
 IMAGE_SIZE = (12, 8)
 
-
+# Generates anchors
+from nets import ssd_vgg_300
+ssd_net = ssd_vgg_300.SSDNet()
+net_shape = (300, 300)
+ssd_anchors = ssd_net.anchors(net_shape) # anchors function includes only numpy
 
 def run_inference_for_single_image(image, graph):
   with graph.as_default():
@@ -113,6 +105,7 @@ def run_inference_for_single_image(image, graph):
       # Run inference
       output_dict = sess.run(tensor_dict,
                              feed_dict={image_tensor: image})
+      # Select class proposals via prediction confidence
       n_classes = len(class_names)
       n_boxdims = 4
       pred_conf = np.concatenate(
@@ -123,10 +116,13 @@ def run_inference_for_single_image(image, graph):
           np.reshape(output_dict[ "ssd_300_vgg/softmax_4/Reshape_1"][0],(-1,n_classes)),
           np.reshape(output_dict[ "ssd_300_vgg/softmax_5/Reshape_1"][0],(-1,n_classes))],
           axis=0)
-      ij = np.where(pred_conf[:,1:]>0.95)
+      flag_background = 1    # which infer image background or not
+      conf_threshold  = 0.95
+      ij = np.where(pred_conf[:,flag_background:]>conf_threshold)
       prop_classid = np.argmax(pred_conf[ij[0]],axis=1)
-      prop_names   = [class_names[i] for i in prop_classid]
+      prop_names   = {class_names[i] for i in prop_classid}
 
+      # Select hat G proposals via prediction confidence
       pred_hatgs = np.concatenate(
           [np.reshape(output_dict["ssd_300_vgg/block4_box/Reshape" ][0],(-1,n_boxdims)),
           np.reshape(output_dict[ "ssd_300_vgg/block7_box/Reshape" ][0],(-1,n_boxdims)),
@@ -137,6 +133,7 @@ def run_inference_for_single_image(image, graph):
           axis=0)
       prop_hatgs = pred_hatgs[ij[0]]
       set_trace()
+
       # all outputs are float32 numpy arrays, so convert types as appropriate
       output_dict['num_detections'] = int(output_dict['num_detections'][0])
       output_dict['detection_classes'] = output_dict[
