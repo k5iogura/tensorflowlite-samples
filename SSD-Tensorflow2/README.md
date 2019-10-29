@@ -25,13 +25,18 @@ Here are two examples of successful detection outputs:
 
 To run the notebook you first have to unzip the checkpoint files in ./checkpoint
 ```bash
- $ git submodule update --init
- $ cd SSD-Tensorflow/checkpoints
+ $ cd SSD-Tensorflow2/checkpoints
  $ unzip ssd_300_vgg.ckpt.zip
  $ cd ..
 ```
 
-and then start a python via nbconvert notebook with  
+and then run python to inference object    
+```
+  $ PYTHONPATH=../ python ssd_notebook.py
+```
+
+or convert juupyter to python via nbconvert notebook then run it  
+
 ```
   $ cd notenbooks
   $ jupyter nbconvert --to python ssd_notebook.ipynb 
@@ -43,7 +48,7 @@ and then start a python via nbconvert notebook with
   // #get_ipython().run_line_magic('matplotlib', 'inline')
   $ touch __init__.py
   $ PYTHONPATH=../ python ssd_notebook.py
-```
+```  
 ![](../SSD-Tensorflow_files/dog_result.jpg)  
 
 ## Datasets
