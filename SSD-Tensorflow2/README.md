@@ -57,12 +57,20 @@ ssd_notebook.py generates also *frozen protobuf 'ssd_net_frozen.pb'*
    ssd_net_frozen.pb
 ```
 
-infer objects with ssd_net_frozen.pb
+infer objects with ssd_net_frozen.pb.  
 ```
  $ python object_detection_pb.py
 ```
+Each class has a random color and without nms(Non Maximum Suppression) function.  
+can modify it to try any own post-processing methods.  
+
 ## View points  
 ### anchors data format which must be same at training and inference  
+
+|tuple No.| CenterY | CenterX | Height | Width |
+|        -|        -|        -|       -|      -|
+|        0|38,38,1  |38,38,1  |4       |4      |
+
 ### variance values for loss function which must be same at training and inference  
 
 ## Datasets
