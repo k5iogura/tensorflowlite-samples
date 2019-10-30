@@ -17,7 +17,7 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 
 ## SSD minimal example to infer only  
 
-The [SSD Notebook](notebooks/ssd_notebook.ipynb) contains a minimal example of the SSD TensorFlow pipeline. Shortly, the detection is made of two main steps: running the SSD network on the image and post-processing the output using common algorithms (top-k filtering and Non-Maximum Suppression algorithm).
+The [SSD Notebook](notebooks/ssd_notebook.ipynb) and python version [ssd_notebook.py](notebook/ssd_notebook.py) contains a minimal example of the SSD TensorFlow pipeline. Shortly, the detection is made of two main steps: running the SSD network on the image and post-processing the output using common algorithms (top-k filtering and Non-Maximum Suppression algorithm).
 
 Here are two examples of successful detection outputs:
 ![](../SSD-Tensorflow_files/ex1.png "SSD anchors")
