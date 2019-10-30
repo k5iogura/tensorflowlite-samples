@@ -62,8 +62,8 @@ infer objects with ssd_net_frozen.pb
  $ python object_detection_pb.py
 ```
 ## View points  
-### anchors data format  
-### variance values for loss function  
+### anchors data format which must be same at training and inference  
+### variance values for loss function which must be same at training and inference  
 
 ## Datasets
 
