@@ -67,9 +67,9 @@ can modify it to try any own post-processing methods.
 ## View points  
 ### anchors data format which must be same at training and inference  
 
-|tuple No.| CenterY | CenterX | Height | Width |                               |
+|tuple No.| CenterY | CenterX | Height | Width |memo                           |
 |      :-:|      :-:|      :-:|     :-:|    :-:|:-                             |
-|         |        0|        1|       2|      3|generator layer                |
+|         |        0|        1|       2|      3|                               |
 |        0|38, 38, 1|38, 38, 1|4       |4      |ssd_300_vgg/block4_box/Reshape |
 |        1|19, 19, 1|19, 19, 1|6       |6      |ssd_300_vgg/block7_box/Reshape |
 |        2|10, 10, 1|10, 10, 1|6       |6      |ssd_300_vgg/block8_box/Reshape |
