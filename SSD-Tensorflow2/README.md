@@ -23,7 +23,7 @@ Here are two examples of successful detection outputs:
 ![](../SSD-Tensorflow_files/ex1.png "SSD anchors")
 ![](../SSD-Tensorflow_files/ex2.png "SSD anchors")
 
-To run the notebook you first have to unzip the checkpoint files in ./checkpoint
+To run python scripts you first have to unzip the checkpoint files in ./checkpoint
 ```bash
  $ cd SSD-Tensorflow2/checkpoints
  $ unzip ssd_300_vgg.ckpt.zip
