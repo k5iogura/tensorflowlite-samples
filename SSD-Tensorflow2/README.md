@@ -67,7 +67,8 @@ can modify it to try any own post-processing methods.
 ## View points  
 ### anchors data format which must be same at training and inference  
 
-|         | 0 1 2 3 |  
+|   X     | 0 1 2 3 |  
+|-        |-        |
 |tuple No.| CenterY | CenterX | Height | Width |
 |      :-:|      :-:|      :-:|     :-:|    :-:|
 |        0|38, 38, 1|38, 38, 1|4       |4      |
