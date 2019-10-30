@@ -15,7 +15,7 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 - opencv2(4.1.1)  
 - jupyter(1.0.0 with python3)  
 
-## SSD minimal example
+## SSD minimal example to infer only  
 
 The [SSD Notebook](notebooks/ssd_notebook.ipynb) contains a minimal example of the SSD TensorFlow pipeline. Shortly, the detection is made of two main steps: running the SSD network on the image and post-processing the output using common algorithms (top-k filtering and Non-Maximum Suppression algorithm).
 
@@ -30,12 +30,12 @@ To run the notebook you first have to unzip the checkpoint files in ./checkpoint
  $ cd ..
 ```
 
-and then run python to inference object    
+and then run python to inference object without jupyter    
 ```
   $ PYTHONPATH=../ python ssd_notebook.py
 ```
 
-or convert juupyter to python via nbconvert notebook then run it  
+or convert jupyter file to python via nbconvert notebook then run it  
 
 ```
   $ cd notenbooks
@@ -50,6 +50,20 @@ or convert juupyter to python via nbconvert notebook then run it
   $ PYTHONPATH=../ python ssd_notebook.py
 ```  
 ![](../SSD-Tensorflow_files/dog_result.jpg)  
+
+ssd_notebook.py generates also *frozen protobuf 'ssd_net_frozen.pb'*  
+```
+ $ ls *.pb
+   ssd_net_frozen.pb
+```
+
+infer objects with ssd_net_frozen.pb
+```
+ $ python object_detection_pb.py
+```
+## View points  
+### anchors data format  
+### variance values for loss function  
 
 ## Datasets
 
