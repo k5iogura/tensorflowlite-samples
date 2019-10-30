@@ -68,8 +68,8 @@ can modify it to try any own post-processing methods.
 ### anchors data format which must be same at training and inference  
 
 |tuple No.| CenterY | CenterX | Height | Width |
-|tuple No.| CenterY | CenterX | Height | Width |
 |      :-:|      :-:|      :-:|     :-:|    :-:|
+|         |        0|        1|       2|      3|
 |        0|38, 38, 1|38, 38, 1|4       |4      |
 |        1|19, 19, 1|19, 19, 1|6       |6      |
 |        2|10, 10, 1|10, 10, 1|6       |6      |
