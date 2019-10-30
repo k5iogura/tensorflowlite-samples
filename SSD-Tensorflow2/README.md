@@ -64,7 +64,7 @@ infer objects with ssd_net_frozen.pb.
 Each class has a random color and without nms(Non Maximum Suppression) function.  
 can modify it to try any own post-processing methods.  
 
-## View points  
+## Notice points on training and inferece methods   
 ### anchors data format which must be same at training and inference  
 
 |             | CenterY | CenterX | Height | Width |memo                                           |
