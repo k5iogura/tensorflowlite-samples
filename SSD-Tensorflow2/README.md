@@ -69,7 +69,14 @@ can modify it to try any own post-processing methods.
 
 |tuple No.| CenterY | CenterX | Height | Width |
 |        -|        -|        -|       -|      -|
-|        0|38,38,1  |38,38,1  |4       |4      |
+|        0|38, 38, 1|38, 38, 1|4       |4      |
+|        1|19, 19, 1|19, 19, 1|6       |6      |
+|        2|10, 10, 1|10, 10, 1|6       |6      |
+|        3| 5,  5, 1| 5,  5, 1|6       |6      |
+|        4| 3,  3, 1| 3,  3, 1|4       |4      |
+|        5| 1,  1, 1| 1,  1, 1|4       |4      |  
+
+Here, **38x38x4 + 19x19x6 + 10x10x6 + 5x5x6 + 3x3x4 + 1x1x4 = 8732** default boxes.  
 
 ### variance values for loss function which must be same at training and inference  
 
