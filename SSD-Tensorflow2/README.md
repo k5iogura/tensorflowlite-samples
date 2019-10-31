@@ -64,8 +64,8 @@ infer objects with ssd_net_frozen.pb.
  $ python object_detection_pb.py
 ```
 
-### inference via tflite(flatbuffer) made by tflite_convert command.  
-To infer with tflite format,  
+### inference via tflite(flatbuffers) made by tflite_convert command.  
+To infer with tflite file that has float type of input and inference.  
 ```
   $ tflite_convert \
 --graph_def_file=ssd_net_frozen.pb \
