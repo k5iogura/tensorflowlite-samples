@@ -23,6 +23,7 @@ Here are two examples of successful detection outputs:
 ![](../SSD-Tensorflow_files/ex1.png "SSD anchors")
 ![](../SSD-Tensorflow_files/ex2.png "SSD anchors")
 
+### inference via pretrained ckpt files  
 To run python scripts you first have to unzip the checkpoint files in ./checkpoint
 ```bash
  $ cd SSD-Tensorflow2/checkpoints
@@ -51,6 +52,7 @@ if you want to know how to make ssd_notebook.py from ssd_notebook.ipynb, followi
 ```  
 ![](../SSD-Tensorflow_files/dog_result.jpg)  
 
+### inference via protocol buffer file made by ssd_notebook.py.  
 ssd_notebook.py generates also *frozen protobuf 'ssd_net_frozen.pb'*  
 ```
  $ ls *.pb
@@ -62,6 +64,7 @@ infer objects with ssd_net_frozen.pb.
  $ python object_detection_pb.py
 ```
 
+### inference via tflite(flatbuffer) made by tflite_convert command.  
 To infer with tflite format,  
 ```
   $ tflite_convert \
