@@ -84,7 +84,7 @@ To infer with tflite format,
 
  $ PYTHONPATH=.. python object_detection_tfl.py
 ```
-![](SSD-Tensorflow_files/dog_result_no_nms.jpg)  
+![](../SSD-Tensorflow_files/dog_result_no_nms.jpg)  
 
 Each class has a random color and without nms(Non Maximum Suppression) function.  
 You can modify it to try any own post-processing methods.  
