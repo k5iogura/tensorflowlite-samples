@@ -9,7 +9,7 @@ fi
 if [ ${CASE} -eq 1 ];then
 
 tflite_convert \
---output_file abc.tflite \
+--output_file detect.tflite \
 --graph_def_file ssd_net_frozen.pb \
 --inference_type QUANTIZED_UINT8 \
 --std_dev_values 1 \
