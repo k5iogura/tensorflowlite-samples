@@ -34,7 +34,7 @@ print("input image size:",org.shape)
 #LABELS = LABELS[ background: ]
 #print("Classes:",len(LABELS))
 
-ip = tf.Interpreter(model_path="./abc.tflite")
+ip = tf.Interpreter(model_path="./detect.tflite")
 ip.allocate_tensors()
 
 infoi=ip.get_input_details()
