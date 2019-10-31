@@ -125,7 +125,7 @@ def run_inference_for_single_image(image, anchors, graph):
             np.reshape(output_dict[ "ssd_300_vgg/softmax_5/Reshape_1"][0],(-1,n_classes))],
             axis=0)
         flag_background = 1    # which infer image background or not
-        conf_threshold  = 0.80
+        conf_threshold  = 0.70
         ij = np.where(pred_conf[:,flag_background:]>conf_threshold)
         prop_classid = np.argmax(pred_conf[ij[0]],axis=1) # prop_classid.shape (8732,21)
         prop_names   = {class_names[i] for i in prop_classid}
