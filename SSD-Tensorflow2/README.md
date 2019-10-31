@@ -10,14 +10,14 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 * pre-processing: pre-processing and data augmentation routines, inspired by original VGG and Inception implementations.
 
 ## Requirement to reproduce  
-- tensorflow(1.13.1) [Nightly version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)  
+- tensorflow(1.13.1) [Community version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)  
 - matplotlib(2.1.1)  
 - opencv2(4.1.1)  
 - jupyter(1.0.0 with python3)  
 
 ## SSD minimal example to infer only  
 
-The [SSD Notebook](notebooks/ssd_notebook.ipynb) and python version [ssd_notebook.py](notebook/ssd_notebook.py) contains a minimal example of the SSD TensorFlow pipeline. Shortly, the detection is made of two main steps: running the SSD network on the image and post-processing the output using common algorithms (top-k filtering and Non-Maximum Suppression algorithm).
+The [SSD Notebook](notebooks/ssd_notebook.ipynb) and its python version [ssd_notebook.py](notebook/ssd_notebook.py) contains a minimal example of the SSD TensorFlow pipeline. Shortly, the detection is made of two main steps: running the SSD network on the image and post-processing the output using common algorithms (top-k filtering and Non-Maximum Suppression algorithm).
 
 Here are two examples of successful detection outputs:
 ![](../SSD-Tensorflow_files/ex1.png "SSD anchors")
@@ -35,7 +35,7 @@ and then run python to inference object without jupyter
   $ PYTHONPATH=../ python ssd_notebook.py
 ```
 
-or convert jupyter file to python via nbconvert notebook then run it  
+if you want to know how to make ssd_notebook.py from ssd_notebook.ipynb, following below,  
 
 ```
   $ cd notenbooks
@@ -62,9 +62,13 @@ infer objects with ssd_net_frozen.pb.
  $ python object_detection_pb.py
 ```
 Each class has a random color and without nms(Non Maximum Suppression) function.  
-can modify it to try any own post-processing methods.  
+You can modify it to try any own post-processing methods.  
 
-## Notice points on training and inferece methods   
+## Notice points on training and inferece methods  
+
+*Can decode the outputs of SSD network without knowing of its structure?*  
+*No!* because to decode outputs you need **information of anchors and two varience values for loss function** at training.  
+
 ### anchors data format which must be same at training and inference  
 
 |             | CenterY | CenterX | Height | Width |memo                                           |
@@ -80,6 +84,9 @@ can modify it to try any own post-processing methods.
 Here, **38x38x4 + 19x19x6 + 10x10x6 + 5x5x6 + 3x3x4 + 1x1x4 = 8732** default boxes.  
 
 ### variance values for loss function which must be same at training and inference  
+*varience of location loss: 0.1*  
+*varience of size loss: 0.2*  
+This is magic number but maybe knowledge of experience for SSD Training.  
 
 ## Datasets
 
