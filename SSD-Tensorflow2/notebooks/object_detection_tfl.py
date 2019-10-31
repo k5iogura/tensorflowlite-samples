@@ -28,11 +28,11 @@ img = cv2.resize(org, (300,300))
 img = img.astype(np.float32)
 print("input image size:",org.shape)
 
-with open('labelmap.txt') as f: LABELS = f.readlines()
-LABELS = [ l.strip() for l in LABELS ]
-background = 1
-LABELS = LABELS[ background: ]
-print("Classes:",len(LABELS))
+#with open('labelmap.txt') as f: LABELS = f.readlines()
+#LABELS = [ l.strip() for l in LABELS ]
+#background = 1
+#LABELS = LABELS[ background: ]
+#print("Classes:",len(LABELS))
 
 ip = tf.Interpreter(model_path="./abc.tflite")
 ip.allocate_tensors()
@@ -127,11 +127,15 @@ for i in range(Ndets):
     (left, top, right, bottom) = int(org_w * (gx-gw/2.)), int(org_h * (gy-gh/2.)), int(org_w * (gx+gw/2.)), int(org_h * (gy+gh/2.))
     class_id    = classes[i]
     #set_trace()
-    print("%.3f(%.3d %.3d %.3d %.3d) %d"%(score,top,left,bottom,right,class_id))
-    label_txt = "%d-%s"%(class_id,LABELS[class_id])
-    cv2.rectangle(org,(left,top),(right,bottom),(255,255,255),1)
-    #cv2.putText(org,label_txt,tl,cv2.FONT_HERSHEY_SIMPLEX,1.0,(255,255,255),2)
+    label_txt = "%d-%s"%(class_id,class_names[class_id])
+    print("%.3f(%.3d %.3d %.3d %.3d) %d %s"%(score,top,left,bottom,right,class_id,label_txt))
+    cv2.rectangle(org,(left,top),(right,bottom),class_color[class_id],1)
+    cv2.putText(org,label_txt,(left,top),cv2.FONT_HERSHEY_SIMPLEX,0.5,class_color[class_id],1)
 assert cv2.imwrite("result.jpg",org)
+cv2.imshow('SSD',org)
+while True:
+    k = cv2.waitKey(10)
+    if k==27:sys.exit(-1)
 
 # For Debug
 def view(idx):
