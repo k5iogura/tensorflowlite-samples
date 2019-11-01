@@ -115,7 +115,7 @@ Here, **38x38x4 + 19x19x6 + 10x10x6 + 5x5x6 + 3x3x4 + 1x1x4 = 8732** default box
 ### variance values for loss function which must be same at training and inference  
 *varience of location loss: 0.1*  
 *varience of size loss: 0.2*  
-This is magic number but maybe knowledge of experience for SSD Training.  
+These are two magic numbers but maybe derived via knowledge of experience for SSD Training.  
 
 ## Datasets
 
