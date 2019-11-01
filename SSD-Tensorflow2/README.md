@@ -256,4 +256,4 @@ python train_ssd_network.py \
     --batch_size=32
 ```
 
-A number of pre-trained weights of popular deep architectures can be found on [TF-Slim models page](https://github.com/tensorflow/models/tree/master/slim).
+A number of pre-trained weights of popular deep architectures can be found on [TF-Slim models page](https://github.com/tensorflow/models/tree/master/research/slim).
