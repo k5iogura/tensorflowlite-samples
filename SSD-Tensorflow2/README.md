@@ -14,6 +14,7 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 * pre-processing: pre-processing and data augmentation routines, inspired by original VGG and Inception implementations.
 
 ## Requirement to reproduce  
+- python 2.7.12
 - tensorflow(1.13.1) [Community version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)  
 - matplotlib(2.1.1)  
 - opencv2(4.1.1)  
