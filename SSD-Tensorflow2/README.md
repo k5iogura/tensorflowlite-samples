@@ -1,5 +1,5 @@
 # SSD: Single Shot MultiBox Detector in TensorFlow
------------------
+
 *This is modified [Original SSD-Tensorflow](https://github.com/balancap/SSD-Tensorflow/) site to reproduce.*  
 *The Explanation for SSD VGG network is spellouted very well on same author's anothor site [here](https://github.com/balancap/SDC-Vehicle-Detection). It is very helpfull.*  
 ------------------
