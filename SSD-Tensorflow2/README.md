@@ -125,12 +125,13 @@ These are two magic numbers but maybe derived via knowledge of experience for SS
 
 The current version only supports Pascal VOC datasets (2007 and 2012). In order to be used for training a SSD model, the former need to be converted to TF-Records using the `tf_convert_data.py` script:
 ```bash
-DATASET_DIR=./VOC2007/test/
+mkdir ./tfrecords
+DATASET_DIR=./VOCdevkit/VOC2007/
 OUTPUT_DIR=./tfrecords
 python tf_convert_data.py \
     --dataset_name=pascalvoc \
     --dataset_dir=${DATASET_DIR} \
-    --output_name=voc_2007_train \
+    --output_name=voc_2007_test \
     --output_dir=${OUTPUT_DIR}
 ```
 Note the previous command generated a collection of TF-Records instead of a single file in order to ease shuffling during training.
@@ -149,11 +150,12 @@ We are working hard at reproducing the same performance as the original [Caffe i
 
 After downloading and extracting the previous checkpoints, the evaluation metrics should be reproducible by running the following command:
 ```bash
+mkdir ./logs
 EVAL_DIR=./logs/
 CHECKPOINT_PATH=./checkpoints/VGG_VOC0712_SSD_300x300_ft_iter_120000.ckpt
 python eval_ssd_network.py \
     --eval_dir=${EVAL_DIR} \
-    --dataset_dir=${DATASET_DIR} \
+    --dataset_dir=${OUTPUT_DIR} \
     --dataset_name=pascalvoc_2007 \
     --dataset_split_name=test \
     --model_name=ssd_300_vgg \
