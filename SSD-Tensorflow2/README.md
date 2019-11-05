@@ -164,6 +164,14 @@ python eval_ssd_network.py \
 ```
 The evaluation script provides estimates on the recall-precision curve and compute the mAP metrics following the Pascal VOC 2007 and 2012 guidelines.
 
+```
+...
+AP_VOC07/mAP[0.74313211395020939]
+AP_VOC12/mAP[0.76659678523265873]
+I1105 01:14:30.333214 140431879247616 evaluation.py:275] Finished evaluation at 2019-11-05-01:14:30
+```
+Notice: *We fitted with tensorflow version 1.13.1(or 1.15.0) following [issue#321](https://github.com/balancap/SSD-Tensorflow/issues/321). In the issue#321 shows how to use eval_ssd_network.py and tf_extend/metrics.py with 1.13rc1. We made eval_ssd_network.py and tf_extend/metrics.py to fit with isseu#321.  
+
 In addition, if one wants to experiment/test a different Caffe SSD checkpoint, the former can be converted to TensorFlow checkpoints as following:
 ```sh
 CAFFE_MODEL=./ckpts/SSD_300x300_ft_VOC0712/VGG_VOC0712_SSD_300x300_ft_iter_120000.caffemodel
