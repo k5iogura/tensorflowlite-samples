@@ -150,12 +150,13 @@ We are working hard at reproducing the same performance as the original [Caffe i
 
 After downloading and extracting the previous checkpoints, the evaluation metrics should be reproducible by running the following command:
 ```bash
+DATASET_DIR=./tfrecords
 mkdir ./logs
 EVAL_DIR=./logs/
 CHECKPOINT_PATH=./checkpoints/VGG_VOC0712_SSD_300x300_ft_iter_120000.ckpt
 python eval_ssd_network.py \
     --eval_dir=${EVAL_DIR} \
-    --dataset_dir=${OUTPUT_DIR} \
+    --dataset_dir=${DATASET_DIR} \
     --dataset_name=pascalvoc_2007 \
     --dataset_split_name=test \
     --model_name=ssd_300_vgg \
@@ -166,11 +167,11 @@ The evaluation script provides estimates on the recall-precision curve and compu
 
 ```
 ...
-AP_VOC07/mAP[0.74313211395020939]
-AP_VOC12/mAP[0.76659678523265873]
+AP_VOC07/mAP[0.74313211395020939]  // eval with 2007 guildline
+AP_VOC12/mAP[0.76659678523265873]  // eval with 2012 guildline
 I1105 01:14:30.333214 140431879247616 evaluation.py:275] Finished evaluation at 2019-11-05-01:14:30
 ```
-Notice: *We fitted with tensorflow version 1.13.1(or 1.15.0) following [issue#321](https://github.com/balancap/SSD-Tensorflow/issues/321). In the issue#321 shows how to use eval_ssd_network.py and tf_extend/metrics.py with 1.13rc1. We made eval_ssd_network.py and tf_extend/metrics.py to fit with isseu#321.  
+Notice: *We fitted with tensorflow version 1.13.1(or 1.15.0) following [issue#321](https://github.com/balancap/SSD-Tensorflow/issues/321). In the issue#321 shows how to modify eval_ssd_network.py and tf_extend/metrics.py with 1.13rc1. We made eval_ssd_network.py and tf_extend/metrics.py to fit with our tensorflow versions.  
 
 In addition, if one wants to experiment/test a different Caffe SSD checkpoint, the former can be converted to TensorFlow checkpoints as following:
 ```sh
