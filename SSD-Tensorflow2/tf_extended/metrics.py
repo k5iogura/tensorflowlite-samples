@@ -48,7 +48,8 @@ def _create_local(name, shape, collections=None, validate_shape=True,
     # Make sure local variables are added to tf.GraphKeys.LOCAL_VARIABLES
     collections = list(collections or [])
     collections += [ops.GraphKeys.LOCAL_VARIABLES]
-    return variables.Variable(
+    # return variables.Variable( # for tensorflow 1.12 or 0.xx?
+    return variables.VariableV1(
             initial_value=array_ops.zeros(shape, dtype=dtype),
             name=name,
             trainable=False,
