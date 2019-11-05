@@ -171,7 +171,7 @@ AP_VOC07/mAP[0.74313211395020939]  // eval with 2007 guildline
 AP_VOC12/mAP[0.76659678523265873]  // eval with 2012 guildline
 I1105 01:14:30.333214 140431879247616 evaluation.py:275] Finished evaluation at 2019-11-05-01:14:30
 ```
-Notice: *We fitted with tensorflow version 1.13.1(or 1.15.0) following [issue#321](https://github.com/balancap/SSD-Tensorflow/issues/321). In the issue#321 shows how to modify eval_ssd_network.py and tf_extend/metrics.py with 1.13rc1. We made eval_ssd_network.py and tf_extend/metrics.py to fit with our tensorflow versions.  
+Notice: *We fitted with tensorflow version 1.13.1(or 1.15.0) following [issue#321](https://github.com/balancap/SSD-Tensorflow/issues/321). In the issue#321 shows how to modify eval_ssd_network.py and tf_extend/metrics.py with 1.13rc1. We made eval_ssd_network.py and tf_extend/metrics.py to fit with our tensorflow versions.*  
 
 In addition, if one wants to experiment/test a different Caffe SSD checkpoint, the former can be converted to TensorFlow checkpoints as following:
 ```sh
