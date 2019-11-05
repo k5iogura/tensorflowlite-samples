@@ -137,7 +137,7 @@ python tf_convert_data.py \
 Note the previous command generated a collection of TF-Records instead of a single file in order to ease shuffling during training.
 
 ## Evaluation on Pascal VOC 2007
-
+### Below needs fast PC or GPU  
 The present TensorFlow implementation of SSD models have the following performances:
 
 | Model | Training data  | Testing data | mAP | FPS  |
