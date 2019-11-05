@@ -1,5 +1,9 @@
 # SSD: Single Shot MultiBox Detector in TensorFlow
 
+*This is modified [Original SSD-Tensorflow](https://github.com/balancap/SSD-Tensorflow/) site to reproduce.*  
+*The Explanation for SSD VGG network is spellouted very well on same author's anothor site [here](https://github.com/balancap/SDC-Vehicle-Detection). It is very helpfull.*  
+------------------
+
 SSD is an unified framework for object detection with a single network. It has been originally introduced in this research [article](http://arxiv.org/abs/1512.02325).
 
 This repository contains a TensorFlow re-implementation of the original [Caffe code](https://github.com/weiliu89/caffe/tree/ssd). At present, it only implements VGG-based SSD networks (with 300 and 512 inputs), but the architecture of the project is modular, and should make easy the implementation and training of other SSD variants (ResNet or Inception based for instance). Present TF checkpoints have been directly converted from SSD Caffe models.
@@ -10,6 +14,7 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 * pre-processing: pre-processing and data augmentation routines, inspired by original VGG and Inception implementations.
 
 ## Requirement to reproduce  
+- python(2.7.12)  
 - tensorflow(1.13.1) [Community version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)  
 - matplotlib(2.1.1)  
 - opencv2(4.1.1)  
@@ -23,6 +28,7 @@ Here are two examples of successful detection outputs:
 ![](../SSD-Tensorflow_files/ex1.png "SSD anchors")
 ![](../SSD-Tensorflow_files/ex2.png "SSD anchors")
 
+### inference via pretrained ckpt files  
 To run python scripts you first have to unzip the checkpoint files in ./checkpoint
 ```bash
  $ cd SSD-Tensorflow2/checkpoints
@@ -51,6 +57,7 @@ if you want to know how to make ssd_notebook.py from ssd_notebook.ipynb, followi
 ```  
 ![](../SSD-Tensorflow_files/dog_result.jpg)  
 
+### inference via protocol buffer file made by ssd_notebook.py.  
 ssd_notebook.py generates also *frozen protobuf 'ssd_net_frozen.pb'*  
 ```
  $ ls *.pb
@@ -62,7 +69,8 @@ infer objects with ssd_net_frozen.pb.
  $ python object_detection_pb.py
 ```
 
-To infer with tflite format,  
+### inference via tflite(flatbuffers) made by tflite_convert command.  
+To infer with tflite file that has float type of input and inference.  
 ```
   $ tflite_convert \
 --graph_def_file=ssd_net_frozen.pb \
@@ -111,24 +119,24 @@ Here, **38x38x4 + 19x19x6 + 10x10x6 + 5x5x6 + 3x3x4 + 1x1x4 = 8732** default box
 ### variance values for loss function which must be same at training and inference  
 *varience of location loss: 0.1*  
 *varience of size loss: 0.2*  
-This is magic number but maybe knowledge of experience for SSD Training.  
+These are two magic numbers but maybe derived via knowledge of experience for SSD Training.  
 
 ## Datasets
 
 The current version only supports Pascal VOC datasets (2007 and 2012). In order to be used for training a SSD model, the former need to be converted to TF-Records using the `tf_convert_data.py` script:
 ```bash
-DATASET_DIR=./VOC2007/test/
-OUTPUT_DIR=./tfrecords
-python tf_convert_data.py \
+ // After download VOCtest_06-Nov-2007.tar and untar
+ $ mkdir ./tfrecords
+ $ export DATASET_DIR=./VOCdevkit/VOC2007/
+ $ python tf_convert_data.py \
     --dataset_name=pascalvoc \
     --dataset_dir=${DATASET_DIR} \
-    --output_name=voc_2007_train \
-    --output_dir=${OUTPUT_DIR}
+    --output_name=voc_2007_test \
+    --output_dir=./tfrecords
 ```
 Note the previous command generated a collection of TF-Records instead of a single file in order to ease shuffling during training.
 
-## Evaluation on Pascal VOC 2007
-
+## Evaluation on Pascal VOC 2007 (Below needs fast CPU or CUDA-GPU)  
 The present TensorFlow implementation of SSD models have the following performances:
 
 | Model | Training data  | Testing data | mAP | FPS  |
@@ -141,11 +149,14 @@ We are working hard at reproducing the same performance as the original [Caffe i
 
 After downloading and extracting the previous checkpoints, the evaluation metrics should be reproducible by running the following command:
 ```bash
-EVAL_DIR=./logs/
-CHECKPOINT_PATH=./checkpoints/VGG_VOC0712_SSD_300x300_ft_iter_120000.ckpt
-python eval_ssd_network.py \
+ // After download model weights and unzip
+ $ mkdir ./logs
+ $ export EVAL_DIR=./logs/
+ $ export CHECKPOINT_PATH=./checkpoints/VGG_VOC0712_SSD_300x300_ft_iter_120000.ckpt
+ // By python3
+ $ python3 eval_ssd_network.py \
     --eval_dir=${EVAL_DIR} \
-    --dataset_dir=${DATASET_DIR} \
+    --dataset_dir=./tfrecords \
     --dataset_name=pascalvoc_2007 \
     --dataset_split_name=test \
     --model_name=ssd_300_vgg \
@@ -153,6 +164,14 @@ python eval_ssd_network.py \
     --batch_size=1
 ```
 The evaluation script provides estimates on the recall-precision curve and compute the mAP metrics following the Pascal VOC 2007 and 2012 guidelines.
+
+```
+...
+AP_VOC07/mAP[0.74313211395020939]  // eval with 2007 guildline
+AP_VOC12/mAP[0.76659678523265873]  // eval with 2012 guildline
+I1105 01:14:30.333214 140431879247616 evaluation.py:275] Finished evaluation at 2019-11-05-01:14:30
+```
+Notice: *We fitted with tensorflow version 1.13.1(or 1.15.0) following [issue#321](https://github.com/balancap/SSD-Tensorflow/issues/321). In the issue#321 shows how to modify eval_ssd_network.py and tf_extend/metrics.py with 1.13rc1. We made eval_ssd_network.py and tf_extend/metrics.py to fit with our tensorflow versions.*  
 
 In addition, if one wants to experiment/test a different Caffe SSD checkpoint, the former can be converted to TensorFlow checkpoints as following:
 ```sh
@@ -252,4 +271,4 @@ python train_ssd_network.py \
     --batch_size=32
 ```
 
-A number of pre-trained weights of popular deep architectures can be found on [TF-Slim models page](https://github.com/tensorflow/models/tree/master/slim).
+A number of pre-trained weights of popular deep architectures can be found on [TF-Slim models page](https://github.com/tensorflow/models/tree/master/research/slim).

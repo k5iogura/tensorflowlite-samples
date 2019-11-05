@@ -4,3 +4,6 @@
 [submodule "SSD-Tensorflow"]
 	path = SSD-Tensorflow
 	url = https://github.com/balancap/SSD-Tensorflow
+[submodule "SDC-Vehicle-Detection"]
+	path = SDC-Vehicle-Detection
+	url = https://github.com/balancap/SDC-Vehicle-Detection
