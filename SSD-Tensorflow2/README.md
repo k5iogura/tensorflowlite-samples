@@ -14,7 +14,7 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 * pre-processing: pre-processing and data augmentation routines, inspired by original VGG and Inception implementations.
 
 ## Requirement to reproduce  
-- python(2.7.12)  
+- python(2.7.12 for evaluation section/3.5.6 for training section)  
 - tensorflow(1.13.1) [Community version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)  
 - matplotlib(2.1.1)  
 - opencv2(4.1.1)  
@@ -138,6 +138,13 @@ The current version only supports Pascal VOC datasets (2007 and 2012). In order 
 Note the previous command generated a collection of TF-Records instead of a single file in order to ease shuffling during training.
 
 ## Evaluation on Pascal VOC 2007 (Below needs fast CPU or CUDA-GPU)  
+- *GPU Environment*  
+  OS CentOS7  
+  tensorflow-gpu == 1.13.1 (via python3 -m pip)  
+  nVIDIA Tesla V100  
+  CUDA cuda_10.0.130_410.48_linux.run from [CUDA archive](https://developer.nvidia.com/cuda-toolkit-archive)  
+  cuDNN cudnn-10.0-linux-x64-v7.6.5.32.tgz from [cuDNN download](https://developer.nvidia.com/rdp/cudnn-download)  
+
 The present TensorFlow implementation of SSD models have the following performances:
 
 | Model | Training data  | Testing data | mAP | FPS  |
