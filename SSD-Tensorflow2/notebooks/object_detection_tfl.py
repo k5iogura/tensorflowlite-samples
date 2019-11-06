@@ -2,7 +2,8 @@
 import os, sys
 import numpy as np
 import cv2
-from tflite_runtime import interpreter as tf
+#from tflite_runtime import interpreter as tf
+import tensorflow as tf
 from time import time
 from random import seed, random
 from pdb import set_trace
@@ -34,7 +35,7 @@ print("input image size:",org.shape)
 #LABELS = LABELS[ background: ]
 #print("Classes:",len(LABELS))
 
-ip = tf.Interpreter(model_path="./detect.tflite")
+ip = tf.lite.Interpreter(model_path="./detect.tflite")
 ip.allocate_tensors()
 
 infoi=ip.get_input_details()
