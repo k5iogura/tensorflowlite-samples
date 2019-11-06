@@ -138,7 +138,7 @@ The current version only supports Pascal VOC datasets (2007 and 2012). In order 
 Note the previous command generated a collection of TF-Records instead of a single file in order to ease shuffling during training.
 
 ## Evaluation on Pascal VOC 2007 (Below needs fast CPU or CUDA-GPU)  
-- *GPU Environment*  
+- **GPU Environment as of now**  
   OS CentOS7  
   tensorflow-gpu == 1.13.1 (via python3 -m pip)  
   nVIDIA Tesla V100  
@@ -292,3 +292,5 @@ python train_ssd_network.py \
 ```
 
 A number of pre-trained weights of popular deep architectures can be found on [TF-Slim models page](https://github.com/tensorflow/models/tree/master/research/slim).
+
+**Nov.06,2019**  
