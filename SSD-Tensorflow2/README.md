@@ -225,6 +225,7 @@ For example, to train by VOC2012, create voc_2012_train_NO.tfrecord files in tfr
     --output_name=voc_2012_train \
     --output_dir=./tfrecords
 ```
+At the above trainig *loss value are almost 13.0~ 25.0*.  
 If training with own dataset then create `TF-Record` files as same as above.  
 
 Note that in addition to the training script flags, one may also want to experiment with data augmentation parameters (random cropping, resolution, ...) in `ssd_vgg_preprocessing.py` or/and network parameters (feature layers, anchors boxes, ...) in `ssd_vgg_300/512.py`
