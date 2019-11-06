@@ -138,8 +138,8 @@ The current version only supports Pascal VOC datasets (2007 and 2012). In order 
 Note the previous command generated a collection of TF-Records instead of a single file in order to ease shuffling during training.
 
 ## Evaluation on Pascal VOC 2007 (Below needs fast CPU or CUDA-GPU)  
-- *GPU Environment*
-  OS CentOS7
+- *GPU Environment*  
+  OS CentOS7  
   tensorflow-gpu == 1.13.1  
   CUDA cuda_10.0.130_410.48_linux.run  
   cuDNN cudnn-10.0-linux-x64-v7.6.5.32.tgz  
