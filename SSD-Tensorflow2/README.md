@@ -140,9 +140,9 @@ Note the previous command generated a collection of TF-Records instead of a sing
 ## Evaluation on Pascal VOC 2007 (Below needs fast CPU or CUDA-GPU)  
 - *GPU Environment*  
   OS CentOS7  
-  tensorflow-gpu == 1.13.1  
-  CUDA cuda_10.0.130_410.48_linux.run  
-  cuDNN cudnn-10.0-linux-x64-v7.6.5.32.tgz  
+  tensorflow-gpu == 1.13.1 (via python3 -m pip)  
+  CUDA cuda_10.0.130_410.48_linux.run from [CUDA archive](https://developer.nvidia.com/cuda-toolkit-archive)  
+  cuDNN cudnn-10.0-linux-x64-v7.6.5.32.tgz from [cuDNN download](https://developer.nvidia.com/rdp/cudnn-download)  
 
 The present TensorFlow implementation of SSD models have the following performances:
 
