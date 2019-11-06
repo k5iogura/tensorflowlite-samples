@@ -214,6 +214,19 @@ CHECKPOINT_PATH=./checkpoints/ssd_300_vgg.ckpt
     --learning_rate=0.001 \
     --batch_size=32
 ```
+
+For example, to train by VOC2012, create voc_2012_train_NO.tfrecord files in tfrecords directory for training.  
+```bash
+ // After download VOCtrainval_11-May-2012.tar and untar
+ $ export DATASET_DIR=./VOCdevkit/VOC2012/
+ $ python tf_convert_data.py \
+    --dataset_name=pascalvoc \
+    --dataset_dir=${DATASET_DIR} \
+    --output_name=voc_2012_train \
+    --output_dir=./tfrecords
+```
+If training with own dataset then create `TF-Record` files as same as above.  
+
 Note that in addition to the training script flags, one may also want to experiment with data augmentation parameters (random cropping, resolution, ...) in `ssd_vgg_preprocessing.py` or/and network parameters (feature layers, anchors boxes, ...) in `ssd_vgg_300/512.py`
 
 Furthermore, the training script can be combined with the evaluation routine in order to monitor the performance of saved checkpoints on a validation dataset. For that purpose, one can pass to training and validation scripts a GPU memory upper limit such that both can run in parallel on the same device. If some GPU memory is available for the evaluation script, the former can be run in parallel as follows:
