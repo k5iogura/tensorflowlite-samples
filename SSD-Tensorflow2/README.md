@@ -31,13 +31,13 @@ Here are two examples of successful detection outputs:
 ### inference via pretrained ckpt files  
 To run python scripts you first have to unzip the checkpoint files in ./checkpoint
 ```bash
- $ cd SSD-Tensorflow2/checkpoints
- $ unzip ssd_300_vgg.ckpt.zip
- $ cd ..
+  $ cd SSD-Tensorflow2
+  $ unzip checkpoints/ssd_300_vgg.ckpt.zip -d checkpoints
 ```
 
 and then run python to inference object without jupyter    
 ```
+  $ cd notebook
   $ PYTHONPATH=../ python ssd_notebook.py
 ```
 
