@@ -125,6 +125,7 @@ These are two magic numbers but maybe derived via knowledge of experience for SS
 
 The current version only supports Pascal VOC datasets (2007 and 2012). In order to be used for training a SSD model, the former need to be converted to TF-Records using the `tf_convert_data.py` script:
 ```bash
+ $ cd SSD-Tensorflow2
  // After download VOCtest_06-Nov-2007.tar and untar
  $ mkdir ./tfrecords
  $ export DATASET_DIR=./VOCdevkit/VOC2007/
