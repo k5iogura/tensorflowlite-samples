@@ -198,12 +198,11 @@ The script `train_ssd_network.py` is in charged of training the network. Similar
 
 The easiest way to fine the SSD model is to use as pre-trained SSD network (VGG-300 or VGG-512). For instance, one can fine a model starting from the former as following:
 ```bash
-DATASET_DIR=./tfrecords
 TRAIN_DIR=./logs/
 CHECKPOINT_PATH=./checkpoints/ssd_300_vgg.ckpt
  $ python3 train_ssd_network.py \
     --train_dir=${TRAIN_DIR} \
-    --dataset_dir=${DATASET_DIR} \
+    --dataset_dir=./tfrecords \
     --dataset_name=pascalvoc_2012 \
     --dataset_split_name=train \
     --model_name=ssd_300_vgg \
