@@ -201,7 +201,7 @@ The easiest way to fine the SSD model is to use as pre-trained SSD network (VGG-
 DATASET_DIR=./tfrecords
 TRAIN_DIR=./logs/
 CHECKPOINT_PATH=./checkpoints/ssd_300_vgg.ckpt
-python train_ssd_network.py \
+ $ python3 train_ssd_network.py \
     --train_dir=${TRAIN_DIR} \
     --dataset_dir=${DATASET_DIR} \
     --dataset_name=pascalvoc_2012 \
