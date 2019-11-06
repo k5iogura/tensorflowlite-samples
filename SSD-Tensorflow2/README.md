@@ -190,7 +190,7 @@ python caffe_to_tensorflow.py \
     --caffemodel_path=${CAFFE_MODEL}
 ```
 
-## Training
+## Training Fine-Tune
 
 The script `train_ssd_network.py` is in charged of training the network. Similarly to TF-Slim models, one can pass numerous options to the training process (dataset, optimiser, hyper-parameters, model, ...). In particular, it is possible to provide a checkpoint file which can be use as starting point in order to fine-tune a network.
 
@@ -249,10 +249,10 @@ python eval_ssd_network.py \
 
 One can also try to build a new SSD model based on standard architecture (VGG, ResNet, Inception, ...) and set up on top of it the `multibox` layers (with specific anchors, ratios, ...). For that purpose, you can fine-tune a network by only loading the weights of the original architecture, and initialize randomly the rest of network. For instance, in the case of the [VGG-16 architecture](http://download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz), one can train a new model as following:
 ```bash
-DATASET_DIR=./tfrecords
-TRAIN_DIR=./log/
-CHECKPOINT_PATH=./checkpoints/vgg_16.ckpt
-python train_ssd_network.py \
+ $ DATASET_DIR=./tfrecords
+ $ TRAIN_DIR=./log/
+ $ CHECKPOINT_PATH=./checkpoints/vgg_16.ckpt
+ $ python3 train_ssd_network.py \
     --train_dir=${TRAIN_DIR} \
     --dataset_dir=${DATASET_DIR} \
     --dataset_name=pascalvoc_2007 \
