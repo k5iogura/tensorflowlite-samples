@@ -15,15 +15,15 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 
 ## Requirement to reproduce  
 
-`*For model evaluation via tensorflow on Old CPU only without any accererations such as AVX, NVIDIA GPU.*`  
+`For model evaluation via tensorflow on Old CPU only without any accererations such as AVX, NVIDIA GPU.`  
 - python 2.7.12  
 - tensorflow (1.13.1) [Community version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)  
 
-*For model training via tensorflow on  CPU and NVIDIA GPU.*  
+`For model training via tensorflow on  CPU and NVIDIA GPU.`  
 - python 3.5.6 for training section  
 - tensorflow-gpu 1.13.1 via python3 -m pip install tensorflow-gpu==1.13.1  
 
-*Common used modules.*  
+`Common used modules.`  
 - matplotlib(2.1.1)  
 - opencv2(4.1.1)  
 - jupyter(1.0.0 with python3)  
