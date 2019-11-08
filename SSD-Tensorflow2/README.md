@@ -15,7 +15,7 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 
 ## Requirement to reproduce  
 
-*For model evaluation via tensorflow on Old CPU only without any accererations such as AVX, NVIDIA GPU.*  
+`*For model evaluation via tensorflow on Old CPU only without any accererations such as AVX, NVIDIA GPU.*`  
 - python 2.7.12  
 - tensorflow (1.13.1) [Community version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)  
 
