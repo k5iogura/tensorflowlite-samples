@@ -306,10 +306,10 @@ python train_ssd_network.py \
 
 A number of pre-trained weights of popular deep architectures can be found on [TF-Slim models page](https://github.com/tensorflow/models/tree/master/research/slim).
 
-## Scratch from grounds  
+## Train from ground  
 
 Without using vgg_16.ckpt checkpoint file can run training from scratch below,  
-(Fine-Tune is faild with error message such as "Key vgg_16/block10/conv1x1/biases not found in checkpoint")  
+(Fine-Tune failds with error message such as "Key vgg_16/block10/conv1x1/biases not found in checkpoint")  
 
 ```
 $ DATASET_DIR=./tfrecords
