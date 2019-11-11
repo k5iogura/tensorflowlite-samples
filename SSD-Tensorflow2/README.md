@@ -28,6 +28,9 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 - opencv2(4.1.1)  
 - jupyter(1.0.0 with python3)  
 
+`GPU CUDA and cuDNN`  
+- [compatibility versus tensorflow and CUDA and cuDNN](https://www.tensorflow.org/install/source#common_installation_problems)  
+
 ## SSD minimal example to infer only  
 
 The [SSD Notebook](notebooks/ssd_notebook.ipynb) and its python version [ssd_notebook.py](notebook/ssd_notebook.py) contains a minimal example of the SSD TensorFlow pipeline. Shortly, the detection is made of two main steps: running the SSD network on the image and post-processing the output using common algorithms (top-k filtering and Non-Maximum Suppression algorithm).
