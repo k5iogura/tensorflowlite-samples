@@ -306,4 +306,26 @@ python train_ssd_network.py \
 
 A number of pre-trained weights of popular deep architectures can be found on [TF-Slim models page](https://github.com/tensorflow/models/tree/master/research/slim).
 
+### Scratch from grounds  
+Without using vgg_16.ckpt checkpoint file can run training from scratch below,  
+(Fine-Tune is faild with error message such as "Key vgg_16/block10/conv1x1/biases not found in checkpoint")  
+
+```
+$ DATASET_DIR=./tfrecords
+$ TRAIN_DIR=./log/
+$ python3 train_ssd_network.py \
+--train_dir=${TRAIN_DIR} \
+--dataset_dir=${DATASET_DIR} \
+--dataset_name=pascalvoc_2012 \
+--dataset_split_name=train \
+--model_name=ssd_300_vgg \
+--save_summaries_secs=60 \
+--save_interval_secs=600 \
+--weight_decay=0.0005 \
+--learning_rate=0.001 \
+--learning_rate_decay_factor=0.94 \
+--optimizer=adam \
+--batch_size=64
+```
+
 **Nov.06,2019**  
