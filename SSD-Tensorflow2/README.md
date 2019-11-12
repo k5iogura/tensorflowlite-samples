@@ -203,6 +203,8 @@ python caffe_to_tensorflow.py \
 ```
 
 ## Training Fine-Tune
+**Notice: tensorflow version is sencetive to train for fine-tuning or from scratch**  
+`For training Python == 3.5 and tensorflow == 0.12.0`  
 
 The script `train_ssd_network.py` is in charged of training the network. Similarly to TF-Slim models, one can pass numerous options to the training process (dataset, optimiser, hyper-parameters, model, ...). In particular, it is possible to provide a checkpoint file which can be use as starting point in order to fine-tune a network.
 
