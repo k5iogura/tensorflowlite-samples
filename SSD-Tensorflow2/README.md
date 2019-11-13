@@ -17,22 +17,29 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 
 `For model evaluation via tensorflow on Old CPU only without any accererations such as AVX, NVIDIA GPU.`  
 - python 2.7.12  
-- tensorflow (1.13.1) [Community version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)  
+- tensorflow 1.13.1 [Community version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)　 
 
 `For model training via tensorflow on  CPU and NVIDIA GPU.`  
 - python 3.5.6  
-- tensorflow-gpu 1.13.1 via *python3 -m pip install tensorflow-gpu==1.13.1*  
+- tensorflow-gpu 1.0.0 via *python3 -m pip install tensorflow-gpu==1.0.0*  
+- CUDA   8.0  
+- cuDNN  5.1  
+- Driver 410.48(for Tesla V100 GPU)  
+**According to [tensorflow version #3](https://github.com/balancap/SSD-Tensorflow/issues/3) using version of tensorflow is 1.0.0 hence needs that CUDA is 8.0, cuDNN is 5.1 but Tesla V100 GPU needs latest driver** even though GPU setup time is too long.  
 
-`Common used modules.`  
-- matplotlib(2.1.1)  
-- opencv2(4.1.1)  
-- jupyter(1.0.0 with python3)  
+`Common used python modules.`  
+- matplotlib 2.1.1  
+- opencv2 4.1.1  
+- jupyter 1.0.0 with python3  
 
-`GPU CUDA and cuDNN`  
+`How to know info and donwload CUDA and cuDNN software for Tesla V100 GPU`  
 - [compatibility versus tensorflow and CUDA and cuDNN](https://www.tensorflow.org/install/source#common_installation_problems)  
 - [GPU versus CUDA and cuDNN](https://www.nvidia.co.jp/Download/index.aspx?lang=jp)  
-- [cuDNN](https://developer.nvidia.com/rdp/cudnn-download)  
-- [CUDA](https://developer.nvidia.com/cuda-toolkit-archive)  
+- [Download from cuDNN](https://developer.nvidia.com/rdp/cudnn-download)  
+- [Download from CUDA](https://developer.nvidia.com/cuda-toolkit-archive)  
+
+`Modification for tensorflow 1.13.1`  
+- tf_extend/metrics.py  
 
 ## SSD minimal example to infer only  
 
