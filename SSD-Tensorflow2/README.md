@@ -28,7 +28,7 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 - CUDA   8.0  
 - cuDNN  5.1  
 - Driver 410.48(for Tesla V100 GPU)  
-**According to `[tensorflow version #3](https://github.com/balancap/SSD-Tensorflow/issues/3)` using version of tensorflow is 1.0.0 hence needs that CUDA is 8.0, cuDNN is 5.1 but Tesla V100 GPU needs latest driver** even though GPU setup time is too long.  
+**According to the issue:[tensorflow version #3](https://github.com/balancap/SSD-Tensorflow/issues/3) using version of tensorflow is 1.0.0 hence needs that CUDA is 8.0, cuDNN is 5.1 but Tesla V100 GPU needs latest driver** even though GPU setup time is too long.  
 
 `Common used python modules.`  
 - matplotlib 2.1.1  
