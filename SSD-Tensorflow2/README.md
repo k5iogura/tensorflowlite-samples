@@ -14,15 +14,20 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 * pre-processing: pre-processing and data augmentation routines, inspired by original VGG and Inception implementations.
 
 ## Requirement to reproduce  
+In Original [SSD-Tensorflow](https://github.com/balancap/SSD-Tensorflow/) tensorflow 1.0.0 was used without GPU. But to spped up evaluation and trainig we try two case that use CPU only and CPU+GPU.    
 
 `For model evaluation via tensorflow on Old CPU only without any accererations such as AVX, NVIDIA GPU.`  
 - python 2.7.12  
 - tensorflow 1.13.1 [Community version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)　 
 
+`For model evaluation via tensorflow on Old CPU only without any accererations such as AVX, NVIDIA GPU.`  
+- python 3.5.6  
+- tensorflow 1.0.0 via *python3 -m pip install tensotflow==1.0.0*
+
 **Modification for tensorflow 1.13.1**  
 - tf_extend/metrics.py  
 
-`For model training via tensorflow on  CPU and NVIDIA GPU.`  
+`For model training via tensorflow on CPU and NVIDIA GPU.`  
 - python 3.5.6  
 - tensorflow-gpu 1.0.0 via *python3 -m pip install tensorflow-gpu==1.0.0*  
 - CUDA   8.0  
