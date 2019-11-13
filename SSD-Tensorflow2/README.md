@@ -31,6 +31,8 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 `GPU CUDA and cuDNN`  
 - [compatibility versus tensorflow and CUDA and cuDNN](https://www.tensorflow.org/install/source#common_installation_problems)  
 - [GPU versus CUDA and cuDNN](https://www.nvidia.co.jp/Download/index.aspx?lang=jp)  
+- [cuDNN](https://developer.nvidia.com/rdp/cudnn-download)  
+- [CUDA](https://developer.nvidia.com/cuda-toolkit-archive)  
 
 ## SSD minimal example to infer only  
 
