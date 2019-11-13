@@ -19,6 +19,9 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 - python 2.7.12  
 - tensorflow 1.13.1 [Community version](https://github.com/k5iogura/docker_docker/blob/master/README_tensorflow.md)　 
 
+**Modification for tensorflow 1.13.1**  
+- tf_extend/metrics.py  
+
 `For model training via tensorflow on  CPU and NVIDIA GPU.`  
 - python 3.5.6  
 - tensorflow-gpu 1.0.0 via *python3 -m pip install tensorflow-gpu==1.0.0*  
@@ -37,9 +40,6 @@ The organisation is inspired by the TF-Slim models repository containing the imp
 - [GPU versus CUDA and cuDNN](https://www.nvidia.co.jp/Download/index.aspx?lang=jp)  
 - [Download from cuDNN](https://developer.nvidia.com/rdp/cudnn-download)  
 - [Download from CUDA](https://developer.nvidia.com/cuda-toolkit-archive)  
-
-`Modification for tensorflow 1.13.1`  
-- tf_extend/metrics.py  
 
 ## SSD minimal example to infer only  
 
