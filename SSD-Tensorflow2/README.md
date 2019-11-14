@@ -154,7 +154,7 @@ The current version only supports Pascal VOC datasets (2007 and 2012). In order 
  $ cd SSD-Tensorflow2
  // After download VOCtest_06-Nov-2007.tar and untar
  $ mkdir ./tfrecords
- $ export DATASET_DIR=./VOCdevkit/VOC2007/
+ $ DATASET_DIR=./VOCdevkit/VOC2007/
  $ python tf_convert_data.py \
     --dataset_name=pascalvoc \
     --dataset_dir=${DATASET_DIR} \
