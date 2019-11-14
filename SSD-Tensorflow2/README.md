@@ -185,8 +185,8 @@ After downloading and extracting the previous checkpoints, the evaluation metric
 ```bash
  // After download model weights and unzip
  $ mkdir ./logs
- $ export EVAL_DIR=./logs/
- $ export CHECKPOINT_PATH=./checkpoints/VGG_VOC0712_SSD_300x300_ft_iter_120000.ckpt
+ $ EVAL_DIR=./logs/
+ $ CHECKPOINT_PATH=./checkpoints/VGG_VOC0712_SSD_300x300_ft_iter_120000.ckpt
  // By python3
  $ python3 eval_ssd_network.py \
     --eval_dir=${EVAL_DIR} \
@@ -246,7 +246,7 @@ CHECKPOINT_PATH=./checkpoints/ssd_300_vgg.ckpt
 For example, to train by VOC2012, create voc_2012_train_NO.tfrecord files in tfrecords directory for training.  
 ```bash
  // After download VOCtrainval_11-May-2012.tar and untar
- $ export DATASET_DIR=./VOCdevkit/VOC2012/
+ $ DATASET_DIR=./VOCdevkit/VOC2012/
  $ python tf_convert_data.py \
     --dataset_name=pascalvoc \
     --dataset_dir=${DATASET_DIR} \
