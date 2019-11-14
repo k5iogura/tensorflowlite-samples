@@ -177,7 +177,7 @@ The present TensorFlow implementation of SSD models have the following performan
 |--------|:---------:|:------:|:------:|:------:|
 | [SSD-300 VGG-based](https://drive.google.com/open?id=0B0qPCUZ-3YwWZlJaRTRRQWRFYXM) | VOC07+12 trainval | VOC07 test | 0.778 |VGG_VOC0712_SSD_300x300_ft_iter_120000.ckpt.zip|
 | [SSD-300 VGG-based](https://drive.google.com/file/d/0B0qPCUZ-3YwWUXh4UHJrd1RDM3c/view?usp=sharing) | VOC07+12+COCO trainval | VOC07 test | 0.817 |VGG_VOC0712_SSD_300x300_ft_iter_120000.ckpt.zip|
-| [SSD-512 VGG-based](https://drive.google.com/open?id=0B0qPCUZ-3YwWT1RCLVZNN3RTVEU) | VOC07+12+COCO trainval | VOC07 test | 0.837 |-|
+| [SSD-512 VGG-based](https://drive.google.com/open?id=0B0qPCUZ-3YwWT1RCLVZNN3RTVEU) | VOC07+12+COCO trainval | VOC07 test | 0.837 |VGG_VOC0712_SSD_512x512_ft_iter_120000.ckpt.zip|
 
 We are working hard at reproducing the same performance as the original [Caffe implementation](https://github.com/weiliu89/caffe/tree/ssd)!
 
